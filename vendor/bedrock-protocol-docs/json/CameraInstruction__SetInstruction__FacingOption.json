@@ -1,0 +1,18 @@
+{
+    "title": "CameraInstruction::SetInstruction::FacingOption",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "/CameraInstruction__SetInstruction__FacingOption.json",
+    "x-format-version": "MISSING VERSION",
+    "x-minecraft-version": "1.26.70-beta.24",
+    "x-protocol-version": 2259,
+    "type": "object",
+    "properties": {
+        "pos": {
+            "$ref": "./Vec3.json",
+            "x-ordinal-index": 0
+        }
+    },
+    "required": [
+        "pos"
+    ]
+}

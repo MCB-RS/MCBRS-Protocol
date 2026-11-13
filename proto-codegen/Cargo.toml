@@ -1,0 +1,17 @@
+[package]
+name = "proto-codegen"
+version = "0.1.0"
+edition = "2021"
+description = "Generates the Rust protocol code of mcbrs-protocol from Mojang's bedrock-protocol-docs JSON schemas."
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "proto-codegen"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+syn = { version = "2", default-features = false, features = ["full", "parsing"] }
+prettyplease = "0.2"
+proc-macro2 = { version = "1", features = ["span-locations"] }

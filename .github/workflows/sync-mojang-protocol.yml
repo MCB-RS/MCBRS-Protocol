@@ -1,0 +1,116 @@
+name: Sync Mojang protocol
+
+# Keeps the generated protocol in sync with the `main` branch of
+# https://github.com/Mojang/bedrock-protocol-docs.
+#
+# Requires "Allow GitHub Actions to create and approve pull requests"
+# (Settings > Actions > General) so the last step can open the PR.
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-mojang-protocol
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  MOJANG_REPO: https://github.com/Mojang/bedrock-protocol-docs.git
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Cheap check: one `git ls-remote`, no clone, no toolchain. When Mojang's
+      # `main` has not moved every following step is skipped and the run ends
+      # successfully within seconds.
+      - name: Compare Mojang main with .mojang-protocol-sha
+        id: upstream
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote "$MOJANG_REPO" refs/heads/main | cut -f1)"
+          if [ -z "$remote" ]; then
+            echo "::error::could not resolve refs/heads/main of $MOJANG_REPO"
+            exit 1
+          fi
+          local_sha="$(tr -d '[:space:]' < .mojang-protocol-sha 2>/dev/null || true)"
+          echo "remote=$remote" >> "$GITHUB_OUTPUT"
+          echo "short=${remote:0:7}" >> "$GITHUB_OUTPUT"
+          if [ "$remote" = "$local_sha" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Up to date with Mojang main ($remote)." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Mojang main moved: ${local_sha:-<none>} -> $remote" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Download Mojang's json/ and update .mojang-protocol-sha
+        if: steps.upstream.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          bash scripts/fetch-mojang-protocol.sh "${{ steps.upstream.outputs.remote }}"
+          test "$(cat .mojang-protocol-sha)" = "${{ steps.upstream.outputs.remote }}"
+
+      - name: Install Rust
+        if: steps.upstream.outputs.changed == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        if: steps.upstream.outputs.changed == 'true'
+        uses: Swatinem/rust-cache@v2
+
+      - name: Regenerate the protocol
+        if: steps.upstream.outputs.changed == 'true'
+        run: cargo run --locked --bin proto-codegen
+
+      - name: cargo check
+        if: steps.upstream.outputs.changed == 'true'
+        run: cargo check --locked --workspace --all-targets
+
+      - name: cargo test
+        if: steps.upstream.outputs.changed == 'true'
+        run: cargo test --locked --workspace
+
+      - name: Read generated protocol version
+        if: steps.upstream.outputs.changed == 'true'
+        id: version
+        run: |
+          set -euo pipefail
+          protocol="$(sed -n 's/^pub const PROTOCOL_VERSION: i32 = \(.*\);$/\1/p' src/generated/mod.rs)"
+          minecraft="$(sed -n 's/^pub const MINECRAFT_VERSION: &str = "\(.*\)";$/\1/p' src/generated/mod.rs)"
+          echo "protocol=$protocol" >> "$GITHUB_OUTPUT"
+          echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.upstream.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/sync-mojang-protocol
+          delete-branch: true
+          add-paths: |
+            .mojang-protocol-sha
+            vendor/bedrock-protocol-docs
+            src/generated
+          commit-message: "chore(protocol): sync with Mojang/bedrock-protocol-docs@${{ steps.upstream.outputs.short }}"
+          title: "Sync protocol with Mojang/bedrock-protocol-docs@${{ steps.upstream.outputs.short }}"
+          body: |
+            Automated update of the Bedrock protocol.
+
+            - Upstream commit: https://github.com/Mojang/bedrock-protocol-docs/commit/${{ steps.upstream.outputs.remote }}
+            - Minecraft version: `${{ steps.version.outputs.minecraft }}`
+            - Protocol version: `${{ steps.version.outputs.protocol }}`
+
+            The JSON schemas were downloaded again, `src/generated/` was rebuilt with
+            `cargo run --bin proto-codegen`, and `cargo check` / `cargo test` passed.
+            Nothing in `src/generated/` was edited by hand.
+          labels: protocol-sync
