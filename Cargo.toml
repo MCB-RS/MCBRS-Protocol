@@ -1,0 +1,17 @@
+[workspace]
+members = [".", "proto-codegen"]
+default-members = [".", "proto-codegen"]
+resolver = "2"
+
+[package]
+name = "mcbrs-protocol"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Minecraft Bedrock Edition network protocol for MCBE-RS, generated from Mojang's official protocol docs."
+license = "MIT"
+repository = "https://github.com/MCB-RS/MCBRS-Protocol"
+exclude = ["vendor/", "proto-codegen/", "scripts/", ".github/"]
+
+[dependencies]
+bytes = "1"

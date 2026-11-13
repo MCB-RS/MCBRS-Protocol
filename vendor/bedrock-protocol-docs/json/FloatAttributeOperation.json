@@ -1,0 +1,28 @@
+{
+    "title": "FloatAttributeOperation",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "/FloatAttributeOperation.json",
+    "x-format-version": "MISSING VERSION",
+    "x-minecraft-version": "1.26.70-beta.24",
+    "x-protocol-version": 2259,
+    "type": "string",
+    "enum": [
+        "OVERRIDE",
+        "ALPHA_BLEND",
+        "ADD",
+        "SUBTRACT",
+        "MULTIPLY",
+        "MINIMUM",
+        "MAXIMUM"
+    ],
+    "x-underlying-type": "int32",
+    "x-enum-binary-value": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+    ]
+}

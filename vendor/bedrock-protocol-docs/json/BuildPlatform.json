@@ -1,0 +1,36 @@
+{
+    "title": "BuildPlatform",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "/BuildPlatform.json",
+    "x-format-version": "MISSING VERSION",
+    "x-minecraft-version": "1.26.70-beta.24",
+    "x-protocol-version": 2259,
+    "type": "string",
+    "enum": [
+        "Google",
+        "iOS",
+        "OSX",
+        "Amazon",
+        "Win32",
+        "Dedicated",
+        "Sony",
+        "Nintendo",
+        "Xbox",
+        "Linux",
+        "Unknown"
+    ],
+    "x-underlying-type": "int32",
+    "x-enum-binary-value": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        9,
+        11,
+        12,
+        13,
+        15,
+        -1
+    ]
+}
