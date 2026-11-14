@@ -1,6 +1,6 @@
 # MCBRS-Protocol
 
-Minecraft: Bedrock Edition network protocol for [MCBE-RS](https://github.com/MCB-RS), as a Rust crate.
+Minecraft: Bedrock Edition network protocol for [MCB-RS](https://github.com/MCB-RS), as a Rust crate.
 
 Every packet, type and enum is **generated** from the JSON schemas Mojang publishes in
 [`Mojang/bedrock-protocol-docs`](https://github.com/Mojang/bedrock-protocol-docs) (branch `main`, folder `json/`).
