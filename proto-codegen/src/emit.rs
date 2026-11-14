@@ -708,7 +708,7 @@ impl<'m> Emitter<'m> {
     fn types(&self) -> Result<String, String> {
         let mut out = String::from(
             "//! Protocol structures, variants (`oneOf`) and aliases.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match, clippy::collapsible_match)]\n\n\
              use super::enums::*;\n\
              use crate::codec::{self, BedrockCodec, BedrockString, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result, Validate};\n\n",
         );
@@ -959,7 +959,7 @@ impl<'m> Emitter<'m> {
         let packets = &self.model.packets;
         let mut out = String::from(
             "//! Packets and the global [`Packet`] dispatch table.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match, clippy::collapsible_match)]\n\n\
              use super::enums::*;\n\
              use super::types::*;\n\
              use crate::codec::{self, BedrockCodec, BedrockString, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result, Validate};\n\n",
@@ -1101,7 +1101,7 @@ impl<'m> Emitter<'m> {
         let model = self.model;
         let mut out = String::from(
             "//! Pseudo-random value builders used by the round-trip tests.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match, clippy::collapsible_match)]\n\n\
              use super::enums::*;\n\
              use super::packets::*;\n\
              use super::types::*;\n\

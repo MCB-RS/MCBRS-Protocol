@@ -7,7 +7,8 @@
     unused_imports,
     clippy::derivable_impls,
     clippy::large_enum_variant,
-    clippy::single_match
+    clippy::single_match,
+    clippy::collapsible_match
 )]
 use super::enums::*;
 use super::types::*;
