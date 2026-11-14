@@ -224,8 +224,6 @@ table, rest on the schema alone. Confirm against real traffic before relying on 
 
 **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**
 
-**PAS UN PRODUIT MINECRAFT OFFICIEL. NON APPROUVÉ OU ASSOCIÉ À MOJANG OU MICROSOFT.**
-
 - **License.** `mcbrs-protocol` and `proto-codegen` are an independent implementation, released under
   the [MIT license](LICENSE).
 - **Mojang's files.** The current tree of this repository and the published crate contain no file
