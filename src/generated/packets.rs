@@ -6,13 +6,14 @@
     unused_variables,
     unused_imports,
     clippy::derivable_impls,
-    clippy::large_enum_variant
+    clippy::large_enum_variant,
+    clippy::single_match
 )]
 use super::enums::*;
 use super::types::*;
 use crate::codec::{
-    self, BedrockCodec, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum,
-    ProtocolError, Result,
+    self, BedrockCodec, BedrockString, Buf, BufMut, MaybeUnknown, NetworkNbt,
+    ProtocolEnum, ProtocolError, Result, Validate,
 };
 /// Sent once from client to server at login. About 100k.
 ///
@@ -36,6 +37,11 @@ impl BedrockCodec for LoginPacket {
         Ok(Self {
             payload: <LoginPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LoginPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<LoginPacket> for Packet {
@@ -72,6 +78,11 @@ impl BedrockCodec for PlayStatusPacket {
         })
     }
 }
+impl Validate for PlayStatusPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlayStatusPacket> for Packet {
     fn from(packet: PlayStatusPacket) -> Self {
         Packet::PlayStatus(packet)
@@ -105,6 +116,11 @@ impl BedrockCodec for ServerToClientHandshakePacket {
         })
     }
 }
+impl Validate for ServerToClientHandshakePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerToClientHandshakePacket> for Packet {
     fn from(packet: ServerToClientHandshakePacket) -> Self {
         Packet::ServerToClientHandshake(packet)
@@ -136,6 +152,11 @@ impl BedrockCodec for ClientToServerHandshakePacket {
         })
     }
 }
+impl Validate for ClientToServerHandshakePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientToServerHandshakePacket> for Packet {
     fn from(packet: ClientToServerHandshakePacket) -> Self {
         Packet::ClientToServerHandshake(packet)
@@ -163,6 +184,11 @@ impl BedrockCodec for DisconnectPacket {
         Ok(Self {
             payload: <DisconnectPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for DisconnectPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<DisconnectPacket> for Packet {
@@ -196,6 +222,12 @@ impl BedrockCodec for ResourcePacksInfoPacket {
         })
     }
 }
+impl Validate for ResourcePacksInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ResourcePacksInfoPacket> for Packet {
     fn from(packet: ResourcePacksInfoPacket) -> Self {
         Packet::ResourcePacksInfo(packet)
@@ -225,6 +257,12 @@ impl BedrockCodec for ResourcePackStackPacket {
         Ok(Self {
             payload: <ResourcePackStackPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ResourcePackStackPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ResourcePackStackPacket> for Packet {
@@ -260,6 +298,12 @@ impl BedrockCodec for ResourcePackClientResponsePacket {
         })
     }
 }
+impl Validate for ResourcePackClientResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ResourcePackClientResponsePacket> for Packet {
     fn from(packet: ResourcePackClientResponsePacket) -> Self {
         Packet::ResourcePackClientResponse(packet)
@@ -289,6 +333,12 @@ impl BedrockCodec for TextPacket {
         Ok(Self {
             payload: <TextPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for TextPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<TextPacket> for Packet {
@@ -322,6 +372,11 @@ impl BedrockCodec for SetTimePacket {
         })
     }
 }
+impl Validate for SetTimePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetTimePacket> for Packet {
     fn from(packet: SetTimePacket) -> Self {
         Packet::SetTime(packet)
@@ -351,6 +406,12 @@ impl BedrockCodec for StartGamePacket {
         Ok(Self {
             payload: <StartGamePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for StartGamePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<StartGamePacket> for Packet {
@@ -384,6 +445,12 @@ impl BedrockCodec for AddPlayerPacket {
         })
     }
 }
+impl Validate for AddPlayerPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<AddPlayerPacket> for Packet {
     fn from(packet: AddPlayerPacket) -> Self {
         Packet::AddPlayer(packet)
@@ -413,6 +480,12 @@ impl BedrockCodec for AddActorPacket {
         Ok(Self {
             payload: <AddActorPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AddActorPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<AddActorPacket> for Packet {
@@ -446,6 +519,11 @@ impl BedrockCodec for RemoveActorPacket {
         })
     }
 }
+impl Validate for RemoveActorPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RemoveActorPacket> for Packet {
     fn from(packet: RemoveActorPacket) -> Self {
         Packet::RemoveActor(packet)
@@ -473,6 +551,12 @@ impl BedrockCodec for AddItemActorPacket {
         Ok(Self {
             payload: <AddItemActorPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AddItemActorPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<AddItemActorPacket> for Packet {
@@ -508,6 +592,11 @@ impl BedrockCodec for ServerPlayerPostMovePositionPacket {
         })
     }
 }
+impl Validate for ServerPlayerPostMovePositionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerPlayerPostMovePositionPacket> for Packet {
     fn from(packet: ServerPlayerPostMovePositionPacket) -> Self {
         Packet::ServerPlayerPostMovePosition(packet)
@@ -539,6 +628,11 @@ impl BedrockCodec for TakeItemActorPacket {
         })
     }
 }
+impl Validate for TakeItemActorPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<TakeItemActorPacket> for Packet {
     fn from(packet: TakeItemActorPacket) -> Self {
         Packet::TakeItemActor(packet)
@@ -568,6 +662,11 @@ impl BedrockCodec for MoveActorAbsolutePacket {
         })
     }
 }
+impl Validate for MoveActorAbsolutePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<MoveActorAbsolutePacket> for Packet {
     fn from(packet: MoveActorAbsolutePacket) -> Self {
         Packet::MoveActorAbsolute(packet)
@@ -595,6 +694,11 @@ impl BedrockCodec for MovePlayerPacket {
         Ok(Self {
             payload: <MovePlayerPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for MovePlayerPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<MovePlayerPacket> for Packet {
@@ -628,6 +732,11 @@ impl BedrockCodec for UpdateBlockPacket {
         })
     }
 }
+impl Validate for UpdateBlockPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateBlockPacket> for Packet {
     fn from(packet: UpdateBlockPacket) -> Self {
         Packet::UpdateBlock(packet)
@@ -655,6 +764,11 @@ impl BedrockCodec for AddPaintingPacket {
         Ok(Self {
             payload: <AddPaintingPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AddPaintingPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AddPaintingPacket> for Packet {
@@ -686,6 +800,11 @@ impl BedrockCodec for LevelEventPacket {
         })
     }
 }
+impl Validate for LevelEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<LevelEventPacket> for Packet {
     fn from(packet: LevelEventPacket) -> Self {
         Packet::LevelEvent(packet)
@@ -713,6 +832,11 @@ impl BedrockCodec for BlockEventPacket {
         Ok(Self {
             payload: <BlockEventPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for BlockEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<BlockEventPacket> for Packet {
@@ -744,6 +868,11 @@ impl BedrockCodec for ActorEventPacket {
         Ok(Self {
             payload: <ActorEventPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ActorEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ActorEventPacket> for Packet {
@@ -785,6 +914,11 @@ impl BedrockCodec for MobEffectPacket {
         })
     }
 }
+impl Validate for MobEffectPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<MobEffectPacket> for Packet {
     fn from(packet: MobEffectPacket) -> Self {
         Packet::MobEffect(packet)
@@ -814,6 +948,11 @@ impl BedrockCodec for UpdateAttributesPacket {
         Ok(Self {
             payload: <UpdateAttributesPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for UpdateAttributesPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<UpdateAttributesPacket> for Packet {
@@ -847,6 +986,12 @@ impl BedrockCodec for InventoryTransactionPacket {
         })
     }
 }
+impl Validate for InventoryTransactionPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<InventoryTransactionPacket> for Packet {
     fn from(packet: InventoryTransactionPacket) -> Self {
         Packet::InventoryTransaction(packet)
@@ -874,6 +1019,12 @@ impl BedrockCodec for MobEquipmentPacket {
         Ok(Self {
             payload: <MobEquipmentPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for MobEquipmentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<MobEquipmentPacket> for Packet {
@@ -907,6 +1058,12 @@ impl BedrockCodec for MobArmorEquipmentPacket {
         })
     }
 }
+impl Validate for MobArmorEquipmentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<MobArmorEquipmentPacket> for Packet {
     fn from(packet: MobArmorEquipmentPacket) -> Self {
         Packet::MobArmorEquipment(packet)
@@ -938,6 +1095,11 @@ impl BedrockCodec for InteractPacket {
         })
     }
 }
+impl Validate for InteractPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<InteractPacket> for Packet {
     fn from(packet: InteractPacket) -> Self {
         Packet::Interact(packet)
@@ -967,6 +1129,11 @@ impl BedrockCodec for BlockPickRequestPacket {
         })
     }
 }
+impl Validate for BlockPickRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<BlockPickRequestPacket> for Packet {
     fn from(packet: BlockPickRequestPacket) -> Self {
         Packet::BlockPickRequest(packet)
@@ -994,6 +1161,11 @@ impl BedrockCodec for ActorPickRequestPacket {
         Ok(Self {
             payload: <ActorPickRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ActorPickRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ActorPickRequestPacket> for Packet {
@@ -1029,6 +1201,11 @@ impl BedrockCodec for PlayerActionPacket {
         })
     }
 }
+impl Validate for PlayerActionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlayerActionPacket> for Packet {
     fn from(packet: PlayerActionPacket) -> Self {
         Packet::PlayerAction(packet)
@@ -1060,6 +1237,11 @@ impl BedrockCodec for HurtArmorPacket {
         })
     }
 }
+impl Validate for HurtArmorPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<HurtArmorPacket> for Packet {
     fn from(packet: HurtArmorPacket) -> Self {
         Packet::HurtArmor(packet)
@@ -1087,6 +1269,11 @@ impl BedrockCodec for SetActorDataPacket {
         Ok(Self {
             payload: <SetActorDataPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SetActorDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SetActorDataPacket> for Packet {
@@ -1125,6 +1312,11 @@ impl BedrockCodec for SetActorMotionPacket {
         })
     }
 }
+impl Validate for SetActorMotionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetActorMotionPacket> for Packet {
     fn from(packet: SetActorMotionPacket) -> Self {
         Packet::SetActorMotion(packet)
@@ -1156,6 +1348,11 @@ impl BedrockCodec for SetActorLinkPacket {
         })
     }
 }
+impl Validate for SetActorLinkPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetActorLinkPacket> for Packet {
     fn from(packet: SetActorLinkPacket) -> Self {
         Packet::SetActorLink(packet)
@@ -1183,6 +1380,11 @@ impl BedrockCodec for SetHealthPacket {
         Ok(Self {
             payload: <SetHealthPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SetHealthPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SetHealthPacket> for Packet {
@@ -1216,6 +1418,11 @@ impl BedrockCodec for SetSpawnPositionPacket {
         })
     }
 }
+impl Validate for SetSpawnPositionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetSpawnPositionPacket> for Packet {
     fn from(packet: SetSpawnPositionPacket) -> Self {
         Packet::SetSpawnPosition(packet)
@@ -1245,6 +1452,11 @@ impl BedrockCodec for AnimatePacket {
         Ok(Self {
             payload: <AnimatePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AnimatePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AnimatePacket> for Packet {
@@ -1278,6 +1490,11 @@ impl BedrockCodec for RespawnPacket {
         })
     }
 }
+impl Validate for RespawnPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RespawnPacket> for Packet {
     fn from(packet: RespawnPacket) -> Self {
         Packet::Respawn(packet)
@@ -1305,6 +1522,11 @@ impl BedrockCodec for ContainerOpenPacket {
         Ok(Self {
             payload: <ContainerOpenPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ContainerOpenPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ContainerOpenPacket> for Packet {
@@ -1337,6 +1559,11 @@ impl BedrockCodec for ContainerClosePacket {
         })
     }
 }
+impl Validate for ContainerClosePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ContainerClosePacket> for Packet {
     fn from(packet: ContainerClosePacket) -> Self {
         Packet::ContainerClose(packet)
@@ -1364,6 +1591,11 @@ impl BedrockCodec for PlayerHotbarPacket {
         Ok(Self {
             payload: <PlayerHotbarPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerHotbarPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<PlayerHotbarPacket> for Packet {
@@ -1395,6 +1627,12 @@ impl BedrockCodec for InventoryContentPacket {
         })
     }
 }
+impl Validate for InventoryContentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<InventoryContentPacket> for Packet {
     fn from(packet: InventoryContentPacket) -> Self {
         Packet::InventoryContent(packet)
@@ -1424,6 +1662,12 @@ impl BedrockCodec for InventorySlotPacket {
         })
     }
 }
+impl Validate for InventorySlotPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<InventorySlotPacket> for Packet {
     fn from(packet: InventorySlotPacket) -> Self {
         Packet::InventorySlot(packet)
@@ -1451,6 +1695,11 @@ impl BedrockCodec for ContainerSetDataPacket {
         Ok(Self {
             payload: <ContainerSetDataPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ContainerSetDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ContainerSetDataPacket> for Packet {
@@ -1484,6 +1733,12 @@ impl BedrockCodec for CraftingDataPacket {
         })
     }
 }
+impl Validate for CraftingDataPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<CraftingDataPacket> for Packet {
     fn from(packet: CraftingDataPacket) -> Self {
         Packet::CraftingData(packet)
@@ -1515,6 +1770,11 @@ impl BedrockCodec for GuiDataPickItemPacket {
         })
     }
 }
+impl Validate for GuiDataPickItemPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<GuiDataPickItemPacket> for Packet {
     fn from(packet: GuiDataPickItemPacket) -> Self {
         Packet::GuiDataPickItem(packet)
@@ -1542,6 +1802,11 @@ impl BedrockCodec for BlockActorDataPacket {
         Ok(Self {
             payload: <BlockActorDataPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for BlockActorDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<BlockActorDataPacket> for Packet {
@@ -1575,6 +1840,12 @@ impl BedrockCodec for LevelChunkPacket {
         })
     }
 }
+impl Validate for LevelChunkPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<LevelChunkPacket> for Packet {
     fn from(packet: LevelChunkPacket) -> Self {
         Packet::LevelChunk(packet)
@@ -1604,6 +1875,11 @@ impl BedrockCodec for SetCommandsEnabledPacket {
         Ok(Self {
             payload: <SetCommandsEnabledPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SetCommandsEnabledPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SetCommandsEnabledPacket> for Packet {
@@ -1637,6 +1913,11 @@ impl BedrockCodec for SetDifficultyPacket {
         })
     }
 }
+impl Validate for SetDifficultyPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetDifficultyPacket> for Packet {
     fn from(packet: SetDifficultyPacket) -> Self {
         Packet::SetDifficulty(packet)
@@ -1664,6 +1945,11 @@ impl BedrockCodec for ChangeDimensionPacket {
         Ok(Self {
             payload: <ChangeDimensionPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ChangeDimensionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ChangeDimensionPacket> for Packet {
@@ -1697,6 +1983,11 @@ impl BedrockCodec for SetPlayerGameTypePacket {
         })
     }
 }
+impl Validate for SetPlayerGameTypePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetPlayerGameTypePacket> for Packet {
     fn from(packet: SetPlayerGameTypePacket) -> Self {
         Packet::SetPlayerGameType(packet)
@@ -1726,6 +2017,12 @@ impl BedrockCodec for PlayerListPacket {
         Ok(Self {
             payload: <PlayerListPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerListPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<PlayerListPacket> for Packet {
@@ -1759,6 +2056,11 @@ impl BedrockCodec for SimpleEventPacket {
         })
     }
 }
+impl Validate for SimpleEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SimpleEventPacket> for Packet {
     fn from(packet: SimpleEventPacket) -> Self {
         Packet::SimpleEvent(packet)
@@ -1788,6 +2090,12 @@ impl BedrockCodec for LegacyTelemetryEventPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for LegacyTelemetryEventPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<LegacyTelemetryEventPacket> for Packet {
@@ -1821,6 +2129,11 @@ impl BedrockCodec for SpawnExperienceOrbPacket {
         })
     }
 }
+impl Validate for SpawnExperienceOrbPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SpawnExperienceOrbPacket> for Packet {
     fn from(packet: SpawnExperienceOrbPacket) -> Self {
         Packet::SpawnExperienceOrb(packet)
@@ -1850,6 +2163,12 @@ impl BedrockCodec for ClientboundMapItemDataPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundMapItemDataPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundMapItemDataPacket> for Packet {
@@ -1890,6 +2209,12 @@ impl BedrockCodec for MapInfoRequestPacket {
         })
     }
 }
+impl Validate for MapInfoRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<MapInfoRequestPacket> for Packet {
     fn from(packet: MapInfoRequestPacket) -> Self {
         Packet::MapInfoRequest(packet)
@@ -1921,6 +2246,11 @@ impl BedrockCodec for RequestChunkRadiusPacket {
         })
     }
 }
+impl Validate for RequestChunkRadiusPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RequestChunkRadiusPacket> for Packet {
     fn from(packet: RequestChunkRadiusPacket) -> Self {
         Packet::RequestChunkRadius(packet)
@@ -1948,6 +2278,11 @@ impl BedrockCodec for ChunkRadiusUpdatedPacket {
         Ok(Self {
             payload: <ChunkRadiusUpdatedPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ChunkRadiusUpdatedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ChunkRadiusUpdatedPacket> for Packet {
@@ -1981,6 +2316,11 @@ impl BedrockCodec for GameRulesChangedPacket {
         })
     }
 }
+impl Validate for GameRulesChangedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<GameRulesChangedPacket> for Packet {
     fn from(packet: GameRulesChangedPacket) -> Self {
         Packet::GameRulesChanged(packet)
@@ -2010,6 +2350,11 @@ impl BedrockCodec for CameraPacket {
         })
     }
 }
+impl Validate for CameraPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CameraPacket> for Packet {
     fn from(packet: CameraPacket) -> Self {
         Packet::Camera(packet)
@@ -2037,6 +2382,12 @@ impl BedrockCodec for BossEventPacket {
         Ok(Self {
             payload: <BossEventPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for BossEventPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<BossEventPacket> for Packet {
@@ -2070,6 +2421,11 @@ impl BedrockCodec for ShowCreditsPacket {
         })
     }
 }
+impl Validate for ShowCreditsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ShowCreditsPacket> for Packet {
     fn from(packet: ShowCreditsPacket) -> Self {
         Packet::ShowCredits(packet)
@@ -2099,6 +2455,12 @@ impl BedrockCodec for AvailableCommandsPacket {
         })
     }
 }
+impl Validate for AvailableCommandsPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<AvailableCommandsPacket> for Packet {
     fn from(packet: AvailableCommandsPacket) -> Self {
         Packet::AvailableCommands(packet)
@@ -2126,6 +2488,12 @@ impl BedrockCodec for CommandRequestPacket {
         Ok(Self {
             payload: <CommandRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CommandRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CommandRequestPacket> for Packet {
@@ -2159,6 +2527,11 @@ impl BedrockCodec for CommandBlockUpdatePacket {
         })
     }
 }
+impl Validate for CommandBlockUpdatePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CommandBlockUpdatePacket> for Packet {
     fn from(packet: CommandBlockUpdatePacket) -> Self {
         Packet::CommandBlockUpdate(packet)
@@ -2186,6 +2559,12 @@ impl BedrockCodec for CommandOutputPacket {
         Ok(Self {
             payload: <CommandOutputPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CommandOutputPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CommandOutputPacket> for Packet {
@@ -2217,6 +2596,11 @@ impl BedrockCodec for UpdateTradePacket {
         })
     }
 }
+impl Validate for UpdateTradePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateTradePacket> for Packet {
     fn from(packet: UpdateTradePacket) -> Self {
         Packet::UpdateTrade(packet)
@@ -2244,6 +2628,11 @@ impl BedrockCodec for UpdateEquipPacket {
         Ok(Self {
             payload: <UpdateEquipPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for UpdateEquipPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<UpdateEquipPacket> for Packet {
@@ -2279,6 +2668,11 @@ impl BedrockCodec for ResourcePackDataInfoPacket {
         })
     }
 }
+impl Validate for ResourcePackDataInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ResourcePackDataInfoPacket> for Packet {
     fn from(packet: ResourcePackDataInfoPacket) -> Self {
         Packet::ResourcePackDataInfo(packet)
@@ -2312,6 +2706,11 @@ impl BedrockCodec for ResourcePackChunkDataPacket {
         })
     }
 }
+impl Validate for ResourcePackChunkDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ResourcePackChunkDataPacket> for Packet {
     fn from(packet: ResourcePackChunkDataPacket) -> Self {
         Packet::ResourcePackChunkData(packet)
@@ -2343,6 +2742,12 @@ impl BedrockCodec for ResourcePackChunkRequestPacket {
         })
     }
 }
+impl Validate for ResourcePackChunkRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ResourcePackChunkRequestPacket> for Packet {
     fn from(packet: ResourcePackChunkRequestPacket) -> Self {
         Packet::ResourcePackChunkRequest(packet)
@@ -2370,6 +2775,12 @@ impl BedrockCodec for TransferPacket {
         Ok(Self {
             payload: <TransferPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for TransferPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<TransferPacket> for Packet {
@@ -2401,6 +2812,11 @@ impl BedrockCodec for PlaySoundPacket {
         })
     }
 }
+impl Validate for PlaySoundPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlaySoundPacket> for Packet {
     fn from(packet: PlaySoundPacket) -> Self {
         Packet::PlaySound(packet)
@@ -2428,6 +2844,11 @@ impl BedrockCodec for StopSoundPacket {
         Ok(Self {
             payload: <StopSoundPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for StopSoundPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<StopSoundPacket> for Packet {
@@ -2463,6 +2884,11 @@ impl BedrockCodec for SetTitlePacket {
         })
     }
 }
+impl Validate for SetTitlePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetTitlePacket> for Packet {
     fn from(packet: SetTitlePacket) -> Self {
         Packet::SetTitle(packet)
@@ -2492,6 +2918,11 @@ impl BedrockCodec for AddBehaviorTreePacket {
         Ok(Self {
             payload: <AddBehaviorTreePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AddBehaviorTreePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AddBehaviorTreePacket> for Packet {
@@ -2525,6 +2956,12 @@ impl BedrockCodec for StructureBlockUpdatePacket {
         })
     }
 }
+impl Validate for StructureBlockUpdatePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<StructureBlockUpdatePacket> for Packet {
     fn from(packet: StructureBlockUpdatePacket) -> Self {
         Packet::StructureBlockUpdate(packet)
@@ -2554,6 +2991,11 @@ impl BedrockCodec for ShowStoreOfferPacket {
         Ok(Self {
             payload: <ShowStoreOfferPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ShowStoreOfferPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ShowStoreOfferPacket> for Packet {
@@ -2588,6 +3030,12 @@ impl BedrockCodec for PurchaseReceiptPacket {
         })
     }
 }
+impl Validate for PurchaseReceiptPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PurchaseReceiptPacket> for Packet {
     fn from(packet: PurchaseReceiptPacket) -> Self {
         Packet::PurchaseReceipt(packet)
@@ -2619,6 +3067,12 @@ impl BedrockCodec for PlayerSkinPacket {
         })
     }
 }
+impl Validate for PlayerSkinPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PlayerSkinPacket> for Packet {
     fn from(packet: PlayerSkinPacket) -> Self {
         Packet::PlayerSkin(packet)
@@ -2646,6 +3100,11 @@ impl BedrockCodec for SubClientLoginPacket {
         Ok(Self {
             payload: <SubClientLoginPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SubClientLoginPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SubClientLoginPacket> for Packet {
@@ -2681,6 +3140,11 @@ impl BedrockCodec for AutomationClientConnectPacket {
         })
     }
 }
+impl Validate for AutomationClientConnectPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<AutomationClientConnectPacket> for Packet {
     fn from(packet: AutomationClientConnectPacket) -> Self {
         Packet::AutomationClientConnect(packet)
@@ -2710,6 +3174,11 @@ impl BedrockCodec for SetLastHurtByPacket {
         })
     }
 }
+impl Validate for SetLastHurtByPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetLastHurtByPacket> for Packet {
     fn from(packet: SetLastHurtByPacket) -> Self {
         Packet::SetLastHurtBy(packet)
@@ -2737,6 +3206,12 @@ impl BedrockCodec for BookEditPacket {
         Ok(Self {
             payload: <BookEditPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for BookEditPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<BookEditPacket> for Packet {
@@ -2770,6 +3245,11 @@ impl BedrockCodec for NpcRequestPacket {
         Ok(Self {
             payload: <NpcRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for NpcRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<NpcRequestPacket> for Packet {
@@ -2807,6 +3287,12 @@ impl BedrockCodec for PhotoTransferPacket {
         })
     }
 }
+impl Validate for PhotoTransferPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PhotoTransferPacket> for Packet {
     fn from(packet: PhotoTransferPacket) -> Self {
         Packet::PhotoTransfer(packet)
@@ -2838,6 +3324,11 @@ impl BedrockCodec for ModalFormRequestPacket {
         })
     }
 }
+impl Validate for ModalFormRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ModalFormRequestPacket> for Packet {
     fn from(packet: ModalFormRequestPacket) -> Self {
         Packet::ModalFormRequest(packet)
@@ -2867,6 +3358,11 @@ impl BedrockCodec for ModalFormResponsePacket {
         Ok(Self {
             payload: <ModalFormResponsePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ModalFormResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ModalFormResponsePacket> for Packet {
@@ -2902,6 +3398,11 @@ impl BedrockCodec for ServerSettingsRequestPacket {
         })
     }
 }
+impl Validate for ServerSettingsRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerSettingsRequestPacket> for Packet {
     fn from(packet: ServerSettingsRequestPacket) -> Self {
         Packet::ServerSettingsRequest(packet)
@@ -2931,6 +3432,11 @@ impl BedrockCodec for ServerSettingsResponsePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ServerSettingsResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ServerSettingsResponsePacket> for Packet {
@@ -2964,6 +3470,11 @@ impl BedrockCodec for ShowProfilePacket {
         })
     }
 }
+impl Validate for ShowProfilePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ShowProfilePacket> for Packet {
     fn from(packet: ShowProfilePacket) -> Self {
         Packet::ShowProfile(packet)
@@ -2991,6 +3502,11 @@ impl BedrockCodec for SetDefaultGameTypePacket {
         Ok(Self {
             payload: <SetDefaultGameTypePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SetDefaultGameTypePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SetDefaultGameTypePacket> for Packet {
@@ -3024,6 +3540,11 @@ impl BedrockCodec for RemoveObjectivePacket {
         })
     }
 }
+impl Validate for RemoveObjectivePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RemoveObjectivePacket> for Packet {
     fn from(packet: RemoveObjectivePacket) -> Self {
         Packet::RemoveObjective(packet)
@@ -3053,6 +3574,11 @@ impl BedrockCodec for SetDisplayObjectivePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for SetDisplayObjectivePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SetDisplayObjectivePacket> for Packet {
@@ -3086,6 +3612,11 @@ impl BedrockCodec for SetScorePacket {
         })
     }
 }
+impl Validate for SetScorePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetScorePacket> for Packet {
     fn from(packet: SetScorePacket) -> Self {
         Packet::SetScore(packet)
@@ -3115,6 +3646,11 @@ impl BedrockCodec for LabTablePacket {
         Ok(Self {
             payload: <LabTablePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LabTablePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<LabTablePacket> for Packet {
@@ -3148,6 +3684,11 @@ impl BedrockCodec for UpdateBlockSyncedPacket {
         })
     }
 }
+impl Validate for UpdateBlockSyncedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateBlockSyncedPacket> for Packet {
     fn from(packet: UpdateBlockSyncedPacket) -> Self {
         Packet::UpdateBlockSynced(packet)
@@ -3177,6 +3718,11 @@ impl BedrockCodec for MoveActorDeltaPacket {
         Ok(Self {
             payload: <MoveActorDeltaPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for MoveActorDeltaPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<MoveActorDeltaPacket> for Packet {
@@ -3212,6 +3758,11 @@ impl BedrockCodec for SetScoreboardIdentityPacket {
         })
     }
 }
+impl Validate for SetScoreboardIdentityPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetScoreboardIdentityPacket> for Packet {
     fn from(packet: SetScoreboardIdentityPacket) -> Self {
         Packet::SetScoreboardIdentity(packet)
@@ -3245,6 +3796,11 @@ impl BedrockCodec for SetLocalPlayerAsInitializedPacket {
         })
     }
 }
+impl Validate for SetLocalPlayerAsInitializedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetLocalPlayerAsInitializedPacket> for Packet {
     fn from(packet: SetLocalPlayerAsInitializedPacket) -> Self {
         Packet::SetLocalPlayerAsInitialized(packet)
@@ -3274,6 +3830,11 @@ impl BedrockCodec for UpdateSoftEnumPacket {
         Ok(Self {
             payload: <UpdateSoftEnumPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for UpdateSoftEnumPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<UpdateSoftEnumPacket> for Packet {
@@ -3309,6 +3870,11 @@ impl BedrockCodec for NetworkStackLatencyPacket {
         })
     }
 }
+impl Validate for NetworkStackLatencyPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<NetworkStackLatencyPacket> for Packet {
     fn from(packet: NetworkStackLatencyPacket) -> Self {
         Packet::NetworkStackLatency(packet)
@@ -3342,6 +3908,11 @@ impl BedrockCodec for SpawnParticleEffectPacket {
         })
     }
 }
+impl Validate for SpawnParticleEffectPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SpawnParticleEffectPacket> for Packet {
     fn from(packet: SpawnParticleEffectPacket) -> Self {
         Packet::SpawnParticleEffect(packet)
@@ -3371,6 +3942,11 @@ impl BedrockCodec for AvailableActorIdentifiersPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for AvailableActorIdentifiersPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AvailableActorIdentifiersPacket> for Packet {
@@ -3404,6 +3980,12 @@ impl BedrockCodec for NetworkChunkPublisherUpdatePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for NetworkChunkPublisherUpdatePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<NetworkChunkPublisherUpdatePacket> for Packet {
@@ -3440,6 +4022,12 @@ impl BedrockCodec for BiomeDefinitionListPacket {
         })
     }
 }
+impl Validate for BiomeDefinitionListPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<BiomeDefinitionListPacket> for Packet {
     fn from(packet: BiomeDefinitionListPacket) -> Self {
         Packet::BiomeDefinitionList(packet)
@@ -3474,6 +4062,11 @@ impl BedrockCodec for LevelSoundEventPacket {
         })
     }
 }
+impl Validate for LevelSoundEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<LevelSoundEventPacket> for Packet {
     fn from(packet: LevelSoundEventPacket) -> Self {
         Packet::LevelSoundEvent(packet)
@@ -3501,6 +4094,11 @@ impl BedrockCodec for LevelEventGenericPacket {
         Ok(Self {
             payload: <LevelEventGenericPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LevelEventGenericPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<LevelEventGenericPacket> for Packet {
@@ -3532,6 +4130,11 @@ impl BedrockCodec for LecternUpdatePacket {
         Ok(Self {
             payload: <LecternUpdatePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LecternUpdatePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<LecternUpdatePacket> for Packet {
@@ -3566,6 +4169,11 @@ impl BedrockCodec for ClientCacheStatusPacket {
         })
     }
 }
+impl Validate for ClientCacheStatusPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientCacheStatusPacket> for Packet {
     fn from(packet: ClientCacheStatusPacket) -> Self {
         Packet::ClientCacheStatus(packet)
@@ -3597,6 +4205,11 @@ impl BedrockCodec for OnScreenTextureAnimationPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for OnScreenTextureAnimationPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<OnScreenTextureAnimationPacket> for Packet {
@@ -3634,6 +4247,11 @@ impl BedrockCodec for MapCreateLockedCopyPacket {
         })
     }
 }
+impl Validate for MapCreateLockedCopyPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<MapCreateLockedCopyPacket> for Packet {
     fn from(packet: MapCreateLockedCopyPacket) -> Self {
         Packet::MapCreateLockedCopy(packet)
@@ -3665,6 +4283,12 @@ impl BedrockCodec for StructureTemplateDataRequestPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for StructureTemplateDataRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<StructureTemplateDataRequestPacket> for Packet {
@@ -3700,6 +4324,11 @@ impl BedrockCodec for StructureTemplateDataResponsePacket {
         })
     }
 }
+impl Validate for StructureTemplateDataResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<StructureTemplateDataResponsePacket> for Packet {
     fn from(packet: StructureTemplateDataResponsePacket) -> Self {
         Packet::StructureTemplateDataResponse(packet)
@@ -3731,6 +4360,12 @@ impl BedrockCodec for ClientCacheBlobStatusPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientCacheBlobStatusPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientCacheBlobStatusPacket> for Packet {
@@ -3766,6 +4401,12 @@ impl BedrockCodec for ClientCacheMissResponsePacket {
         })
     }
 }
+impl Validate for ClientCacheMissResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ClientCacheMissResponsePacket> for Packet {
     fn from(packet: ClientCacheMissResponsePacket) -> Self {
         Packet::ClientCacheMissResponse(packet)
@@ -3797,6 +4438,11 @@ impl BedrockCodec for EducationSettingsPacket {
         })
     }
 }
+impl Validate for EducationSettingsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<EducationSettingsPacket> for Packet {
     fn from(packet: EducationSettingsPacket) -> Self {
         Packet::EducationSettings(packet)
@@ -3826,6 +4472,11 @@ impl BedrockCodec for EmotePacket {
         Ok(Self {
             payload: <EmotePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for EmotePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<EmotePacket> for Packet {
@@ -3864,6 +4515,11 @@ impl BedrockCodec for MultiplayerSettingsPacket {
         })
     }
 }
+impl Validate for MultiplayerSettingsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<MultiplayerSettingsPacket> for Packet {
     fn from(packet: MultiplayerSettingsPacket) -> Self {
         Packet::MultiplayerSettings(packet)
@@ -3893,6 +4549,11 @@ impl BedrockCodec for SettingsCommandPacket {
         Ok(Self {
             payload: <SettingsCommandPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SettingsCommandPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<SettingsCommandPacket> for Packet {
@@ -3928,6 +4589,11 @@ impl BedrockCodec for AnvilDamagePacket {
         })
     }
 }
+impl Validate for AnvilDamagePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<AnvilDamagePacket> for Packet {
     fn from(packet: AnvilDamagePacket) -> Self {
         Packet::AnvilDamage(packet)
@@ -3957,6 +4623,11 @@ impl BedrockCodec for CompletedUsingItemPacket {
         })
     }
 }
+impl Validate for CompletedUsingItemPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CompletedUsingItemPacket> for Packet {
     fn from(packet: CompletedUsingItemPacket) -> Self {
         Packet::CompletedUsingItem(packet)
@@ -3984,6 +4655,11 @@ impl BedrockCodec for NetworkSettingsPacket {
         Ok(Self {
             payload: <NetworkSettingsPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for NetworkSettingsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<NetworkSettingsPacket> for Packet {
@@ -4017,6 +4693,12 @@ impl BedrockCodec for PlayerAuthInputPacket {
         })
     }
 }
+impl Validate for PlayerAuthInputPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PlayerAuthInputPacket> for Packet {
     fn from(packet: PlayerAuthInputPacket) -> Self {
         Packet::PlayerAuthInput(packet)
@@ -4046,6 +4728,12 @@ impl BedrockCodec for CreativeContentPacket {
         Ok(Self {
             payload: <CreativeContentPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CreativeContentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CreativeContentPacket> for Packet {
@@ -4079,6 +4767,12 @@ impl BedrockCodec for PlayerEnchantOptionsPacket {
         })
     }
 }
+impl Validate for PlayerEnchantOptionsPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PlayerEnchantOptionsPacket> for Packet {
     fn from(packet: PlayerEnchantOptionsPacket) -> Self {
         Packet::PlayerEnchantOptions(packet)
@@ -4106,6 +4800,12 @@ impl BedrockCodec for ItemStackRequestPacket {
         Ok(Self {
             payload: <ItemStackRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ItemStackRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ItemStackRequestPacket> for Packet {
@@ -4137,6 +4837,12 @@ impl BedrockCodec for ItemStackResponsePacket {
         })
     }
 }
+impl Validate for ItemStackResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ItemStackResponsePacket> for Packet {
     fn from(packet: ItemStackResponsePacket) -> Self {
         Packet::ItemStackResponse(packet)
@@ -4164,6 +4870,12 @@ impl BedrockCodec for PlayerArmorDamagePacket {
         Ok(Self {
             payload: <PlayerArmorDamagePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerArmorDamagePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<PlayerArmorDamagePacket> for Packet {
@@ -4198,6 +4910,11 @@ impl BedrockCodec for CodeBuilderPacket {
         })
     }
 }
+impl Validate for CodeBuilderPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CodeBuilderPacket> for Packet {
     fn from(packet: CodeBuilderPacket) -> Self {
         Packet::CodeBuilder(packet)
@@ -4229,6 +4946,11 @@ impl BedrockCodec for UpdatePlayerGameTypePacket {
         })
     }
 }
+impl Validate for UpdatePlayerGameTypePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdatePlayerGameTypePacket> for Packet {
     fn from(packet: UpdatePlayerGameTypePacket) -> Self {
         Packet::UpdatePlayerGameType(packet)
@@ -4256,6 +4978,12 @@ impl BedrockCodec for EmoteListPacket {
         Ok(Self {
             payload: <EmoteListPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for EmoteListPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<EmoteListPacket> for Packet {
@@ -4287,6 +5015,11 @@ impl BedrockCodec for PositionTrackingDBServerBroadcastPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for PositionTrackingDBServerBroadcastPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<PositionTrackingDBServerBroadcastPacket> for Packet {
@@ -4322,6 +5055,11 @@ impl BedrockCodec for PositionTrackingDBClientRequestPacket {
         })
     }
 }
+impl Validate for PositionTrackingDBClientRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PositionTrackingDBClientRequestPacket> for Packet {
     fn from(packet: PositionTrackingDBClientRequestPacket) -> Self {
         Packet::PositionTrackingDBClientRequest(packet)
@@ -4349,6 +5087,11 @@ impl BedrockCodec for DebugInfoPacket {
         Ok(Self {
             payload: <DebugInfoPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for DebugInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<DebugInfoPacket> for Packet {
@@ -4382,6 +5125,11 @@ impl BedrockCodec for PacketViolationWarningPacket {
         })
     }
 }
+impl Validate for PacketViolationWarningPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PacketViolationWarningPacket> for Packet {
     fn from(packet: PacketViolationWarningPacket) -> Self {
         Packet::PacketViolationWarning(packet)
@@ -4413,6 +5161,11 @@ impl BedrockCodec for MotionPredictionHintsPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for MotionPredictionHintsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<MotionPredictionHintsPacket> for Packet {
@@ -4452,6 +5205,11 @@ impl BedrockCodec for AnimateEntityPacket {
         })
     }
 }
+impl Validate for AnimateEntityPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<AnimateEntityPacket> for Packet {
     fn from(packet: AnimateEntityPacket) -> Self {
         Packet::AnimateEntity(packet)
@@ -4483,6 +5241,11 @@ impl BedrockCodec for CameraShakePacket {
         })
     }
 }
+impl Validate for CameraShakePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CameraShakePacket> for Packet {
     fn from(packet: CameraShakePacket) -> Self {
         Packet::CameraShake(packet)
@@ -4512,6 +5275,12 @@ impl BedrockCodec for PlayerFogPacket {
         Ok(Self {
             payload: <PlayerFogPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerFogPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<PlayerFogPacket> for Packet {
@@ -4550,6 +5319,11 @@ impl BedrockCodec for CorrectPlayerMovePredictionPacket {
         })
     }
 }
+impl Validate for CorrectPlayerMovePredictionPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CorrectPlayerMovePredictionPacket> for Packet {
     fn from(packet: CorrectPlayerMovePredictionPacket) -> Self {
         Packet::CorrectPlayerMovePrediction(packet)
@@ -4581,6 +5355,11 @@ impl BedrockCodec for ItemRegistryPacket {
         })
     }
 }
+impl Validate for ItemRegistryPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ItemRegistryPacket> for Packet {
     fn from(packet: ItemRegistryPacket) -> Self {
         Packet::ItemRegistry(packet)
@@ -4608,6 +5387,12 @@ impl BedrockCodec for ClientboundDebugRendererPacket {
         Ok(Self {
             payload: <DebugRendererData as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ClientboundDebugRendererPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundDebugRendererPacket> for Packet {
@@ -4641,6 +5426,11 @@ impl BedrockCodec for SyncActorPropertyPacket {
         })
     }
 }
+impl Validate for SyncActorPropertyPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SyncActorPropertyPacket> for Packet {
     fn from(packet: SyncActorPropertyPacket) -> Self {
         Packet::SyncActorProperty(packet)
@@ -4672,6 +5462,11 @@ impl BedrockCodec for SimulationTypePacket {
         })
     }
 }
+impl Validate for SimulationTypePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SimulationTypePacket> for Packet {
     fn from(packet: SimulationTypePacket) -> Self {
         Packet::SimulationType(packet)
@@ -4699,6 +5494,11 @@ impl BedrockCodec for NpcDialoguePacket {
         Ok(Self {
             payload: <NpcDialoguePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for NpcDialoguePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<NpcDialoguePacket> for Packet {
@@ -4730,6 +5530,11 @@ impl BedrockCodec for EduUriResourcePacket {
         })
     }
 }
+impl Validate for EduUriResourcePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<EduUriResourcePacket> for Packet {
     fn from(packet: EduUriResourcePacket) -> Self {
         Packet::EduUriResource(packet)
@@ -4757,6 +5562,11 @@ impl BedrockCodec for CreatePhotoPacket {
         Ok(Self {
             payload: <CreatePhotoPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CreatePhotoPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<CreatePhotoPacket> for Packet {
@@ -4790,6 +5600,11 @@ impl BedrockCodec for UpdateSubChunkBlocksPacket {
         })
     }
 }
+impl Validate for UpdateSubChunkBlocksPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateSubChunkBlocksPacket> for Packet {
     fn from(packet: UpdateSubChunkBlocksPacket) -> Self {
         Packet::UpdateSubChunkBlocks(packet)
@@ -4821,6 +5636,12 @@ impl BedrockCodec for SubChunkPacket {
         })
     }
 }
+impl Validate for SubChunkPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<SubChunkPacket> for Packet {
     fn from(packet: SubChunkPacket) -> Self {
         Packet::SubChunk(packet)
@@ -4848,6 +5669,12 @@ impl BedrockCodec for SubChunkRequestPacket {
         Ok(Self {
             payload: <SubChunkRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for SubChunkRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<SubChunkRequestPacket> for Packet {
@@ -4883,6 +5710,11 @@ impl BedrockCodec for PlayerStartItemCooldownPacket {
         })
     }
 }
+impl Validate for PlayerStartItemCooldownPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlayerStartItemCooldownPacket> for Packet {
     fn from(packet: PlayerStartItemCooldownPacket) -> Self {
         Packet::PlayerStartItemCooldown(packet)
@@ -4912,6 +5744,11 @@ impl BedrockCodec for ScriptMessagePacket {
         })
     }
 }
+impl Validate for ScriptMessagePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ScriptMessagePacket> for Packet {
     fn from(packet: ScriptMessagePacket) -> Self {
         Packet::ScriptMessage(packet)
@@ -4939,6 +5776,11 @@ impl BedrockCodec for CodeBuilderSourcePacket {
         Ok(Self {
             payload: <CodeBuilderSourcePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CodeBuilderSourcePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<CodeBuilderSourcePacket> for Packet {
@@ -4972,6 +5814,11 @@ impl BedrockCodec for TickingAreasLoadStatusPacket {
         })
     }
 }
+impl Validate for TickingAreasLoadStatusPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<TickingAreasLoadStatusPacket> for Packet {
     fn from(packet: TickingAreasLoadStatusPacket) -> Self {
         Packet::TickingAreasLoadStatus(packet)
@@ -5003,6 +5850,12 @@ impl BedrockCodec for DimensionDataPacket {
         })
     }
 }
+impl Validate for DimensionDataPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<DimensionDataPacket> for Packet {
     fn from(packet: DimensionDataPacket) -> Self {
         Packet::DimensionData(packet)
@@ -5030,6 +5883,11 @@ impl BedrockCodec for AgentActionEventPacket {
         Ok(Self {
             payload: <AgentActionEventPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AgentActionEventPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AgentActionEventPacket> for Packet {
@@ -5061,6 +5919,11 @@ impl BedrockCodec for ChangeMobPropertyPacket {
         })
     }
 }
+impl Validate for ChangeMobPropertyPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ChangeMobPropertyPacket> for Packet {
     fn from(packet: ChangeMobPropertyPacket) -> Self {
         Packet::ChangeMobProperty(packet)
@@ -5088,6 +5951,11 @@ impl BedrockCodec for LessonProgressPacket {
         Ok(Self {
             payload: <LessonProgressPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LessonProgressPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<LessonProgressPacket> for Packet {
@@ -5121,6 +5989,12 @@ impl BedrockCodec for RequestAbilityPacket {
         })
     }
 }
+impl Validate for RequestAbilityPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<RequestAbilityPacket> for Packet {
     fn from(packet: RequestAbilityPacket) -> Self {
         Packet::RequestAbility(packet)
@@ -5152,6 +6026,11 @@ impl BedrockCodec for RequestPermissionsPacket {
         })
     }
 }
+impl Validate for RequestPermissionsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RequestPermissionsPacket> for Packet {
     fn from(packet: RequestPermissionsPacket) -> Self {
         Packet::RequestPermissions(packet)
@@ -5181,6 +6060,11 @@ impl BedrockCodec for ToastRequestPacket {
         })
     }
 }
+impl Validate for ToastRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ToastRequestPacket> for Packet {
     fn from(packet: ToastRequestPacket) -> Self {
         Packet::ToastRequest(packet)
@@ -5208,6 +6092,11 @@ impl BedrockCodec for UpdateAbilitiesPacket {
         Ok(Self {
             payload: <UpdateAbilitiesPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for UpdateAbilitiesPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<UpdateAbilitiesPacket> for Packet {
@@ -5243,6 +6132,11 @@ impl BedrockCodec for UpdateAdventureSettingsPacket {
         })
     }
 }
+impl Validate for UpdateAdventureSettingsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateAdventureSettingsPacket> for Packet {
     fn from(packet: UpdateAdventureSettingsPacket) -> Self {
         Packet::UpdateAdventureSettings(packet)
@@ -5272,6 +6166,11 @@ impl BedrockCodec for DeathInfoPacket {
         Ok(Self {
             payload: <DeathInfoPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for DeathInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<DeathInfoPacket> for Packet {
@@ -5305,6 +6204,11 @@ impl BedrockCodec for EditorNetworkPacket {
         })
     }
 }
+impl Validate for EditorNetworkPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<EditorNetworkPacket> for Packet {
     fn from(packet: EditorNetworkPacket) -> Self {
         Packet::EditorNetwork(packet)
@@ -5332,6 +6236,11 @@ impl BedrockCodec for FeatureRegistryPacket {
         Ok(Self {
             payload: <FeatureRegistryPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for FeatureRegistryPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<FeatureRegistryPacket> for Packet {
@@ -5363,6 +6272,11 @@ impl BedrockCodec for ServerStatsPacket {
         Ok(Self {
             payload: <ServerStatsPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ServerStatsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ServerStatsPacket> for Packet {
@@ -5398,6 +6312,12 @@ impl BedrockCodec for RequestNetworkSettingsPacket {
         })
     }
 }
+impl Validate for RequestNetworkSettingsPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<RequestNetworkSettingsPacket> for Packet {
     fn from(packet: RequestNetworkSettingsPacket) -> Self {
         Packet::RequestNetworkSettings(packet)
@@ -5425,6 +6345,11 @@ impl BedrockCodec for GameTestRequestPacket {
         Ok(Self {
             payload: <GameTestRequestPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for GameTestRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<GameTestRequestPacket> for Packet {
@@ -5456,6 +6381,11 @@ impl BedrockCodec for GameTestResultsPacket {
         Ok(Self {
             payload: <GameTestResultsPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for GameTestResultsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<GameTestResultsPacket> for Packet {
@@ -5491,6 +6421,11 @@ impl BedrockCodec for UpdateClientInputLocksPacket {
         })
     }
 }
+impl Validate for UpdateClientInputLocksPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateClientInputLocksPacket> for Packet {
     fn from(packet: UpdateClientInputLocksPacket) -> Self {
         Packet::UpdateClientInputLocks(packet)
@@ -5518,6 +6453,11 @@ impl BedrockCodec for CameraPresetsPacket {
         Ok(Self {
             payload: <CameraPresetsPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CameraPresetsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<CameraPresetsPacket> for Packet {
@@ -5549,6 +6489,11 @@ impl BedrockCodec for UnlockedRecipesPacket {
         })
     }
 }
+impl Validate for UnlockedRecipesPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UnlockedRecipesPacket> for Packet {
     fn from(packet: UnlockedRecipesPacket) -> Self {
         Packet::UnlockedRecipes(packet)
@@ -5576,6 +6521,12 @@ impl BedrockCodec for CameraInstructionPacket {
         Ok(Self {
             payload: <CameraInstructionPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CameraInstructionPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CameraInstructionPacket> for Packet {
@@ -5610,6 +6561,11 @@ impl BedrockCodec for TrimDataPacket {
         })
     }
 }
+impl Validate for TrimDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<TrimDataPacket> for Packet {
     fn from(packet: TrimDataPacket) -> Self {
         Packet::TrimData(packet)
@@ -5639,6 +6595,11 @@ impl BedrockCodec for OpenSignPacket {
         })
     }
 }
+impl Validate for OpenSignPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<OpenSignPacket> for Packet {
     fn from(packet: OpenSignPacket) -> Self {
         Packet::OpenSign(packet)
@@ -5666,6 +6627,11 @@ impl BedrockCodec for AgentAnimationPacket {
         Ok(Self {
             payload: <AgentAnimationPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AgentAnimationPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AgentAnimationPacket> for Packet {
@@ -5699,6 +6665,11 @@ impl BedrockCodec for RefreshEntitlementsPacket {
         })
     }
 }
+impl Validate for RefreshEntitlementsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<RefreshEntitlementsPacket> for Packet {
     fn from(packet: RefreshEntitlementsPacket) -> Self {
         Packet::RefreshEntitlements(packet)
@@ -5728,6 +6699,11 @@ impl BedrockCodec for PlayerToggleCrafterSlotRequestPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for PlayerToggleCrafterSlotRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<PlayerToggleCrafterSlotRequestPacket> for Packet {
@@ -5761,6 +6737,11 @@ impl BedrockCodec for SetPlayerInventoryOptionsPacket {
         })
     }
 }
+impl Validate for SetPlayerInventoryOptionsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetPlayerInventoryOptionsPacket> for Packet {
     fn from(packet: SetPlayerInventoryOptionsPacket) -> Self {
         Packet::SetPlayerInventoryOptions(packet)
@@ -5792,6 +6773,11 @@ impl BedrockCodec for SetHudPacket {
         })
     }
 }
+impl Validate for SetHudPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetHudPacket> for Packet {
     fn from(packet: SetHudPacket) -> Self {
         Packet::SetHud(packet)
@@ -5819,6 +6805,11 @@ impl BedrockCodec for AwardAchievementPacket {
         Ok(Self {
             payload: <AwardAchievementPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for AwardAchievementPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<AwardAchievementPacket> for Packet {
@@ -5852,6 +6843,11 @@ impl BedrockCodec for ClientboundCloseFormPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundCloseFormPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ClientboundCloseFormPacket> for Packet {
@@ -5891,6 +6887,11 @@ impl BedrockCodec for ServerboundLoadingScreenPacket {
         })
     }
 }
+impl Validate for ServerboundLoadingScreenPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerboundLoadingScreenPacket> for Packet {
     fn from(packet: ServerboundLoadingScreenPacket) -> Self {
         Packet::ServerboundLoadingScreen(packet)
@@ -5922,6 +6923,11 @@ impl BedrockCodec for JigsawStructureDataPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for JigsawStructureDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<JigsawStructureDataPacket> for Packet {
@@ -5958,6 +6964,11 @@ impl BedrockCodec for CurrentStructureFeaturePacket {
         })
     }
 }
+impl Validate for CurrentStructureFeaturePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CurrentStructureFeaturePacket> for Packet {
     fn from(packet: CurrentStructureFeaturePacket) -> Self {
         Packet::CurrentStructureFeature(packet)
@@ -5989,6 +7000,12 @@ impl BedrockCodec for ServerboundDiagnosticsPacket {
         })
     }
 }
+impl Validate for ServerboundDiagnosticsPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ServerboundDiagnosticsPacket> for Packet {
     fn from(packet: ServerboundDiagnosticsPacket) -> Self {
         Packet::ServerboundDiagnostics(packet)
@@ -6016,6 +7033,12 @@ impl BedrockCodec for CameraAimAssistPacket {
         Ok(Self {
             payload: <CameraAimAssistPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CameraAimAssistPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CameraAimAssistPacket> for Packet {
@@ -6053,6 +7076,12 @@ impl BedrockCodec for ContainerRegistryCleanupPacket {
         })
     }
 }
+impl Validate for ContainerRegistryCleanupPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ContainerRegistryCleanupPacket> for Packet {
     fn from(packet: ContainerRegistryCleanupPacket) -> Self {
         Packet::ContainerRegistryCleanup(packet)
@@ -6084,6 +7113,11 @@ impl BedrockCodec for MovementEffectPacket {
         Ok(Self {
             payload: <MovementEffectPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for MovementEffectPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<MovementEffectPacket> for Packet {
@@ -6119,6 +7153,12 @@ impl BedrockCodec for CameraAimAssistPresetsPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for CameraAimAssistPresetsPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CameraAimAssistPresetsPacket> for Packet {
@@ -6157,6 +7197,11 @@ impl BedrockCodec for ClientCameraAimAssistPacket {
         })
     }
 }
+impl Validate for ClientCameraAimAssistPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientCameraAimAssistPacket> for Packet {
     fn from(packet: ClientCameraAimAssistPacket) -> Self {
         Packet::ClientCameraAimAssist(packet)
@@ -6188,6 +7233,11 @@ impl BedrockCodec for ClientMovementPredictionSyncPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientMovementPredictionSyncPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ClientMovementPredictionSyncPacket> for Packet {
@@ -6223,6 +7273,11 @@ impl BedrockCodec for UpdateClientOptionsPacket {
         })
     }
 }
+impl Validate for UpdateClientOptionsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<UpdateClientOptionsPacket> for Packet {
     fn from(packet: UpdateClientOptionsPacket) -> Self {
         Packet::UpdateClientOptions(packet)
@@ -6252,6 +7307,11 @@ impl BedrockCodec for PlayerVideoCapturePacket {
         Ok(Self {
             payload: <PlayerVideoCapturePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerVideoCapturePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<PlayerVideoCapturePacket> for Packet {
@@ -6287,6 +7347,11 @@ impl BedrockCodec for PlayerUpdateEntityOverridesPacket {
         })
     }
 }
+impl Validate for PlayerUpdateEntityOverridesPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlayerUpdateEntityOverridesPacket> for Packet {
     fn from(packet: PlayerUpdateEntityOverridesPacket) -> Self {
         Packet::PlayerUpdateEntityOverrides(packet)
@@ -6316,6 +7381,11 @@ impl BedrockCodec for PlayerLocationPacket {
         Ok(Self {
             payload: <PlayerLocationPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PlayerLocationPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<PlayerLocationPacket> for Packet {
@@ -6349,6 +7419,11 @@ impl BedrockCodec for ClientboundControlSchemeSetPacket {
         })
     }
 }
+impl Validate for ClientboundControlSchemeSetPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientboundControlSchemeSetPacket> for Packet {
     fn from(packet: ClientboundControlSchemeSetPacket) -> Self {
         Packet::ClientboundControlSchemeSet(packet)
@@ -6376,6 +7451,12 @@ impl BedrockCodec for PrimitiveShapesPacket {
         Ok(Self {
             payload: <PrimitiveShapesPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for PrimitiveShapesPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<PrimitiveShapesPacket> for Packet {
@@ -6409,6 +7490,12 @@ impl BedrockCodec for ServerboundPackSettingChangePacket {
         })
     }
 }
+impl Validate for ServerboundPackSettingChangePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ServerboundPackSettingChangePacket> for Packet {
     fn from(packet: ServerboundPackSettingChangePacket) -> Self {
         Packet::ServerboundPackSettingChange(packet)
@@ -6436,6 +7523,12 @@ impl BedrockCodec for ClientboundDataStorePacket {
         Ok(Self {
             payload: <ClientboundDataStorePayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ClientboundDataStorePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundDataStorePacket> for Packet {
@@ -6469,6 +7562,12 @@ impl BedrockCodec for GraphicsOverrideParameterPacket {
         })
     }
 }
+impl Validate for GraphicsOverrideParameterPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<GraphicsOverrideParameterPacket> for Packet {
     fn from(packet: GraphicsOverrideParameterPacket) -> Self {
         Packet::GraphicsOverrideParameter(packet)
@@ -6496,6 +7595,12 @@ impl BedrockCodec for ServerboundDataStorePacket {
         Ok(Self {
             payload: <ServerboundDataStoreUpdate as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ServerboundDataStorePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ServerboundDataStorePacket> for Packet {
@@ -6529,6 +7634,12 @@ impl BedrockCodec for ClientboundDataDrivenUIShowScreenPacket {
         })
     }
 }
+impl Validate for ClientboundDataDrivenUIShowScreenPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ClientboundDataDrivenUIShowScreenPacket> for Packet {
     fn from(packet: ClientboundDataDrivenUIShowScreenPacket) -> Self {
         Packet::ClientboundDataDrivenUIShowScreen(packet)
@@ -6558,6 +7669,11 @@ impl BedrockCodec for ClientboundDataDrivenUICloseScreenPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundDataDrivenUICloseScreenPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ClientboundDataDrivenUICloseScreenPacket> for Packet {
@@ -6591,6 +7707,11 @@ impl BedrockCodec for ClientboundDataDrivenUIReloadPacket {
         })
     }
 }
+impl Validate for ClientboundDataDrivenUIReloadPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientboundDataDrivenUIReloadPacket> for Packet {
     fn from(packet: ClientboundDataDrivenUIReloadPacket) -> Self {
         Packet::ClientboundDataDrivenUIReload(packet)
@@ -6620,6 +7741,11 @@ impl BedrockCodec for ClientboundTextureShiftPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundTextureShiftPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ClientboundTextureShiftPacket> for Packet {
@@ -6653,6 +7779,12 @@ impl BedrockCodec for VoxelShapesPacket {
         })
     }
 }
+impl Validate for VoxelShapesPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<VoxelShapesPacket> for Packet {
     fn from(packet: VoxelShapesPacket) -> Self {
         Packet::VoxelShapes(packet)
@@ -6683,6 +7815,12 @@ impl BedrockCodec for CameraSplinePacket {
         Ok(Self {
             payload: <CameraSplinePacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for CameraSplinePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<CameraSplinePacket> for Packet {
@@ -6719,6 +7857,11 @@ impl BedrockCodec for CameraAimAssistActorPriorityPacket {
         })
     }
 }
+impl Validate for CameraAimAssistActorPriorityPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<CameraAimAssistActorPriorityPacket> for Packet {
     fn from(packet: CameraAimAssistActorPriorityPacket) -> Self {
         Packet::CameraAimAssistActorPriority(packet)
@@ -6750,6 +7893,11 @@ impl BedrockCodec for ResourcePacksReadyForValidationPacket {
         })
     }
 }
+impl Validate for ResourcePacksReadyForValidationPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ResourcePacksReadyForValidationPacket> for Packet {
     fn from(packet: ResourcePacksReadyForValidationPacket) -> Self {
         Packet::ResourcePacksReadyForValidation(packet)
@@ -6777,6 +7925,12 @@ impl BedrockCodec for LocatorBarPacket {
         Ok(Self {
             payload: <LocatorBarPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for LocatorBarPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<LocatorBarPacket> for Packet {
@@ -6808,6 +7962,12 @@ impl BedrockCodec for PartyChangedPacket {
         })
     }
 }
+impl Validate for PartyChangedPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PartyChangedPacket> for Packet {
     fn from(packet: PartyChangedPacket) -> Self {
         Packet::PartyChanged(packet)
@@ -6837,6 +7997,11 @@ impl BedrockCodec for ServerboundDataDrivenScreenClosedPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ServerboundDataDrivenScreenClosedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ServerboundDataDrivenScreenClosedPacket> for Packet {
@@ -6872,6 +8037,12 @@ impl BedrockCodec for SyncWorldClocksPacket {
         })
     }
 }
+impl Validate for SyncWorldClocksPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<SyncWorldClocksPacket> for Packet {
     fn from(packet: SyncWorldClocksPacket) -> Self {
         Packet::SyncWorldClocks(packet)
@@ -6903,6 +8074,12 @@ impl BedrockCodec for ClientboundAttributeLayerSyncPacket {
         })
     }
 }
+impl Validate for ClientboundAttributeLayerSyncPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ClientboundAttributeLayerSyncPacket> for Packet {
     fn from(packet: ClientboundAttributeLayerSyncPacket) -> Self {
         Packet::ClientboundAttributeLayerSync(packet)
@@ -6932,6 +8109,11 @@ impl BedrockCodec for ServerStoreInfoPacket {
         })
     }
 }
+impl Validate for ServerStoreInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerStoreInfoPacket> for Packet {
     fn from(packet: ServerStoreInfoPacket) -> Self {
         Packet::ServerStoreInfo(packet)
@@ -6959,6 +8141,12 @@ impl BedrockCodec for ServerPresenceInfoPacket {
         Ok(Self {
             payload: <ServerPresenceInfoPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ServerPresenceInfoPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ServerPresenceInfoPacket> for Packet {
@@ -6992,6 +8180,11 @@ impl BedrockCodec for ClientboundUpdateSoundDataPacket {
         })
     }
 }
+impl Validate for ClientboundUpdateSoundDataPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientboundUpdateSoundDataPacket> for Packet {
     fn from(packet: ClientboundUpdateSoundDataPacket) -> Self {
         Packet::ClientboundUpdateSoundData(packet)
@@ -7021,6 +8214,12 @@ impl BedrockCodec for SendPartyDestinationCookiePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for SendPartyDestinationCookiePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<SendPartyDestinationCookiePacket> for Packet {
@@ -7054,6 +8253,12 @@ impl BedrockCodec for PartyDestinationCookieResponsePacket {
         })
     }
 }
+impl Validate for PartyDestinationCookieResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<PartyDestinationCookieResponsePacket> for Packet {
     fn from(packet: PartyDestinationCookieResponsePacket) -> Self {
         Packet::PartyDestinationCookieResponse(packet)
@@ -7085,6 +8290,11 @@ impl BedrockCodec for SetPlayerFurnaceOptionsPacket {
         })
     }
 }
+impl Validate for SetPlayerFurnaceOptionsPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<SetPlayerFurnaceOptionsPacket> for Packet {
     fn from(packet: SetPlayerFurnaceOptionsPacket) -> Self {
         Packet::SetPlayerFurnaceOptions(packet)
@@ -7112,6 +8322,11 @@ impl BedrockCodec for RecordStartedPacket {
         Ok(Self {
             payload: <RecordStartedPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for RecordStartedPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<RecordStartedPacket> for Packet {
@@ -7143,6 +8358,12 @@ impl BedrockCodec for ClientboundMatchmakingStatePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundMatchmakingStatePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundMatchmakingStatePacket> for Packet {
@@ -7177,6 +8398,11 @@ impl BedrockCodec for ServerboundStonecutterSetRecipePacket {
         })
     }
 }
+impl Validate for ServerboundStonecutterSetRecipePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerboundStonecutterSetRecipePacket> for Packet {
     fn from(packet: ServerboundStonecutterSetRecipePacket) -> Self {
         Packet::ServerboundStonecutterSetRecipe(packet)
@@ -7209,6 +8435,11 @@ impl BedrockCodec for ClientboundStonecutterSetRecipePacket {
         })
     }
 }
+impl Validate for ClientboundStonecutterSetRecipePacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ClientboundStonecutterSetRecipePacket> for Packet {
     fn from(packet: ClientboundStonecutterSetRecipePacket) -> Self {
         Packet::ClientboundStonecutterSetRecipe(packet)
@@ -7238,6 +8469,11 @@ impl BedrockCodec for ServerboundMatchmakingCancelPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ServerboundMatchmakingCancelPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
     }
 }
 impl From<ServerboundMatchmakingCancelPacket> for Packet {
@@ -7273,6 +8509,12 @@ impl BedrockCodec for SetPassengerOfBlockPacket {
         })
     }
 }
+impl Validate for SetPassengerOfBlockPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<SetPassengerOfBlockPacket> for Packet {
     fn from(packet: SetPassengerOfBlockPacket) -> Self {
         Packet::SetPassengerOfBlock(packet)
@@ -7306,6 +8548,11 @@ impl BedrockCodec for ServerboundCursorItemDragPacket {
         })
     }
 }
+impl Validate for ServerboundCursorItemDragPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<ServerboundCursorItemDragPacket> for Packet {
     fn from(packet: ServerboundCursorItemDragPacket) -> Self {
         Packet::ServerboundCursorItemDrag(packet)
@@ -7335,6 +8582,12 @@ impl BedrockCodec for ClientboundPlayAudioContentPacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundPlayAudioContentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundPlayAudioContentPacket> for Packet {
@@ -7368,6 +8621,12 @@ impl BedrockCodec for ServerboundRegisterAudioContentPacket {
         })
     }
 }
+impl Validate for ServerboundRegisterAudioContentPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ServerboundRegisterAudioContentPacket> for Packet {
     fn from(packet: ServerboundRegisterAudioContentPacket) -> Self {
         Packet::ServerboundRegisterAudioContent(packet)
@@ -7397,6 +8656,12 @@ impl BedrockCodec for ChatPacket {
         Ok(Self {
             payload: <ChatPacketPayload as BedrockCodec>::deserialize(buf)?,
         })
+    }
+}
+impl Validate for ChatPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ChatPacket> for Packet {
@@ -7430,6 +8695,12 @@ impl BedrockCodec for ServerboundRequestOnlineMusicPlaybackPacket {
         })
     }
 }
+impl Validate for ServerboundRequestOnlineMusicPlaybackPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<ServerboundRequestOnlineMusicPlaybackPacket> for Packet {
     fn from(packet: ServerboundRequestOnlineMusicPlaybackPacket) -> Self {
         Packet::ServerboundRequestOnlineMusicPlayback(packet)
@@ -7459,6 +8730,12 @@ impl BedrockCodec for ClientboundOnlineMusicPlaybackResponsePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundOnlineMusicPlaybackResponsePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundOnlineMusicPlaybackResponsePacket> for Packet {
@@ -7494,6 +8771,11 @@ impl BedrockCodec for PlayerToggleArmorVisibilityRequestPacket {
         })
     }
 }
+impl Validate for PlayerToggleArmorVisibilityRequestPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 impl From<PlayerToggleArmorVisibilityRequestPacket> for Packet {
     fn from(packet: PlayerToggleArmorVisibilityRequestPacket) -> Self {
         Packet::PlayerToggleArmorVisibilityRequest(packet)
@@ -7523,6 +8805,12 @@ impl BedrockCodec for ClientboundMusicPlaybackFailurePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for ClientboundMusicPlaybackFailurePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<ClientboundMusicPlaybackFailurePacket> for Packet {
@@ -7558,6 +8846,12 @@ impl BedrockCodec for VirtualContainerOpenPacket {
         })
     }
 }
+impl Validate for VirtualContainerOpenPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
 impl From<VirtualContainerOpenPacket> for Packet {
     fn from(packet: VirtualContainerOpenPacket) -> Self {
         Packet::VirtualContainerOpen(packet)
@@ -7589,6 +8883,12 @@ impl BedrockCodec for VirtualContainerClosePacket {
                 buf,
             )?,
         })
+    }
+}
+impl Validate for VirtualContainerClosePacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
     }
 }
 impl From<VirtualContainerClosePacket> for Packet {
@@ -12073,5 +13373,995 @@ impl Packet {
         let header = <codec::PacketHeader as BedrockCodec>::deserialize(buf)?;
         let packet = Self::decode(header.packet_id, buf)?;
         Ok((header, packet))
+    }
+}
+/// Checks the packet against the limits Mojang documents for its fields.
+impl Validate for Packet {
+    fn validate(&self) -> Result<()> {
+        match self {
+            Self::Login(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(LoginPacket::NAME))
+            }
+            Self::PlayStatus(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayStatusPacket::NAME))
+            }
+            Self::ServerToClientHandshake(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerToClientHandshakePacket::NAME))
+            }
+            Self::ClientToServerHandshake(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientToServerHandshakePacket::NAME))
+            }
+            Self::Disconnect(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(DisconnectPacket::NAME))
+            }
+            Self::ResourcePacksInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePacksInfoPacket::NAME))
+            }
+            Self::ResourcePackStack(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePackStackPacket::NAME))
+            }
+            Self::ResourcePackClientResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePackClientResponsePacket::NAME))
+            }
+            Self::Text(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(TextPacket::NAME))
+            }
+            Self::SetTime(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(SetTimePacket::NAME))
+            }
+            Self::StartGame(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(StartGamePacket::NAME))
+            }
+            Self::AddPlayer(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AddPlayerPacket::NAME))
+            }
+            Self::AddActor(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(AddActorPacket::NAME))
+            }
+            Self::RemoveActor(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RemoveActorPacket::NAME))
+            }
+            Self::AddItemActor(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AddItemActorPacket::NAME))
+            }
+            Self::ServerPlayerPostMovePosition(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerPlayerPostMovePositionPacket::NAME))
+            }
+            Self::TakeItemActor(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(TakeItemActorPacket::NAME))
+            }
+            Self::MoveActorAbsolute(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MoveActorAbsolutePacket::NAME))
+            }
+            Self::MovePlayer(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MovePlayerPacket::NAME))
+            }
+            Self::UpdateBlock(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateBlockPacket::NAME))
+            }
+            Self::AddPainting(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AddPaintingPacket::NAME))
+            }
+            Self::LevelEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LevelEventPacket::NAME))
+            }
+            Self::BlockEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(BlockEventPacket::NAME))
+            }
+            Self::ActorEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ActorEventPacket::NAME))
+            }
+            Self::MobEffect(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MobEffectPacket::NAME))
+            }
+            Self::UpdateAttributes(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateAttributesPacket::NAME))
+            }
+            Self::InventoryTransaction(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(InventoryTransactionPacket::NAME))
+            }
+            Self::MobEquipment(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MobEquipmentPacket::NAME))
+            }
+            Self::MobArmorEquipment(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MobArmorEquipmentPacket::NAME))
+            }
+            Self::Interact(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(InteractPacket::NAME))
+            }
+            Self::BlockPickRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(BlockPickRequestPacket::NAME))
+            }
+            Self::ActorPickRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ActorPickRequestPacket::NAME))
+            }
+            Self::PlayerAction(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerActionPacket::NAME))
+            }
+            Self::HurtArmor(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(HurtArmorPacket::NAME))
+            }
+            Self::SetActorData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetActorDataPacket::NAME))
+            }
+            Self::SetActorMotion(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetActorMotionPacket::NAME))
+            }
+            Self::SetActorLink(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetActorLinkPacket::NAME))
+            }
+            Self::SetHealth(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetHealthPacket::NAME))
+            }
+            Self::SetSpawnPosition(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetSpawnPositionPacket::NAME))
+            }
+            Self::Animate(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(AnimatePacket::NAME))
+            }
+            Self::Respawn(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(RespawnPacket::NAME))
+            }
+            Self::ContainerOpen(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ContainerOpenPacket::NAME))
+            }
+            Self::ContainerClose(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ContainerClosePacket::NAME))
+            }
+            Self::PlayerHotbar(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerHotbarPacket::NAME))
+            }
+            Self::InventoryContent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(InventoryContentPacket::NAME))
+            }
+            Self::InventorySlot(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(InventorySlotPacket::NAME))
+            }
+            Self::ContainerSetData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ContainerSetDataPacket::NAME))
+            }
+            Self::CraftingData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CraftingDataPacket::NAME))
+            }
+            Self::GuiDataPickItem(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(GuiDataPickItemPacket::NAME))
+            }
+            Self::BlockActorData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(BlockActorDataPacket::NAME))
+            }
+            Self::LevelChunk(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LevelChunkPacket::NAME))
+            }
+            Self::SetCommandsEnabled(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetCommandsEnabledPacket::NAME))
+            }
+            Self::SetDifficulty(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetDifficultyPacket::NAME))
+            }
+            Self::ChangeDimension(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ChangeDimensionPacket::NAME))
+            }
+            Self::SetPlayerGameType(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetPlayerGameTypePacket::NAME))
+            }
+            Self::PlayerList(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerListPacket::NAME))
+            }
+            Self::SimpleEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SimpleEventPacket::NAME))
+            }
+            Self::LegacyTelemetryEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LegacyTelemetryEventPacket::NAME))
+            }
+            Self::SpawnExperienceOrb(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SpawnExperienceOrbPacket::NAME))
+            }
+            Self::ClientboundMapItemData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundMapItemDataPacket::NAME))
+            }
+            Self::MapInfoRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MapInfoRequestPacket::NAME))
+            }
+            Self::RequestChunkRadius(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RequestChunkRadiusPacket::NAME))
+            }
+            Self::ChunkRadiusUpdated(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ChunkRadiusUpdatedPacket::NAME))
+            }
+            Self::GameRulesChanged(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(GameRulesChangedPacket::NAME))
+            }
+            Self::Camera(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(CameraPacket::NAME))
+            }
+            Self::BossEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(BossEventPacket::NAME))
+            }
+            Self::ShowCredits(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ShowCreditsPacket::NAME))
+            }
+            Self::AvailableCommands(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AvailableCommandsPacket::NAME))
+            }
+            Self::CommandRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CommandRequestPacket::NAME))
+            }
+            Self::CommandBlockUpdate(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CommandBlockUpdatePacket::NAME))
+            }
+            Self::CommandOutput(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CommandOutputPacket::NAME))
+            }
+            Self::UpdateTrade(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateTradePacket::NAME))
+            }
+            Self::UpdateEquip(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateEquipPacket::NAME))
+            }
+            Self::ResourcePackDataInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePackDataInfoPacket::NAME))
+            }
+            Self::ResourcePackChunkData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePackChunkDataPacket::NAME))
+            }
+            Self::ResourcePackChunkRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ResourcePackChunkRequestPacket::NAME))
+            }
+            Self::Transfer(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(TransferPacket::NAME))
+            }
+            Self::PlaySound(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlaySoundPacket::NAME))
+            }
+            Self::StopSound(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(StopSoundPacket::NAME))
+            }
+            Self::SetTitle(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(SetTitlePacket::NAME))
+            }
+            Self::AddBehaviorTree(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AddBehaviorTreePacket::NAME))
+            }
+            Self::StructureBlockUpdate(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(StructureBlockUpdatePacket::NAME))
+            }
+            Self::ShowStoreOffer(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ShowStoreOfferPacket::NAME))
+            }
+            Self::PurchaseReceipt(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PurchaseReceiptPacket::NAME))
+            }
+            Self::PlayerSkin(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerSkinPacket::NAME))
+            }
+            Self::SubClientLogin(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SubClientLoginPacket::NAME))
+            }
+            Self::AutomationClientConnect(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AutomationClientConnectPacket::NAME))
+            }
+            Self::SetLastHurtBy(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetLastHurtByPacket::NAME))
+            }
+            Self::BookEdit(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(BookEditPacket::NAME))
+            }
+            Self::NpcRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(NpcRequestPacket::NAME))
+            }
+            Self::PhotoTransfer(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PhotoTransferPacket::NAME))
+            }
+            Self::ModalFormRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ModalFormRequestPacket::NAME))
+            }
+            Self::ModalFormResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ModalFormResponsePacket::NAME))
+            }
+            Self::ServerSettingsRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerSettingsRequestPacket::NAME))
+            }
+            Self::ServerSettingsResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerSettingsResponsePacket::NAME))
+            }
+            Self::ShowProfile(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ShowProfilePacket::NAME))
+            }
+            Self::SetDefaultGameType(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetDefaultGameTypePacket::NAME))
+            }
+            Self::RemoveObjective(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RemoveObjectivePacket::NAME))
+            }
+            Self::SetDisplayObjective(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetDisplayObjectivePacket::NAME))
+            }
+            Self::SetScore(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(SetScorePacket::NAME))
+            }
+            Self::LabTable(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(LabTablePacket::NAME))
+            }
+            Self::UpdateBlockSynced(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateBlockSyncedPacket::NAME))
+            }
+            Self::MoveActorDelta(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MoveActorDeltaPacket::NAME))
+            }
+            Self::SetScoreboardIdentity(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetScoreboardIdentityPacket::NAME))
+            }
+            Self::SetLocalPlayerAsInitialized(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetLocalPlayerAsInitializedPacket::NAME))
+            }
+            Self::UpdateSoftEnum(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateSoftEnumPacket::NAME))
+            }
+            Self::NetworkStackLatency(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(NetworkStackLatencyPacket::NAME))
+            }
+            Self::SpawnParticleEffect(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SpawnParticleEffectPacket::NAME))
+            }
+            Self::AvailableActorIdentifiers(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AvailableActorIdentifiersPacket::NAME))
+            }
+            Self::NetworkChunkPublisherUpdate(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(NetworkChunkPublisherUpdatePacket::NAME))
+            }
+            Self::BiomeDefinitionList(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(BiomeDefinitionListPacket::NAME))
+            }
+            Self::LevelSoundEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LevelSoundEventPacket::NAME))
+            }
+            Self::LevelEventGeneric(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LevelEventGenericPacket::NAME))
+            }
+            Self::LecternUpdate(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LecternUpdatePacket::NAME))
+            }
+            Self::ClientCacheStatus(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientCacheStatusPacket::NAME))
+            }
+            Self::OnScreenTextureAnimation(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(OnScreenTextureAnimationPacket::NAME))
+            }
+            Self::MapCreateLockedCopy(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MapCreateLockedCopyPacket::NAME))
+            }
+            Self::StructureTemplateDataRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(StructureTemplateDataRequestPacket::NAME))
+            }
+            Self::StructureTemplateDataResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(StructureTemplateDataResponsePacket::NAME))
+            }
+            Self::ClientCacheBlobStatus(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientCacheBlobStatusPacket::NAME))
+            }
+            Self::ClientCacheMissResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientCacheMissResponsePacket::NAME))
+            }
+            Self::EducationSettings(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(EducationSettingsPacket::NAME))
+            }
+            Self::Emote(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(EmotePacket::NAME))
+            }
+            Self::MultiplayerSettings(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MultiplayerSettingsPacket::NAME))
+            }
+            Self::SettingsCommand(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SettingsCommandPacket::NAME))
+            }
+            Self::AnvilDamage(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AnvilDamagePacket::NAME))
+            }
+            Self::CompletedUsingItem(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CompletedUsingItemPacket::NAME))
+            }
+            Self::NetworkSettings(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(NetworkSettingsPacket::NAME))
+            }
+            Self::PlayerAuthInput(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerAuthInputPacket::NAME))
+            }
+            Self::CreativeContent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CreativeContentPacket::NAME))
+            }
+            Self::PlayerEnchantOptions(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerEnchantOptionsPacket::NAME))
+            }
+            Self::ItemStackRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ItemStackRequestPacket::NAME))
+            }
+            Self::ItemStackResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ItemStackResponsePacket::NAME))
+            }
+            Self::PlayerArmorDamage(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerArmorDamagePacket::NAME))
+            }
+            Self::CodeBuilder(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CodeBuilderPacket::NAME))
+            }
+            Self::UpdatePlayerGameType(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdatePlayerGameTypePacket::NAME))
+            }
+            Self::EmoteList(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(EmoteListPacket::NAME))
+            }
+            Self::PositionTrackingDBServerBroadcast(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBServerBroadcastPacket::NAME)
+                    })
+            }
+            Self::PositionTrackingDBClientRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBClientRequestPacket::NAME)
+                    })
+            }
+            Self::DebugInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(DebugInfoPacket::NAME))
+            }
+            Self::PacketViolationWarning(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PacketViolationWarningPacket::NAME))
+            }
+            Self::MotionPredictionHints(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MotionPredictionHintsPacket::NAME))
+            }
+            Self::AnimateEntity(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AnimateEntityPacket::NAME))
+            }
+            Self::CameraShake(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraShakePacket::NAME))
+            }
+            Self::PlayerFog(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerFogPacket::NAME))
+            }
+            Self::CorrectPlayerMovePrediction(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CorrectPlayerMovePredictionPacket::NAME))
+            }
+            Self::ItemRegistry(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ItemRegistryPacket::NAME))
+            }
+            Self::ClientboundDebugRenderer(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundDebugRendererPacket::NAME))
+            }
+            Self::SyncActorProperty(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
+            }
+            Self::SimulationType(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SimulationTypePacket::NAME))
+            }
+            Self::NpcDialogue(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(NpcDialoguePacket::NAME))
+            }
+            Self::EduUriResource(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(EduUriResourcePacket::NAME))
+            }
+            Self::CreatePhoto(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CreatePhotoPacket::NAME))
+            }
+            Self::UpdateSubChunkBlocks(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateSubChunkBlocksPacket::NAME))
+            }
+            Self::SubChunk(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(SubChunkPacket::NAME))
+            }
+            Self::SubChunkRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SubChunkRequestPacket::NAME))
+            }
+            Self::PlayerStartItemCooldown(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerStartItemCooldownPacket::NAME))
+            }
+            Self::ScriptMessage(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ScriptMessagePacket::NAME))
+            }
+            Self::CodeBuilderSource(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CodeBuilderSourcePacket::NAME))
+            }
+            Self::TickingAreasLoadStatus(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(TickingAreasLoadStatusPacket::NAME))
+            }
+            Self::DimensionData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(DimensionDataPacket::NAME))
+            }
+            Self::AgentActionEvent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AgentActionEventPacket::NAME))
+            }
+            Self::ChangeMobProperty(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ChangeMobPropertyPacket::NAME))
+            }
+            Self::LessonProgress(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LessonProgressPacket::NAME))
+            }
+            Self::RequestAbility(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RequestAbilityPacket::NAME))
+            }
+            Self::RequestPermissions(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RequestPermissionsPacket::NAME))
+            }
+            Self::ToastRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ToastRequestPacket::NAME))
+            }
+            Self::UpdateAbilities(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateAbilitiesPacket::NAME))
+            }
+            Self::UpdateAdventureSettings(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateAdventureSettingsPacket::NAME))
+            }
+            Self::DeathInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(DeathInfoPacket::NAME))
+            }
+            Self::EditorNetwork(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(EditorNetworkPacket::NAME))
+            }
+            Self::FeatureRegistry(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(FeatureRegistryPacket::NAME))
+            }
+            Self::ServerStats(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerStatsPacket::NAME))
+            }
+            Self::RequestNetworkSettings(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RequestNetworkSettingsPacket::NAME))
+            }
+            Self::GameTestRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(GameTestRequestPacket::NAME))
+            }
+            Self::GameTestResults(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(GameTestResultsPacket::NAME))
+            }
+            Self::UpdateClientInputLocks(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateClientInputLocksPacket::NAME))
+            }
+            Self::CameraPresets(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraPresetsPacket::NAME))
+            }
+            Self::UnlockedRecipes(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UnlockedRecipesPacket::NAME))
+            }
+            Self::CameraInstruction(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraInstructionPacket::NAME))
+            }
+            Self::TrimData(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(TrimDataPacket::NAME))
+            }
+            Self::OpenSign(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(OpenSignPacket::NAME))
+            }
+            Self::AgentAnimation(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AgentAnimationPacket::NAME))
+            }
+            Self::RefreshEntitlements(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RefreshEntitlementsPacket::NAME))
+            }
+            Self::PlayerToggleCrafterSlotRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerToggleCrafterSlotRequestPacket::NAME))
+            }
+            Self::SetPlayerInventoryOptions(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetPlayerInventoryOptionsPacket::NAME))
+            }
+            Self::SetHud(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(SetHudPacket::NAME))
+            }
+            Self::AwardAchievement(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AwardAchievementPacket::NAME))
+            }
+            Self::ClientboundCloseForm(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundCloseFormPacket::NAME))
+            }
+            Self::ServerboundLoadingScreen(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundLoadingScreenPacket::NAME))
+            }
+            Self::JigsawStructureData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(JigsawStructureDataPacket::NAME))
+            }
+            Self::CurrentStructureFeature(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CurrentStructureFeaturePacket::NAME))
+            }
+            Self::ServerboundDiagnostics(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundDiagnosticsPacket::NAME))
+            }
+            Self::CameraAimAssist(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraAimAssistPacket::NAME))
+            }
+            Self::ContainerRegistryCleanup(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ContainerRegistryCleanupPacket::NAME))
+            }
+            Self::MovementEffect(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(MovementEffectPacket::NAME))
+            }
+            Self::CameraAimAssistPresets(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraAimAssistPresetsPacket::NAME))
+            }
+            Self::ClientCameraAimAssist(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientCameraAimAssistPacket::NAME))
+            }
+            Self::ClientMovementPredictionSync(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientMovementPredictionSyncPacket::NAME))
+            }
+            Self::UpdateClientOptions(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(UpdateClientOptionsPacket::NAME))
+            }
+            Self::PlayerVideoCapture(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerVideoCapturePacket::NAME))
+            }
+            Self::PlayerUpdateEntityOverrides(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerUpdateEntityOverridesPacket::NAME))
+            }
+            Self::PlayerLocation(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PlayerLocationPacket::NAME))
+            }
+            Self::ClientboundControlSchemeSet(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundControlSchemeSetPacket::NAME))
+            }
+            Self::PrimitiveShapes(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PrimitiveShapesPacket::NAME))
+            }
+            Self::ServerboundPackSettingChange(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundPackSettingChangePacket::NAME))
+            }
+            Self::ClientboundDataStore(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundDataStorePacket::NAME))
+            }
+            Self::GraphicsOverrideParameter(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(GraphicsOverrideParameterPacket::NAME))
+            }
+            Self::ServerboundDataStore(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundDataStorePacket::NAME))
+            }
+            Self::ClientboundDataDrivenUIShowScreen(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUIShowScreenPacket::NAME)
+                    })
+            }
+            Self::ClientboundDataDrivenUICloseScreen(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUICloseScreenPacket::NAME)
+                    })
+            }
+            Self::ClientboundDataDrivenUIReload(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundDataDrivenUIReloadPacket::NAME))
+            }
+            Self::ClientboundTextureShift(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundTextureShiftPacket::NAME))
+            }
+            Self::VoxelShapes(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(VoxelShapesPacket::NAME))
+            }
+            Self::CameraSpline(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraSplinePacket::NAME))
+            }
+            Self::CameraAimAssistActorPriority(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(CameraAimAssistActorPriorityPacket::NAME))
+            }
+            Self::ResourcePacksReadyForValidation(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ResourcePacksReadyForValidationPacket::NAME)
+                    })
+            }
+            Self::LocatorBar(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(LocatorBarPacket::NAME))
+            }
+            Self::PartyChanged(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PartyChangedPacket::NAME))
+            }
+            Self::ServerboundDataDrivenScreenClosed(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundDataDrivenScreenClosedPacket::NAME)
+                    })
+            }
+            Self::SyncWorldClocks(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SyncWorldClocksPacket::NAME))
+            }
+            Self::ClientboundAttributeLayerSync(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundAttributeLayerSyncPacket::NAME))
+            }
+            Self::ServerStoreInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerStoreInfoPacket::NAME))
+            }
+            Self::ServerPresenceInfo(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerPresenceInfoPacket::NAME))
+            }
+            Self::ClientboundUpdateSoundData(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundUpdateSoundDataPacket::NAME))
+            }
+            Self::SendPartyDestinationCookie(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SendPartyDestinationCookiePacket::NAME))
+            }
+            Self::PartyDestinationCookieResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(PartyDestinationCookieResponsePacket::NAME))
+            }
+            Self::SetPlayerFurnaceOptions(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetPlayerFurnaceOptionsPacket::NAME))
+            }
+            Self::RecordStarted(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RecordStartedPacket::NAME))
+            }
+            Self::ClientboundMatchmakingState(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundMatchmakingStatePacket::NAME))
+            }
+            Self::ServerboundStonecutterSetRecipe(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundStonecutterSetRecipePacket::NAME)
+                    })
+            }
+            Self::ClientboundStonecutterSetRecipe(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundStonecutterSetRecipePacket::NAME)
+                    })
+            }
+            Self::ServerboundMatchmakingCancel(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundMatchmakingCancelPacket::NAME))
+            }
+            Self::SetPassengerOfBlock(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(SetPassengerOfBlockPacket::NAME))
+            }
+            Self::ServerboundCursorItemDrag(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ServerboundCursorItemDragPacket::NAME))
+            }
+            Self::ClientboundPlayAudioContent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(ClientboundPlayAudioContentPacket::NAME))
+            }
+            Self::ServerboundRegisterAudioContent(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
+                    })
+            }
+            Self::Chat(packet) => {
+                Validate::validate(packet).map_err(|e| e.in_packet(ChatPacket::NAME))
+            }
+            Self::ServerboundRequestOnlineMusicPlayback(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
+                    })
+            }
+            Self::ClientboundOnlineMusicPlaybackResponse(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
+                    })
+            }
+            Self::PlayerToggleArmorVisibilityRequest(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
+                    })
+            }
+            Self::ClientboundMusicPlaybackFailure(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
+                    })
+            }
+            Self::VirtualContainerOpen(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
+            }
+            Self::VirtualContainerClose(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
+            }
+        }
     }
 }

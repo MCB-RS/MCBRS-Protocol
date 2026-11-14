@@ -35,6 +35,12 @@ pub enum ProtocolError {
     NbtTooDeep,
     /// Bytes were left in the buffer after a complete value was decoded.
     TrailingBytes { remaining: usize },
+    /// The envelope of a login connection request is malformed.
+    InvalidConnectionRequest(&'static str),
+    /// A batch or its envelope is malformed.
+    InvalidBatch(&'static str),
+    /// A value breaks a limit documented by Mojang (see `Validate`).
+    ConstraintViolated { type_name: &'static str, field: &'static str, constraint: &'static str },
     /// A packet could not be encoded or decoded; `source` says why.
     Packet { name: &'static str, source: Box<ProtocolError> },
 }
@@ -72,6 +78,11 @@ impl fmt::Display for ProtocolError {
             Self::InvalidNbtTagType(id) => write!(f, "invalid NBT tag type {id}"),
             Self::NbtTooDeep => f.write_str("NBT data is nested too deeply"),
             Self::TrailingBytes { remaining } => write!(f, "{remaining} trailing byte(s) after value"),
+            Self::InvalidConnectionRequest(reason) => write!(f, "invalid connection request: {reason}"),
+            Self::InvalidBatch(reason) => write!(f, "invalid batch: {reason}"),
+            Self::ConstraintViolated { type_name, field, constraint } => {
+                write!(f, "{type_name}.{field} violates its constraint: {constraint}")
+            }
             Self::Packet { name, source } => write!(f, "{name}: {source}"),
         }
     }

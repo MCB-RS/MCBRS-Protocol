@@ -2,20 +2,24 @@
 //!
 //! Wire rules applied here (inferred from the schemas, see the README):
 //!
-//! * object: its properties in `x-ordinal-index` order; a property that is not
-//!   listed in `required` is a `std::optional` (bool flag + value);
+//! * object: its properties in `x-ordinal-index` order. A property missing
+//!   from `required` is a `std::optional` (bool flag + value) unless it
+//!   documents a `default`: then it is a plain member with an initializer,
+//!   always present on the wire;
 //! * integer: fixed little-endian, `"Compression"` -> varint, `"Big Endian"`;
 //! * array: `VarUInt32` count (`u32` with `"No size compression"`), no count at
 //!   all when `minItems == maxItems`; array-level options apply to the items;
 //! * `additionalProperties`: a map, `VarUInt32` count then key/value pairs;
 //! * enum: its number with `"Enum-as-Value"`, otherwise its name as a string;
-//! * `oneOf`: the branch index as `x-control-value-type` varint then the
-//!   branch, unless every branch starts with a `const` field of one enum, in
-//!   which case that field alone discriminates;
+//! * `oneOf`: the branch index as an `x-control-value-type` varint, then the
+//!   branch; a `const` field of a branch is an ordinary field with a fixed
+//!   value, written after the index;
+//! * `string`: length-prefixed bytes (text and binary payloads alike);
 //! * a property without `type` / `$ref` / `oneOf` is network NBT.
 
 use crate::ir::*;
 use crate::names::{self, Namer};
+use crate::overrides;
 use crate::schema::{Document, JsonType, Node, Options, Underlying};
 use std::collections::{BTreeMap, HashMap};
 
@@ -111,6 +115,8 @@ pub struct Lowerer<'a> {
     /// Aliases being resolved, to detect self-referential ones.
     resolving: Vec<&'a str>,
     enum_index: HashMap<String, usize>,
+    /// Indices of the field overrides that matched a schema property.
+    used_overrides: std::collections::HashSet<usize>,
     model: Model,
 }
 
@@ -123,6 +129,7 @@ impl<'a> Lowerer<'a> {
             hoisted: HashMap::new(),
             resolving: Vec::new(),
             enum_index: HashMap::new(),
+            used_overrides: std::collections::HashSet::new(),
             model: Model::default(),
         }
     }
@@ -190,6 +197,17 @@ impl<'a> Lowerer<'a> {
                         payload,
                     });
                 }
+            }
+        }
+
+        // An override that matches nothing means the schema moved on: the
+        // special case must be reviewed, not silently dropped.
+        for (index, entry) in overrides::FIELD_OVERRIDES.iter().enumerate() {
+            if !self.used_overrides.contains(&index) && docs.values().any(|doc| doc.title == entry.document) {
+                return Err(format!(
+                    "override for {}.{:?} matches no property (see proto-codegen/src/overrides.rs)",
+                    entry.document, entry.property
+                ));
             }
         }
 
@@ -265,7 +283,14 @@ impl<'a> Lowerer<'a> {
         }
     }
 
+    /// Lowers a node and attaches the limits documented on it, if any.
     fn lower(&mut self, node: &'a Node, hint: &str, inherit: Inherit, location: &str) -> Result<Ty> {
+        let ty = self.lower_plain(node, hint, inherit, location)?;
+        let constraints = constraints_for(&ty, node);
+        Ok(if constraints.is_empty() { ty } else { Ty::Constrained(Box::new(ty), constraints) })
+    }
+
+    fn lower_plain(&mut self, node: &'a Node, hint: &str, inherit: Inherit, location: &str) -> Result<Ty> {
         let underlying = node.underlying.or(inherit.underlying);
         let options = node.options.or(inherit.options);
 
@@ -487,8 +512,27 @@ impl<'a> Lowerer<'a> {
                 continue;
             }
 
-            let mut ty = self.lower(property, &hint, Inherit::default(), &field_location)?;
-            if !required.contains(original) {
+            let mut ty = match overrides::find(source, original) {
+                Some((index, entry)) => {
+                    // The override replaces a plain string; anything else
+                    // means the schema changed and the override is stale.
+                    let plain_string = property.ty == Some(JsonType::String)
+                        && property.reference.is_none()
+                        && property.enumerators.is_none();
+                    if !plain_string {
+                        return Err(format!(
+                            "{field_location}: overridden as codec::{} but no longer a plain string",
+                            entry.codec_type
+                        ));
+                    }
+                    self.used_overrides.insert(index);
+                    Ty::Extern(entry.codec_type.to_owned())
+                }
+                None => self.lower(property, &hint, Inherit::default(), &field_location)?,
+            };
+            // Not required and no default: a `std::optional`. Not required
+            // with a default: a plain member, always written.
+            if !required.contains(original) && !property.has_default {
                 ty = Ty::Option(Box::new(ty));
             }
             fields.push(Field { name: field_name, original: original.clone(), doc, ty, constant: None });
@@ -501,30 +545,8 @@ impl<'a> Lowerer<'a> {
         Ok(StructDef { name, source: source.to_owned(), doc, fields })
     }
 
-    /// The leading `const` property of the struct document `stem`, if any.
-    fn tag_property(&self, stem: &str) -> Option<&'a Node> {
-        let docs = self.docs;
-        let doc = docs.get(stem)?;
-        if kind_of(doc) != Kind::Struct {
-            return None;
-        }
-        let first = doc.root.properties.as_ref()?.iter().min_by_key(|(_, p)| p.ordinal.unwrap_or(u64::MAX))?;
-        first.1.constant.as_ref().map(|_| &first.1)
-    }
-
     fn build_variant(&mut self, name: String, source: &str, node: &'a Node, location: &str) -> Result<VariantDef> {
         let branches = node.one_of.as_ref().ok_or_else(|| format!("{location}: variant without oneOf"))?;
-
-        // Tagged when every branch is a struct led by a constant of one enum,
-        // serialized identically everywhere.
-        let tags: Option<Vec<&'a Node>> =
-            branches.iter().map(|b| b.reference.as_deref().and_then(|stem| self.tag_property(stem))).collect();
-        let tags = tags.filter(|tags| {
-            tags.windows(2).all(|pair| {
-                let (a, b) = (pair[0], pair[1]);
-                a.reference == b.reference && a.underlying == b.underlying && a.options == b.options
-            })
-        });
 
         let mut base_names = Vec::new();
         let mut tys = Vec::new();
@@ -557,47 +579,59 @@ impl<'a> Lowerer<'a> {
 
         let short_names = shorten_branch_names(&base_names);
         let mut branch_names = Namer::with_reserved(&["Self"]);
-        let mut out = Vec::new();
-        for (index, (ty, short)) in tys.into_iter().zip(short_names).enumerate() {
-            let tag_variant = match tags.as_ref().and_then(|tags| tags.get(index)) {
-                Some(tag) => {
-                    let enum_stem =
-                        tag.reference.as_deref().ok_or_else(|| format!("{location}: const without $ref"))?;
-                    let (enum_stem, _) = self.doc(enum_stem, location)?;
-                    let enum_name = self.rust_names[enum_stem].clone();
-                    let constant = tag.constant.as_deref().ok_or_else(|| format!("{location}: tag without const"))?;
-                    let variant = self.const_variant(&enum_name, constant, location)?;
-                    // Two branches selected by the same value: the second one
-                    // could never be decoded.
-                    if let Some(other) = out.iter().find(|b: &&Branch| b.tag_variant.as_deref() == Some(&variant)) {
-                        return Err(format!(
-                            "{location}: branches {} and {short} are both selected by {enum_name}::{variant}",
-                            other.name
-                        ));
-                    }
-                    Some(variant)
-                }
-                None => None,
-            };
-            out.push(Branch { name: branch_names.unique(&short), ty, tag_variant });
-        }
+        let out = tys
+            .into_iter()
+            .zip(short_names)
+            .map(|(ty, short)| Branch { name: branch_names.unique(&short), ty })
+            .collect();
 
-        let kind = if let Some(tag) = tags.as_ref().and_then(|tags| tags.first()) {
-            let tag_location = format!("{location}/<tag>");
-            match self.lower(tag, &name, Inherit::default(), &tag_location)? {
-                Ty::Enum { name, wire, .. } => VariantKind::Tagged { tag: Ty::Enum { name, wire, allow_unknown: false } },
-                other => return Err(format!("{tag_location}: discriminator is not an enum ({other:?})")),
-            }
-        } else {
-            // `std::variant` index; Mojang documents it as `uint32`, which the
-            // binary stream writes as a varint.
-            let int = node.control.and_then(int_of).unwrap_or(Int::U32);
-            VariantKind::Index(int, Enc::Var)
-        };
-
+        // `std::variant` index. Mojang documents it as `uint32`; the binary
+        // stream writes it as a varint. Branches that start with a `const`
+        // field still get the index: the constant is written after it.
+        let int = node.control.and_then(int_of).unwrap_or(Int::U32);
         let doc = join_doc(std::slice::from_ref(&node.description));
-        Ok(VariantDef { name, source: source.to_owned(), doc, kind, branches: out })
+        Ok(VariantDef { name, source: source.to_owned(), doc, index: (int, Enc::Var), branches: out })
     }
+}
+
+/// The base type behind aliases and constraints.
+fn base_type(ty: &Ty) -> &Ty {
+    match ty {
+        Ty::Alias { target, .. } => base_type(target),
+        Ty::Constrained(inner, _) => base_type(inner),
+        other => other,
+    }
+}
+
+/// The documented limits of `node` that are meaningful for `ty`.
+fn constraints_for(ty: &Ty, node: &Node) -> Constraints {
+    let mut constraints = Constraints::default();
+    match base_type(ty) {
+        Ty::Int(int, _) => {
+            // Bounds the integer type already guarantees carry no information.
+            let (type_min, type_max) = int.range();
+            constraints.minimum = node.minimum.filter(|min| *min > type_min as f64).map(|min| format!("{min:?}"));
+            constraints.maximum = node.maximum.filter(|max| *max < type_max as f64).map(|max| format!("{max:?}"));
+        }
+        Ty::F32 | Ty::F64 => {
+            constraints.minimum = node.minimum.map(|min| format!("{min:?}"));
+            constraints.maximum = node.maximum.map(|max| format!("{max:?}"));
+        }
+        Ty::String => {
+            constraints.min_length = node.min_length.filter(|min| *min > 0);
+            constraints.max_length = node.max_length;
+        }
+        Ty::Vec(..) => {
+            constraints.min_items = node.min_items.filter(|min| *min > 0);
+            // A couple of arrays carry `maxProperties` instead of `maxItems`.
+            constraints.max_items = node.max_items.or(node.max_properties);
+        }
+        Ty::Map(..) => constraints.max_items = node.max_properties,
+        // Fixed-size arrays have their length in the type; nothing else has
+        // limits in the schemas.
+        _ => {}
+    }
+    constraints
 }
 
 /// Strips the words shared by every referenced branch name
@@ -710,6 +744,7 @@ mod tests {
         assert_eq!((def.aliases[0].name.as_str(), def.aliases[0].target.as_str()), ("AliasOfA", "A"));
         // 300 does not fit in the documented uint8.
         assert_eq!(def.repr, Int::I64);
+
     }
 
     #[test]
@@ -718,6 +753,7 @@ mod tests {
             "S",
             json!({"type": "object", "required": ["Type", "List"], "properties": {
                 "Maybe": {"type": "string", "x-ordinal-index": 2},
+                "Defaulted": {"type": "array", "items": {"type": "boolean"}, "default": [], "x-ordinal-index": 3},
                 "List": {"type": "array", "items": {"type": "integer", "x-underlying-type": "uint64"},
                          "x-serialization-options": ["Compression", "No size compression"], "x-ordinal-index": 1},
                 "Type": {"type": "integer", "x-underlying-type": "int32",
@@ -726,7 +762,12 @@ mod tests {
         )]);
         let model = Lowerer::new(&docs).run().unwrap();
         let fields = &model.structs[0].fields;
-        assert_eq!(fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["r#type", "list", "maybe"]);
+        assert_eq!(
+            fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(),
+            ["r#type", "list", "maybe", "defaulted"]
+        );
+        // Not required but documented with a default: always on the wire.
+        assert_eq!(fields[3].ty, Ty::Vec(Box::new(Ty::Bool), LenEnc::Var));
         assert_eq!(fields[0].ty, Ty::Int(Int::I32, Enc::Be));
         assert_eq!(fields[1].ty, Ty::Vec(Box::new(Ty::Int(Int::U64, Enc::Var)), LenEnc::U32Le));
         assert_eq!(fields[2].ty, Ty::Option(Box::new(Ty::String)));
@@ -751,16 +792,17 @@ mod tests {
                             "x-control-value-type": "uint32", "x-ordinal-index": 1}}})),
         ]);
         let model = Lowerer::new(&docs).run().unwrap();
+        // Branches led by a constant are indexed like any other variant: the
+        // constant is a field of the branch, written after the index.
         let tagged = model.variants.iter().find(|v| v.name == "HolderTagged").unwrap();
-        assert!(matches!(tagged.kind, VariantKind::Tagged { .. }));
+        assert_eq!(tagged.index, (Int::U32, Enc::Var));
         assert_eq!(tagged.branches.iter().map(|b| b.name.as_str()).collect::<Vec<_>>(), ["Byte", "Short"]);
-        assert_eq!(tagged.branches[1].tag_variant.as_deref(), Some("ShortValue"));
         let indexed = model.variants.iter().find(|v| v.name == "HolderIndexed").unwrap();
-        assert_eq!(indexed.kind, VariantKind::Index(Int::U32, Enc::Var));
+        assert_eq!(indexed.index, (Int::U32, Enc::Var));
         assert_eq!(indexed.branches.iter().map(|b| b.name.as_str()).collect::<Vec<_>>(), ["Null", "Bool", "BytePayload"]);
         assert_eq!(indexed.branches[0].ty, Ty::Unit);
         let payload = model.structs.iter().find(|s| s.name == "BytePayload").unwrap();
-        assert_eq!(payload.tag().unwrap().constant.as_ref().unwrap().variant, "Byte");
+        assert_eq!(payload.fields[0].constant.as_ref().unwrap().variant, "Byte");
     }
 
     #[test]
@@ -836,16 +878,51 @@ mod tests {
                      "x-serialization-options": ["Enum-as-Value"], "x-ordinal-index": 0}}});
 
         // A constant matching two different enumerators.
-        let message = error(&[("Kind", kind.clone()), ("A", tagged("itemtag"))]);
+        let message = error(&[("Kind", kind), ("A", tagged("itemtag"))]);
         assert!(message.contains("ambiguous"), "{message}");
+    }
 
-        // Two branches selected by the same discriminator value.
-        let message = error(&[
-            ("Kind", kind),
-            ("A", tagged("other")),
-            ("B", tagged("Other")),
-            ("V", json!({"oneOf": [{"$ref": "./A.json"}, {"$ref": "./B.json"}]})),
-        ]);
-        assert!(message.contains("both selected by"), "{message}");
+    #[test]
+    fn constraints_are_kept_when_meaningful() {
+        let docs = docs(&[(
+            "S",
+            json!({"type": "object", "required": ["Name", "Byte", "Level", "Items"], "properties": {
+                "Name": {"type": "string", "minLength": 1, "maxLength": 16, "x-ordinal-index": 0},
+                // 0..=255 on a uint8 says nothing the type does not.
+                "Byte": {"type": "integer", "x-underlying-type": "uint8", "minimum": 0.0, "maximum": 255.0,
+                         "x-ordinal-index": 1},
+                "Level": {"type": "integer", "x-underlying-type": "int32", "minimum": 0.0, "maximum": 100.0,
+                          "x-ordinal-index": 2},
+                "Items": {"type": "array", "items": {"type": "boolean"}, "minItems": 1, "maxItems": 4,
+                          "x-ordinal-index": 3}}}),
+        )]);
+        let model = Lowerer::new(&docs).run().unwrap();
+        let fields = &model.structs[0].fields;
+        let Ty::Constrained(inner, limits) = &fields[0].ty else { panic!("{:?}", fields[0].ty) };
+        assert_eq!(**inner, Ty::String);
+        assert_eq!((limits.min_length, limits.max_length), (Some(1), Some(16)));
+        assert_eq!(fields[1].ty, Ty::Int(Int::U8, Enc::Le));
+        let Ty::Constrained(_, limits) = &fields[2].ty else { panic!("{:?}", fields[2].ty) };
+        assert_eq!((limits.minimum.as_deref(), limits.maximum.as_deref()), (Some("0.0"), Some("100.0")));
+        assert_eq!(limits.describe(), "minimum 0, maximum 100");
+        let Ty::Constrained(_, limits) = &fields[3].ty else { panic!("{:?}", fields[3].ty) };
+        assert_eq!((limits.min_items, limits.max_items), (Some(1), Some(4)));
+    }
+
+    #[test]
+    fn overrides_replace_plain_strings_only() {
+        let payload = |field: Value| json!({"type": "object", "required": ["Connection Request"],
+            "properties": {"Connection Request": field}});
+        let ok = docs(&[("LoginPacketPayload", payload(json!({"type": "string", "x-ordinal-index": 0})))]);
+        let model = Lowerer::new(&ok).run().unwrap();
+        assert_eq!(model.structs[0].fields[0].ty, Ty::Extern("ConnectionRequest".into()));
+
+        // The property changed shape: the override must be reviewed.
+        let changed = docs(&[("LoginPacketPayload", payload(json!({"type": "integer", "x-ordinal-index": 0})))]);
+        assert!(Lowerer::new(&changed).run().unwrap_err().contains("no longer a plain string"));
+
+        // The property disappeared.
+        let gone = docs(&[("LoginPacketPayload", json!({"type": "object"}))]);
+        assert!(Lowerer::new(&gone).run().unwrap_err().contains("matches no property"));
     }
 }

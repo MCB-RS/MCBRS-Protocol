@@ -15,6 +15,7 @@ mod emit;
 mod ir;
 mod lower;
 mod names;
+mod overrides;
 mod schema;
 
 use std::path::{Path, PathBuf};

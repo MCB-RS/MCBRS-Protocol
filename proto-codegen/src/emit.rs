@@ -6,7 +6,7 @@
 //! local `rustfmt`.
 
 use crate::ir::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;
 
 pub struct GeneratedFile {
@@ -142,18 +142,117 @@ pub struct Emitter<'m> {
     model: &'m Model,
     /// Alias name -> Rust type it stands for.
     alias_types: HashMap<&'m str, String>,
-    structs: HashMap<&'m str, &'m StructDef>,
+    /// Structs and variants whose `validate` has something to check.
+    constrained: HashSet<&'m str>,
     upstream_commit: Option<String>,
+}
+
+/// A generated struct that mirrors a hand-written primitive of `crate::codec`.
+struct Primitive {
+    /// Title of the schema document.
+    title: &'static str,
+    /// Name of the type in `crate::codec`.
+    codec: &'static str,
+    /// Expected wire layout; a mismatch aborts generation, so the two
+    /// definitions cannot drift apart unnoticed.
+    layout: &'static [Ty],
+    /// Constructor of the codec type, taking the fields in wire order.
+    constructor: &'static str,
+    /// Expressions reading each field back from a codec `value`.
+    getters: &'static [&'static str],
+}
+
+const U64_LE: Ty = Ty::Int(Int::U64, Enc::Le);
+const I32_LE: Ty = Ty::Int(Int::I32, Enc::Le);
+const I32_VAR: Ty = Ty::Int(Int::I32, Enc::Var);
+
+const PRIMITIVES: &[Primitive] = &[
+    Primitive {
+        title: "mce::UUID",
+        codec: "Uuid",
+        layout: &[U64_LE, U64_LE],
+        constructor: "from_parts",
+        getters: &["value.most_significant_bits()", "value.least_significant_bits()"],
+    },
+    Primitive { title: "Vec2", codec: "Vec2", layout: &[Ty::F32, Ty::F32], constructor: "new", getters: &["value.x", "value.y"] },
+    Primitive {
+        title: "Vec3",
+        codec: "Vec3",
+        layout: &[Ty::F32, Ty::F32, Ty::F32],
+        constructor: "new",
+        getters: &["value.x", "value.y", "value.z"],
+    },
+    Primitive {
+        title: "BlockPos",
+        codec: "BlockPos",
+        layout: &[I32_VAR, I32_VAR, I32_VAR],
+        constructor: "new",
+        getters: &["value.x", "value.y", "value.z"],
+    },
+    Primitive { title: "ChunkPos", codec: "ChunkPos", layout: &[I32_VAR, I32_VAR], constructor: "new", getters: &["value.x", "value.z"] },
+    Primitive {
+        title: "SubChunkPos",
+        codec: "SubChunkPos",
+        layout: &[I32_LE, I32_LE, I32_LE],
+        constructor: "new",
+        getters: &["value.x", "value.y", "value.z"],
+    },
+];
+
+/// Condition "the collection `place` has fewer than `min` elements".
+fn below(place: &str, min: u64) -> String {
+    if min == 1 {
+        format!("{place}.is_empty()")
+    } else {
+        format!("{place}.len() < {min}")
+    }
+}
+
+/// The type behind aliases and constraints.
+fn base(ty: &Ty) -> &Ty {
+    match ty {
+        Ty::Alias { target, .. } => base(target),
+        Ty::Constrained(inner, _) => base(inner),
+        other => other,
+    }
+}
+
+/// Whether validating a value of type `ty` can check anything.
+fn has_checks(ty: &Ty, constrained: &HashSet<&str>) -> bool {
+    match ty {
+        Ty::Constrained(..) => true,
+        Ty::Named(name) => constrained.contains(name.as_str()),
+        Ty::Alias { target, .. } => has_checks(target, constrained),
+        Ty::Option(inner) | Ty::Vec(inner, _) | Ty::FixedVec(inner, _) | Ty::Array(inner, _) | Ty::Boxed(inner) => {
+            has_checks(inner, constrained)
+        }
+        Ty::Map(key, value) => has_checks(key, constrained) || has_checks(value, constrained),
+        _ => false,
+    }
 }
 
 impl<'m> Emitter<'m> {
     pub fn new(model: &'m Model, upstream_commit: Option<String>) -> Self {
-        let mut emitter = Self {
-            model,
-            alias_types: HashMap::new(),
-            structs: model.structs.iter().map(|def| (def.name.as_str(), def)).collect(),
-            upstream_commit,
-        };
+        // Fixed point: a type has checks if one of its fields does, directly
+        // or through another type.
+        let mut constrained: HashSet<&'m str> = HashSet::new();
+        loop {
+            let before = constrained.len();
+            for def in &model.structs {
+                if def.fields.iter().any(|field| has_checks(&field.ty, &constrained)) {
+                    constrained.insert(def.name.as_str());
+                }
+            }
+            for def in &model.variants {
+                if def.branches.iter().any(|branch| has_checks(&branch.ty, &constrained)) {
+                    constrained.insert(def.name.as_str());
+                }
+            }
+            if constrained.len() == before {
+                break;
+            }
+        }
+        let mut emitter = Self { model, alias_types: HashMap::new(), constrained, upstream_commit };
         let alias_types = model.aliases.iter().map(|def| (def.name.as_str(), emitter.rust_type(&def.ty))).collect();
         emitter.alias_types = alias_types;
         emitter
@@ -163,7 +262,7 @@ impl<'m> Emitter<'m> {
         Ok(vec![
             GeneratedFile { name: "mod.rs", contents: format_file(&self.module(), "mod.rs")? },
             GeneratedFile { name: "enums.rs", contents: format_file(&self.enums(), "enums.rs")? },
-            GeneratedFile { name: "types.rs", contents: format_file(&self.types(), "types.rs")? },
+            GeneratedFile { name: "types.rs", contents: format_file(&self.types()?, "types.rs")? },
             GeneratedFile { name: "packets.rs", contents: format_file(&self.packets(), "packets.rs")? },
             GeneratedFile { name: "samples.rs", contents: format_file(&self.samples(), "samples.rs")? },
         ])
@@ -177,7 +276,9 @@ impl<'m> Emitter<'m> {
             Ty::Int(int, _) => int.rust().into(),
             Ty::F32 => "f32".into(),
             Ty::F64 => "f64".into(),
-            Ty::String => "String".into(),
+            Ty::String => "BedrockString".into(),
+            Ty::Extern(name) => format!("codec::{name}"),
+            Ty::Constrained(inner, _) => self.rust_type(inner),
             Ty::Nbt => "NetworkNbt".into(),
             Ty::Unit => "()".into(),
             Ty::Named(name) => name.clone(),
@@ -208,8 +309,8 @@ impl<'m> Emitter<'m> {
             Ty::Int(int, enc) => format!("codec::put_{}(buf, {});", int_fn_suffix(*int, *enc), deref(expr)),
             Ty::F32 => format!("codec::put_f32_le(buf, {});", deref(expr)),
             Ty::F64 => format!("codec::put_f64_le(buf, {});", deref(expr)),
-            Ty::String => format!("codec::put_string(buf, {expr})?;"),
-            Ty::Nbt | Ty::Named(_) => format!("BedrockCodec::serialize({expr}, buf)?;"),
+            Ty::String | Ty::Extern(_) | Ty::Nbt | Ty::Named(_) => format!("BedrockCodec::serialize({expr}, buf)?;"),
+            Ty::Constrained(inner, _) => self.ser(inner, expr, depth),
             Ty::Unit => String::new(),
             // Checked conversion: a value that does not fit the wire integer
             // (an unknown value kept by `MaybeUnknown`, say) is an error, never
@@ -275,7 +376,9 @@ impl<'m> Emitter<'m> {
             Ty::Int(int, enc) => format!("codec::get_{}(buf)?", int_fn_suffix(*int, *enc)),
             Ty::F32 => "codec::get_f32_le(buf)?".into(),
             Ty::F64 => "codec::get_f64_le(buf)?".into(),
-            Ty::String => "codec::get_string(buf)?".into(),
+            Ty::String => "<BedrockString as BedrockCodec>::deserialize(buf)?".into(),
+            Ty::Extern(name) => format!("<codec::{name} as BedrockCodec>::deserialize(buf)?"),
+            Ty::Constrained(inner, _) => self.de(inner),
             Ty::Nbt => "<NetworkNbt as BedrockCodec>::deserialize(buf)?".into(),
             Ty::Named(name) => format!("<{name} as BedrockCodec>::deserialize(buf)?"),
             Ty::Unit => "()".into(),
@@ -318,9 +421,10 @@ impl<'m> Emitter<'m> {
     /// Expression building a pseudo-random value of type `ty` (tests only).
     fn sample(&self, ty: &Ty) -> String {
         match ty {
-            Ty::Bool | Ty::Int(..) | Ty::F32 | Ty::F64 | Ty::String | Ty::Nbt | Ty::Named(_) => {
+            Ty::Bool | Ty::Int(..) | Ty::F32 | Ty::F64 | Ty::String | Ty::Extern(_) | Ty::Nbt | Ty::Named(_) => {
                 "Sample::sample(g)".into()
             }
+            Ty::Constrained(inner, _) => self.sample(inner),
             Ty::Unit => "()".into(),
             Ty::Enum { allow_unknown: true, .. } => "MaybeUnknown::Known(Sample::sample(g))".into(),
             Ty::Enum { .. } => "Sample::sample(g)".into(),
@@ -331,6 +435,110 @@ impl<'m> Emitter<'m> {
             Ty::Array(inner, _) => format!("std::array::from_fn(|_| {})", self.sample(inner)),
             Ty::Map(key, value) => format!("g.vec(|g| ({}, {}))", self.sample(key), self.sample(value)),
             Ty::Boxed(inner) => format!("Box::new({})", self.sample(inner)),
+        }
+    }
+
+    /// Statements checking the limits of the value behind `expr` (of type
+    /// `&T`); empty when there is nothing to check.
+    fn val(&self, ty: &Ty, expr: &str, owner: &str, field: &str, depth: usize) -> String {
+        match ty {
+            Ty::Constrained(inner, limits) => {
+                let mut out = self.limit_checks(inner, limits, expr, owner, field);
+                out.push_str(&self.val(inner, expr, owner, field, depth));
+                out
+            }
+            Ty::Named(name) if self.constrained.contains(name.as_str()) => format!("Validate::validate({expr})?;"),
+            Ty::Alias { target, .. } => self.val(target, expr, owner, field, depth),
+            Ty::Option(inner) => {
+                let var = format!("v{depth}");
+                let body = self.val(inner, &var, owner, field, depth + 1);
+                if body.is_empty() {
+                    body
+                } else {
+                    format!("if let Some({var}) = {expr} {{ {body} }}")
+                }
+            }
+            Ty::Vec(inner, _) | Ty::FixedVec(inner, _) | Ty::Array(inner, _) => {
+                let var = format!("v{depth}");
+                let body = self.val(inner, &var, owner, field, depth + 1);
+                if body.is_empty() {
+                    body
+                } else {
+                    format!("for {var} in {}.iter() {{ {body} }}", place(expr))
+                }
+            }
+            Ty::Map(key, value) => {
+                let (k, v) = (format!("k{depth}"), format!("v{depth}"));
+                let keys = self.val(key, &k, owner, field, depth + 1);
+                let values = self.val(value, &v, owner, field, depth + 1);
+                if keys.is_empty() && values.is_empty() {
+                    String::new()
+                } else {
+                    format!("for ({k}, {v}) in {}.iter() {{ {keys} {values} }}", place(expr))
+                }
+            }
+            Ty::Boxed(inner) => self.val(inner, &format!("&**({expr})"), owner, field, depth),
+            _ => String::new(),
+        }
+    }
+
+    /// The comparisons for one set of limits.
+    fn limit_checks(&self, ty: &Ty, limits: &Constraints, expr: &str, owner: &str, field: &str) -> String {
+        let mut out = String::new();
+        let mut check = |condition: String, constraint: String| {
+            let _ = write!(
+                out,
+                "if {condition} {{ return Err(ProtocolError::ConstraintViolated {{ type_name: {}, field: {}, constraint: {} }}); }}",
+                lit(owner),
+                lit(field),
+                lit(&constraint)
+            );
+        };
+        let number = |text: &str| text.strip_suffix(".0").unwrap_or(text).to_owned();
+        match base(ty) {
+            Ty::Int(..) | Ty::F32 | Ty::F64 => {
+                // Compared as `f64`, the type the schema states the bounds in.
+                let value = match base(ty) {
+                    Ty::F64 => deref(expr),
+                    Ty::F32 => format!("f64::from({})", deref(expr)),
+                    _ => format!("({} as f64)", deref(expr)),
+                };
+                if let Some(minimum) = &limits.minimum {
+                    check(format!("{value} < {minimum}"), format!("minimum {}", number(minimum)));
+                }
+                if let Some(maximum) = &limits.maximum {
+                    check(format!("{value} > {maximum}"), format!("maximum {}", number(maximum)));
+                }
+            }
+            Ty::String => {
+                let len = format!("{}.len()", place(expr));
+                if let Some(min) = limits.min_length {
+                    check(below(&place(expr), min), format!("at least {min} byte(s)"));
+                }
+                if let Some(max) = limits.max_length {
+                    check(format!("{len} > {max}"), format!("at most {max} byte(s)"));
+                }
+            }
+            Ty::Vec(..) | Ty::Map(..) => {
+                let len = format!("{}.len()", place(expr));
+                if let Some(min) = limits.min_items {
+                    check(below(&place(expr), min), format!("at least {min} element(s)"));
+                }
+                if let Some(max) = limits.max_items {
+                    check(format!("{len} > {max}"), format!("at most {max} element(s)"));
+                }
+            }
+            _ => {}
+        }
+        out
+    }
+
+    /// Documentation line listing the limits of a field, if it has any.
+    fn limits_doc(ty: &Ty) -> Option<String> {
+        match ty {
+            Ty::Constrained(_, limits) => Some(format!("Limits: {}.", limits.describe())),
+            Ty::Option(inner) | Ty::Alias { target: inner, .. } => Self::limits_doc(inner),
+            _ => None,
         }
     }
 
@@ -438,6 +646,7 @@ impl<'m> Emitter<'m> {
         out.push_str("_ => None, } }\n}\n");
 
         let _ = writeln!(out, "impl ProtocolEnum for {name} {{\nconst NAME: &'static str = {source};");
+        out.push_str("fn all() -> &'static [Self] { Self::ALL }\n");
         out.push_str("fn to_raw(self) -> i64 { self.value() as i64 }\n");
         let _ = writeln!(
             out,
@@ -496,12 +705,12 @@ impl<'m> Emitter<'m> {
 
     // ---------------------------------------------------------------- types.rs
 
-    fn types(&self) -> String {
+    fn types(&self) -> Result<String, String> {
         let mut out = String::from(
             "//! Protocol structures, variants (`oneOf`) and aliases.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
              use super::enums::*;\n\
-             use crate::codec::{self, BedrockCodec, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result};\n\n",
+             use crate::codec::{self, BedrockCodec, BedrockString, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result, Validate};\n\n",
         );
         for def in &self.model.aliases {
             out.push_str(&doc_lines(&[def.doc.clone(), Some(format!("Protocol type {}.", def.source))]));
@@ -513,7 +722,47 @@ impl<'m> Emitter<'m> {
         for def in &self.model.variants {
             self.variant_def(&mut out, def);
         }
-        out
+        self.primitive_conversions(&mut out)?;
+        Ok(out)
+    }
+
+    /// `From` conversions between generated structs and the hand-written
+    /// primitives of `crate::codec` that describe the same thing.
+    fn primitive_conversions(&self, out: &mut String) -> Result<(), String> {
+        for primitive in PRIMITIVES {
+            let Some(def) = self.model.structs.iter().find(|def| def.source == primitive.title) else {
+                // The schemas no longer have this type: nothing to connect.
+                continue;
+            };
+            let layout: Vec<&Ty> = def.fields.iter().map(|field| base(&field.ty)).collect();
+            let expected: Vec<&Ty> = primitive.layout.iter().collect();
+            if layout != expected || def.fields.iter().any(|field| field.constant.is_some()) {
+                return Err(format!(
+                    "{} no longer has the layout of codec::{} ({:?}): update the primitive and the table in emit.rs",
+                    primitive.title, primitive.codec, layout
+                ));
+            }
+            let (name, codec) = (&def.name, primitive.codec);
+            let fields: Vec<String> = def.fields.iter().map(|field| format!("value.{}", field.name)).collect();
+            let _ = writeln!(
+                out,
+                "impl From<{name}> for codec::{codec} {{ fn from(value: {name}) -> Self {{ codec::{codec}::{}({}) }} }}",
+                primitive.constructor,
+                fields.join(", ")
+            );
+            let init: Vec<String> = def
+                .fields
+                .iter()
+                .zip(primitive.getters)
+                .map(|(field, getter)| format!("{}: {getter}", field.name))
+                .collect();
+            let _ = writeln!(
+                out,
+                "impl From<codec::{codec}> for {name} {{ fn from(value: codec::{codec}) -> Self {{ Self {{ {} }} }} }}\n",
+                init.join(", ")
+            );
+        }
+        Ok(())
     }
 
     fn field_ser(&self, field: &Field) -> String {
@@ -556,24 +805,33 @@ impl<'m> Emitter<'m> {
 
     fn struct_def(&self, out: &mut String, def: &StructDef) {
         let name = &def.name;
-        out.push_str(&doc_lines(&[def.doc.clone(), Some(format!("Protocol type {}.", def.source))]));
+        let primitive = PRIMITIVES
+            .iter()
+            .find(|primitive| primitive.title == def.source)
+            .map(|primitive| format!("Converts to and from `codec::{}`.", primitive.codec));
+        out.push_str(&doc_lines(&[def.doc.clone(), Some(format!("Protocol type {}.", def.source)), primitive]));
         let _ = writeln!(out, "#[derive(Debug, Clone, PartialEq, Default)]\npub struct {name} {{");
         for field in def.fields.iter().filter(|field| field.constant.is_none()) {
-            out.push_str(&doc_lines(&[field.doc.clone(), Some(format!("Documented as \"{}\".", field.original))]));
+            out.push_str(&doc_lines(&[
+                field.doc.clone(),
+                Some(format!("Documented as \"{}\".", field.original)),
+                Self::limits_doc(&field.ty),
+            ]));
             let _ = writeln!(out, "pub {}: {},", field.name, self.rust_type(&field.ty));
         }
         out.push_str("}\n");
 
-        let indexed: Vec<(usize, &Field)> = def.fields.iter().enumerate().collect();
-        let has_tag = def.tag().is_some();
-        let consts: Vec<&Field> = def.fields.iter().filter(|field| field.constant.is_some()).collect();
+        let consts: Vec<(&Field, &ConstValue)> =
+            def.fields.iter().filter_map(|field| field.constant.as_ref().map(|constant| (field, constant))).collect();
         if !consts.is_empty() {
             let _ = writeln!(out, "impl {name} {{");
-            for field in &consts {
-                let constant = field.constant.as_ref().expect("filtered on constants");
+            for (field, constant) in &consts {
                 out.push_str(&doc_lines(&[
                     field.doc.clone(),
-                    Some(format!("Constant value of the {} field.", field.original)),
+                    Some(format!(
+                        "Constant value of the {} field: written on the wire, checked when reading.",
+                        field.original
+                    )),
                 ]));
                 let _ = writeln!(
                     out,
@@ -581,70 +839,42 @@ impl<'m> Emitter<'m> {
                     constant.const_name, constant.enum_name, constant.enum_name, constant.variant
                 );
             }
-            if has_tag {
-                out.push_str(&raw_doc("Writes the fields that follow the leading discriminator."));
-                out.push_str("pub fn serialize_body<B: BufMut>(&self, buf: &mut B) -> Result<()> {\n");
-                for field in &def.fields[1..] {
-                    out.push_str(&self.field_ser(field));
-                    out.push('\n');
-                }
-                out.push_str("Ok(())\n}\n");
-                out.push_str(&raw_doc("Reads the fields that follow the leading discriminator."));
-                out.push_str("pub fn deserialize_body<B: Buf>(buf: &mut B) -> Result<Self> {\n");
-                out.push_str(&self.fields_de(def, &indexed[1..]));
-                out.push_str("}\n");
-            }
             out.push_str("}\n");
         }
 
+        let indexed: Vec<(usize, &Field)> = def.fields.iter().enumerate().collect();
         let _ = writeln!(out, "impl BedrockCodec for {name} {{");
         out.push_str("fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {\n");
-        if has_tag {
-            out.push_str(&self.field_ser(&def.fields[0]));
-            out.push_str("\nself.serialize_body(buf)\n}\n");
-        } else {
-            for field in &def.fields {
-                out.push_str(&self.field_ser(field));
-                out.push('\n');
-            }
-            out.push_str("Ok(())\n}\n");
+        for field in &def.fields {
+            out.push_str(&self.field_ser(field));
+            out.push('\n');
         }
+        out.push_str("Ok(())\n}\n");
         out.push_str("fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {\n");
-        if has_tag {
-            let tag = &def.fields[0];
-            let constant = tag.constant.as_ref().expect("a tag is a constant field");
-            out.push_str(&self.const_check(def, tag, constant));
-            out.push_str("Self::deserialize_body(buf)\n}\n");
-        } else {
-            out.push_str(&self.fields_de(def, &indexed));
-            out.push_str("}\n");
-        }
-        out.push_str("}\n\n");
-    }
+        out.push_str(&self.fields_de(def, &indexed));
+        out.push_str("}\n}\n");
 
-    /// Name of the struct behind a tagged branch.
-    fn branch_struct<'a>(&self, ty: &'a Ty) -> Option<(&'a str, bool)> {
-        match ty {
-            Ty::Named(name) if self.structs.contains_key(name.as_str()) => Some((name, false)),
-            Ty::Boxed(inner) => self.branch_struct(inner).map(|(name, _)| (name, true)),
-            _ => None,
-        }
+        let checks: String = def
+            .fields
+            .iter()
+            .filter(|field| field.constant.is_none())
+            .map(|field| self.val(&field.ty, &format!("&self.{}", field.name), &def.source, &field.original, 0))
+            .collect();
+        let _ = writeln!(out, "impl Validate for {name} {{ fn validate(&self) -> Result<()> {{ {checks} Ok(()) }} }}\n");
     }
 
     fn variant_def(&self, out: &mut String, def: &VariantDef) {
         let name = &def.name;
         let source = lit(&def.source);
-        let encoding = match &def.kind {
-            VariantKind::Index(..) => "Encoded as the index of the active branch followed by the branch.",
-            VariantKind::Tagged { .. } => "Discriminated by the leading constant field of each branch.",
-        };
+        let (int, enc) = def.index;
         out.push_str(&doc_lines(&[
             def.doc.clone(),
             Some(format!("Protocol variant {}.", def.source)),
-            Some(encoding.to_owned()),
+            Some("Encoded as the index of the active branch (a varint) followed by the branch.".to_owned()),
         ]));
         let _ = writeln!(out, "#[derive(Debug, Clone, PartialEq)]\npub enum {name} {{");
-        for branch in &def.branches {
+        for (index, branch) in def.branches.iter().enumerate() {
+            out.push_str(&raw_doc(&format!("Index {index}.")));
             match &branch.ty {
                 Ty::Unit => {
                     let _ = writeln!(out, "{},", branch.name);
@@ -673,11 +903,7 @@ impl<'m> Emitter<'m> {
         let _ = writeln!(out, "impl BedrockCodec for {name} {{");
         out.push_str("fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {\nmatch self {\n");
         for (index, branch) in def.branches.iter().enumerate() {
-            let prefix = match &def.kind {
-                VariantKind::Index(int, enc) => format!("codec::put_{}(buf, {index});", int_fn_suffix(*int, *enc)),
-                // The branch struct writes its own discriminator.
-                VariantKind::Tagged { .. } => String::new(),
-            };
+            let prefix = format!("codec::put_{}(buf, {index});", int_fn_suffix(int, enc));
             match &branch.ty {
                 Ty::Unit => {
                     let _ = writeln!(out, "Self::{} => {{ {prefix} }}", branch.name);
@@ -690,45 +916,41 @@ impl<'m> Emitter<'m> {
         out.push_str("}\nOk(())\n}\n");
 
         out.push_str("fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {\n");
-        match &def.kind {
-            VariantKind::Index(int, enc) => {
-                let _ = writeln!(out, "match codec::get_{}(buf)? {{", int_fn_suffix(*int, *enc));
-                for (index, branch) in def.branches.iter().enumerate() {
-                    match &branch.ty {
-                        Ty::Unit => {
-                            let _ = writeln!(out, "{index} => Ok(Self::{}),", branch.name);
-                        }
-                        ty => {
-                            let _ = writeln!(out, "{index} => Ok(Self::{}({})),", branch.name, self.de(ty));
-                        }
-                    }
+        let _ = writeln!(out, "match codec::get_{}(buf)? {{", int_fn_suffix(int, enc));
+        for (index, branch) in def.branches.iter().enumerate() {
+            match &branch.ty {
+                Ty::Unit => {
+                    let _ = writeln!(out, "{index} => Ok(Self::{}),", branch.name);
                 }
-                let _ = writeln!(
-                    out,
-                    "other => Err(ProtocolError::InvalidVariantIndex {{ type_name: {source}, index: other as i64 }}),\n}}"
-                );
-            }
-            VariantKind::Tagged { tag } => {
-                let Ty::Enum { name: enum_name, .. } = tag else { unreachable!("tags are enums") };
-                let _ = writeln!(out, "let tag = {};", self.de(tag));
-                for branch in &def.branches {
-                    let (struct_name, boxed) = self.branch_struct(&branch.ty).expect("tagged branches are structs");
-                    let variant = branch.tag_variant.as_ref().expect("tagged branches carry their tag");
-                    let body = format!("{struct_name}::deserialize_body(buf)?");
-                    let body = if boxed { format!("Box::new({body})") } else { body };
-                    let _ = writeln!(
-                        out,
-                        "if tag == {enum_name}::{variant} {{ return Ok(Self::{}({body})); }}",
-                        branch.name
-                    );
+                ty => {
+                    let _ = writeln!(out, "{index} => Ok(Self::{}({})),", branch.name, self.de(ty));
                 }
-                let _ = writeln!(
-                    out,
-                    "Err(ProtocolError::InvalidVariantIndex {{ type_name: {source}, index: ProtocolEnum::to_raw(tag) }})"
-                );
             }
         }
-        out.push_str("}\n}\n\n");
+        let _ = writeln!(
+            out,
+            "other => Err(ProtocolError::InvalidVariantIndex {{ type_name: {source}, index: i64::from(other) }}),\n}}"
+        );
+        out.push_str("}\n}\n");
+
+        // Only the branches that have something to check get an arm.
+        let arms: Vec<String> = def
+            .branches
+            .iter()
+            .filter(|branch| branch.ty != Ty::Unit)
+            .filter_map(|branch| {
+                let body = self.val(&branch.ty, "v", &def.source, &branch.name, 0);
+                (!body.is_empty()).then(|| format!("Self::{}(v) => {{ {body} }}", branch.name))
+            })
+            .collect();
+        let body = if arms.is_empty() {
+            String::new()
+        } else if arms.len() == def.branches.len() {
+            format!("match self {{ {} }}", arms.join("\n"))
+        } else {
+            format!("match self {{ {} _ => {{}} }}", arms.join("\n"))
+        };
+        let _ = writeln!(out, "impl Validate for {name} {{ fn validate(&self) -> Result<()> {{ {body} Ok(()) }} }}\n");
     }
 
     // -------------------------------------------------------------- packets.rs
@@ -737,10 +959,10 @@ impl<'m> Emitter<'m> {
         let packets = &self.model.packets;
         let mut out = String::from(
             "//! Packets and the global [`Packet`] dispatch table.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
              use super::enums::*;\n\
              use super::types::*;\n\
-             use crate::codec::{self, BedrockCodec, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result};\n\n",
+             use crate::codec::{self, BedrockCodec, BedrockString, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum, ProtocolError, Result, Validate};\n\n",
         );
 
         for packet in packets {
@@ -766,6 +988,11 @@ impl<'m> Emitter<'m> {
                  fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {{ Ok(Self {{ payload: {} }}) }}\n}}",
                 self.ser(&packet.payload, "&self.payload", 0),
                 self.de(&packet.payload)
+            );
+            let _ = writeln!(
+                out,
+                "impl Validate for {name} {{ fn validate(&self) -> Result<()> {{ {} Ok(()) }} }}",
+                self.val(&packet.payload, "&self.payload", &packet.source, "payload", 0)
             );
             let _ = writeln!(
                 out,
@@ -854,6 +1081,17 @@ impl<'m> Emitter<'m> {
              Ok((header, packet))\n}\n",
         );
         out.push_str("}\n");
+
+        out.push_str(&raw_doc("Checks the packet against the limits Mojang documents for its fields."));
+        out.push_str("impl Validate for Packet { fn validate(&self) -> Result<()> { match self {\n");
+        for packet in packets {
+            let _ = writeln!(
+                out,
+                "Self::{}(packet) => Validate::validate(packet).map_err(|e| e.in_packet({}::NAME)),",
+                packet.variant, packet.name
+            );
+        }
+        out.push_str("} } }\n");
         out
     }
 
@@ -863,7 +1101,7 @@ impl<'m> Emitter<'m> {
         let model = self.model;
         let mut out = String::from(
             "//! Pseudo-random value builders used by the round-trip tests.\n\
-             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant)]\n\n\
+             #![allow(unused_variables, unused_imports, clippy::derivable_impls, clippy::large_enum_variant, clippy::single_match)]\n\n\
              use super::enums::*;\n\
              use super::packets::*;\n\
              use super::types::*;\n\

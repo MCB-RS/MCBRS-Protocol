@@ -170,6 +170,69 @@ impl Uuid {
     pub const fn as_bytes(&self) -> &[u8; 16] {
         &self.0
     }
+
+    /// Builds a UUID from the two halves the protocol transmits.
+    #[inline]
+    pub const fn from_parts(most_significant_bits: u64, least_significant_bits: u64) -> Self {
+        Self::from_u128(((most_significant_bits as u128) << 64) | least_significant_bits as u128)
+    }
+
+    /// High 64 bits (first on the wire).
+    #[inline]
+    pub const fn most_significant_bits(&self) -> u64 {
+        (self.as_u128() >> 64) as u64
+    }
+
+    /// Low 64 bits (second on the wire).
+    #[inline]
+    pub const fn least_significant_bits(&self) -> u64 {
+        self.as_u128() as u64
+    }
+
+    #[inline]
+    pub const fn is_nil(&self) -> bool {
+        self.as_u128() == 0
+    }
+}
+
+/// Parses the canonical `8-4-4-4-12` form; the 32-digit form without hyphens
+/// is accepted too. Hex digits may be in either case.
+impl std::str::FromStr for Uuid {
+    type Err = ProtocolError;
+
+    fn from_str(text: &str) -> Result<Self> {
+        let invalid = || ProtocolError::IntegerOutOfRange { type_name: "UUID", value: 0 };
+        let bytes = text.as_bytes();
+        let hyphenated = match bytes.len() {
+            36 => true,
+            32 => false,
+            _ => return Err(invalid()),
+        };
+        let mut value = 0u128;
+        for (index, &byte) in bytes.iter().enumerate() {
+            if hyphenated && matches!(index, 8 | 13 | 18 | 23) {
+                if byte != b'-' {
+                    return Err(invalid());
+                }
+                continue;
+            }
+            let digit = (byte as char).to_digit(16).ok_or_else(invalid)?;
+            value = (value << 4) | digit as u128;
+        }
+        Ok(Self::from_u128(value))
+    }
+}
+
+impl From<Uuid> for u128 {
+    fn from(value: Uuid) -> Self {
+        value.as_u128()
+    }
+}
+
+impl From<Uuid> for [u8; 16] {
+    fn from(value: Uuid) -> Self {
+        value.0
+    }
 }
 
 impl From<u128> for Uuid {
@@ -216,6 +279,30 @@ impl BedrockCodec for Uuid {
         let most = get_u64_le(buf)? as u128;
         let least = get_u64_le(buf)? as u128;
         Ok(Self::from_u128((most << 64) | least))
+    }
+}
+
+impl From<[f32; 2]> for Vec2 {
+    fn from([x, y]: [f32; 2]) -> Self {
+        Self { x, y }
+    }
+}
+
+impl From<Vec2> for [f32; 2] {
+    fn from(value: Vec2) -> Self {
+        [value.x, value.y]
+    }
+}
+
+impl From<[f32; 3]> for Vec3 {
+    fn from([x, y, z]: [f32; 3]) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl From<Vec3> for [f32; 3] {
+    fn from(value: Vec3) -> Self {
+        [value.x, value.y, value.z]
     }
 }
 
@@ -269,8 +356,7 @@ impl BedrockCodec for Vec3 {
     }
 }
 
-/// Block position: `x` and `z` as `VarInt32`, `y` as `VarUInt32`
-/// (the classic "network block position").
+/// Block position: three `VarInt32` (ZigZag), as described by `BlockPos.json`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct BlockPos {
     pub x: i32,
@@ -282,21 +368,79 @@ impl BlockPos {
     pub const fn new(x: i32, y: i32, z: i32) -> Self {
         Self { x, y, z }
     }
+
+    /// Chunk column containing this block.
+    pub const fn chunk(self) -> ChunkPos {
+        ChunkPos { x: self.x >> 4, z: self.z >> 4 }
+    }
 }
 
 impl BedrockCodec for BlockPos {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         put_i32_var(buf, self.x);
-        put_u32_var(buf, self.y as u32);
+        put_i32_var(buf, self.y);
         put_i32_var(buf, self.z);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self { x: get_i32_var(buf)?, y: get_u32_var(buf)? as i32, z: get_i32_var(buf)? })
+        Ok(Self { x: get_i32_var(buf)?, y: get_i32_var(buf)?, z: get_i32_var(buf)? })
     }
 }
 
-/// Sub-chunk position: three `VarInt32`.
+/// Legacy "network block position": `x` and `z` as `VarInt32`, `y` as
+/// `VarUInt32`. No schema of the current protocol uses it; it is kept for
+/// data produced by older versions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct NetworkBlockPos {
+    pub x: i32,
+    pub y: u32,
+    pub z: i32,
+}
+
+impl NetworkBlockPos {
+    pub const fn new(x: i32, y: u32, z: i32) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl BedrockCodec for NetworkBlockPos {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        put_i32_var(buf, self.x);
+        put_u32_var(buf, self.y);
+        put_i32_var(buf, self.z);
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        Ok(Self { x: get_i32_var(buf)?, y: get_u32_var(buf)?, z: get_i32_var(buf)? })
+    }
+}
+
+/// Chunk column position: two `VarInt32`, as described by `ChunkPos.json`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub struct ChunkPos {
+    pub x: i32,
+    pub z: i32,
+}
+
+impl ChunkPos {
+    pub const fn new(x: i32, z: i32) -> Self {
+        Self { x, z }
+    }
+}
+
+impl BedrockCodec for ChunkPos {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        put_i32_var(buf, self.x);
+        put_i32_var(buf, self.z);
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        Ok(Self { x: get_i32_var(buf)?, z: get_i32_var(buf)? })
+    }
+}
+
+/// Sub-chunk position: three fixed little-endian `i32`, as described by
+/// `SubChunkPos.json`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct SubChunkPos {
     pub x: i32,
@@ -312,13 +456,13 @@ impl SubChunkPos {
 
 impl BedrockCodec for SubChunkPos {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        put_i32_var(buf, self.x);
-        put_i32_var(buf, self.y);
-        put_i32_var(buf, self.z);
+        put_i32_le(buf, self.x);
+        put_i32_le(buf, self.y);
+        put_i32_le(buf, self.z);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self { x: get_i32_var(buf)?, y: get_i32_var(buf)?, z: get_i32_var(buf)? })
+        Ok(Self { x: get_i32_le(buf)?, y: get_i32_le(buf)?, z: get_i32_le(buf)? })
     }
 }
 
@@ -372,6 +516,9 @@ pub trait ProtocolEnum: Copy + Sized + 'static {
 
     /// Variant holding this numeric value, if any.
     fn from_raw(raw: i64) -> Option<Self>;
+
+    /// Every variant, in declaration order.
+    fn all() -> &'static [Self];
 
     /// Name of the variant as documented by Mojang.
     fn name(self) -> &'static str;
@@ -544,6 +691,17 @@ mod tests {
     fn uuid_layout() {
         let uuid = Uuid::from_u128(0x0011_2233_4455_6677_8899_aabb_ccdd_eeff);
         assert_eq!(uuid.to_string(), "00112233-4455-6677-8899-aabbccddeeff");
+        assert_eq!("00112233-4455-6677-8899-AABBCCDDEEFF".parse::<Uuid>().unwrap(), uuid);
+        assert_eq!("00112233445566778899aabbccddeeff".parse::<Uuid>().unwrap(), uuid);
+        assert!("00112233-4455-6677-8899-aabbccddeef".parse::<Uuid>().is_err());
+        assert!("00112233x4455-6677-8899-aabbccddeeff".parse::<Uuid>().is_err());
+        assert!("0011223g-4455-6677-8899-aabbccddeeff".parse::<Uuid>().is_err());
+        assert_eq!(uuid.most_significant_bits(), 0x0011_2233_4455_6677);
+        assert_eq!(uuid.least_significant_bits(), 0x8899_aabb_ccdd_eeff);
+        assert_eq!(Uuid::from_parts(0x0011_2233_4455_6677, 0x8899_aabb_ccdd_eeff), uuid);
+        assert_eq!(u128::from(uuid), 0x0011_2233_4455_6677_8899_aabb_ccdd_eeff);
+        assert_eq!(Uuid::from(<[u8; 16]>::from(uuid)), uuid);
+        assert!(Uuid::NIL.is_nil() && !uuid.is_nil());
         roundtrip(
             uuid,
             &[0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88],
@@ -554,9 +712,16 @@ mod tests {
     fn positions() {
         roundtrip(Vec2::new(1.0, -1.0), &[0, 0, 0x80, 0x3f, 0, 0, 0x80, 0xbf]);
         roundtrip(Vec3::new(0.0, 1.0, 0.0), &[0, 0, 0, 0, 0, 0, 0x80, 0x3f, 0, 0, 0, 0]);
-        roundtrip(BlockPos::new(-1, 64, 1), &[1, 64, 2]);
-        roundtrip(BlockPos::new(0, -1, 0), &[0, 0xff, 0xff, 0xff, 0xff, 0x0f, 0]);
-        roundtrip(SubChunkPos::new(-1, -2, 3), &[1, 3, 6]);
+        // Three ZigZag varints.
+        roundtrip(BlockPos::new(-1, 64, 1), &[1, 0x80, 0x01, 2]);
+        roundtrip(BlockPos::new(0, -1, 0), &[0, 1, 0]);
+        assert_eq!(BlockPos::new(-1, 70, 33).chunk(), ChunkPos::new(-1, 2));
+        // The legacy layout keeps Y unsigned.
+        roundtrip(NetworkBlockPos::new(-1, 64, 1), &[1, 64, 2]);
+        roundtrip(ChunkPos::new(-1, 1), &[1, 2]);
+        // Fixed-width little-endian.
+        roundtrip(SubChunkPos::new(-1, 2, 3), &[0xff, 0xff, 0xff, 0xff, 2, 0, 0, 0, 3, 0, 0, 0]);
+        assert_eq!(<[f32; 3]>::from(Vec3::from([1.0, 2.0, 3.0])), [1.0, 2.0, 3.0]);
     }
 
     #[test]

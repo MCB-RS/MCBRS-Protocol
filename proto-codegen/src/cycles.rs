@@ -15,9 +15,17 @@ fn by_value_refs<'a>(ty: &'a Ty, out: &mut Vec<&'a str>) {
     match ty {
         Ty::Named(name) => out.push(name),
         Ty::Alias { target, .. } => by_value_refs(target, out),
-        Ty::Option(inner) | Ty::Array(inner, _) => by_value_refs(inner, out),
+        Ty::Option(inner) | Ty::Array(inner, _) | Ty::Constrained(inner, _) => by_value_refs(inner, out),
         Ty::Boxed(_) | Ty::Vec(..) | Ty::FixedVec(..) | Ty::Map(..) => {}
-        Ty::Bool | Ty::Int(..) | Ty::F32 | Ty::F64 | Ty::String | Ty::Nbt | Ty::Unit | Ty::Enum { .. } => {}
+        Ty::Bool
+        | Ty::Int(..)
+        | Ty::F32
+        | Ty::F64
+        | Ty::String
+        | Ty::Extern(_)
+        | Ty::Nbt
+        | Ty::Unit
+        | Ty::Enum { .. } => {}
     }
 }
 
@@ -101,7 +109,7 @@ fn box_cyclic(ty: &mut Ty, cyclic: &dyn Fn(&str) -> bool) -> usize {
                 0
             }
         }
-        Ty::Option(inner) | Ty::Array(inner, _) => box_cyclic(inner, cyclic),
+        Ty::Option(inner) | Ty::Array(inner, _) | Ty::Constrained(inner, _) => box_cyclic(inner, cyclic),
         _ => 0,
     }
 }
@@ -214,10 +222,10 @@ mod tests {
             name: "Op".into(),
             source: "Op".into(),
             doc: None,
-            kind: VariantKind::Index(Int::U32, Enc::Var),
+            index: (Int::U32, Enc::Var),
             branches: vec![
-                Branch { name: "Not".into(), ty: named("Expr"), tag_variant: None },
-                Branch { name: "Leaf".into(), ty: named("Leaf"), tag_variant: None },
+                Branch { name: "Not".into(), ty: named("Expr") },
+                Branch { name: "Leaf".into(), ty: named("Leaf") },
             ],
         }];
 

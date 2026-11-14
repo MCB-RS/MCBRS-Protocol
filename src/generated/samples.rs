@@ -6,7 +6,8 @@
     unused_variables,
     unused_imports,
     clippy::derivable_impls,
-    clippy::large_enum_variant
+    clippy::large_enum_variant,
+    clippy::single_match
 )]
 use super::enums::*;
 use super::packets::*;
@@ -1202,7 +1203,7 @@ impl Sample for AnimatePacketPayload {
             target_actor_runtime_id: Sample::sample(g),
             data: Sample::sample(g),
             swing_source: g.option(Sample::sample),
-            hand: g.option(Sample::sample),
+            hand: Sample::sample(g),
         }
     }
 }
@@ -1309,8 +1310,8 @@ impl Sample for AuthorAndMessage {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            player_name: g.option(Sample::sample),
-            message: g.option(Sample::sample),
+            player_name: Sample::sample(g),
+            message: Sample::sample(g),
         }
     }
 }
@@ -1332,7 +1333,7 @@ impl Sample for AvailableCommandsPacketChainedSubcommandData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             name: Sample::sample(g),
-            sub_command_values: g.option(|g| g.vec(Sample::sample)),
+            sub_command_values: g.vec(Sample::sample),
         }
     }
 }
@@ -1808,7 +1809,7 @@ impl Sample for BoolAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(Sample::sample),
+            operation: Sample::sample(g),
         }
     }
 }
@@ -1864,11 +1865,10 @@ impl Sample for CameraAimAssistCategoryDefinition {
 impl Sample for CameraAimAssistCategoryPriorities {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            entities: g.option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
-            blocks: g.option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
-            block_tags: g.option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
-            entity_type_families: g
-                .option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
+            entities: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
+            blocks: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
+            block_tags: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
+            entity_type_families: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
             entity_default: g.option(Sample::sample),
             block_default: g.option(Sample::sample),
         }
@@ -1890,10 +1890,9 @@ impl Sample for CameraAimAssistPresetDefinition {
     fn sample(g: &mut Gen) -> Self {
         Self {
             identifier: Sample::sample(g),
-            exclusion_settings: g.option(Sample::sample),
-            liquid_targeting_list: g.option(|g| g.vec(Sample::sample)),
-            item_settings: g
-                .option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
+            exclusion_settings: Sample::sample(g),
+            liquid_targeting_list: g.vec(Sample::sample),
+            item_settings: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
             default_item_settings: g.option(Sample::sample),
             hand_settings: g.option(Sample::sample),
         }
@@ -1902,10 +1901,10 @@ impl Sample for CameraAimAssistPresetDefinition {
 impl Sample for CameraAimAssistPresetExclusionDefinition {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            blocks: g.option(|g| g.vec(Sample::sample)),
-            entities: g.option(|g| g.vec(Sample::sample)),
-            block_tags: g.option(|g| g.vec(Sample::sample)),
-            entity_type_families: g.option(|g| g.vec(Sample::sample)),
+            blocks: g.vec(Sample::sample),
+            entities: g.vec(Sample::sample),
+            block_tags: g.vec(Sample::sample),
+            entity_type_families: g.vec(Sample::sample),
         }
     }
 }
@@ -2049,8 +2048,8 @@ impl Sample for CameraInstructionSplineInstruction {
             curve: g.vec(Sample::sample),
             progress_key_frames: g.vec(Sample::sample),
             rotation_option: g.vec(Sample::sample),
-            spline_identifier: g.option(Sample::sample),
-            load_from_json: g.option(Sample::sample),
+            spline_identifier: Sample::sample(g),
+            load_from_json: Sample::sample(g),
         }
     }
 }
@@ -2147,7 +2146,7 @@ impl Sample for CameraSplineDefinition {
         Self {
             name: Sample::sample(g),
             total_time: Sample::sample(g),
-            spline_type: g.option(Sample::sample),
+            spline_type: Sample::sample(g),
             control_points: g.vec(Sample::sample),
             progress_key_frames: g.vec(Sample::sample),
             rotation_key_frames: g.vec(Sample::sample),
@@ -2318,7 +2317,7 @@ impl Sample for ClientCameraAimAssistPacketPayload {
         Self {
             camera_preset_id: Sample::sample(g),
             action: Sample::sample(g),
-            allow_aim_assist: g.option(Sample::sample),
+            allow_aim_assist: Sample::sample(g),
         }
     }
 }
@@ -2518,7 +2517,7 @@ impl Sample for ColorAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(Sample::sample),
+            operation: Sample::sample(g),
         }
     }
 }
@@ -2542,8 +2541,8 @@ impl Sample for CommandOriginData {
         Self {
             r#type: Sample::sample(g),
             uuid: Sample::sample(g),
-            request_id: g.option(Sample::sample),
-            player_id: g.option(Sample::sample),
+            request_id: Sample::sample(g),
+            player_id: Sample::sample(g),
         }
     }
 }
@@ -2552,7 +2551,7 @@ impl Sample for CommandOutput {
         Self {
             output_type: Sample::sample(g),
             success_count: Sample::sample(g),
-            output_messages: g.option(|g| g.vec(Sample::sample)),
+            output_messages: g.vec(Sample::sample),
             data_set: g.option(Sample::sample),
         }
     }
@@ -2562,7 +2561,7 @@ impl Sample for CommandOutputMessage {
         Self {
             message_id: Sample::sample(g),
             successful: Sample::sample(g),
-            parameters: g.option(|g| g.vec(Sample::sample)),
+            parameters: g.vec(Sample::sample),
             raw_message: g.option(Sample::sample),
         }
     }
@@ -3113,7 +3112,7 @@ impl Sample for FloatAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(Sample::sample),
+            operation: Sample::sample(g),
             constraint_min: g.option(Sample::sample),
             constraint_max: g.option(Sample::sample),
         }
@@ -3127,8 +3126,8 @@ impl Sample for FloatOverride {
 impl Sample for FloatRange {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            min: g.option(Sample::sample),
-            max: g.option(Sample::sample),
+            min: Sample::sample(g),
+            max: Sample::sample(g),
         }
     }
 }
@@ -3202,11 +3201,11 @@ impl Sample for GameTestResultsPacketPayload {
 impl Sample for GatheringsConfig {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            experience_id: g.option(Sample::sample),
-            experience_name: g.option(Sample::sample),
+            experience_id: Sample::sample(g),
+            experience_name: Sample::sample(g),
             world_id: g.option(Sample::sample),
             world_name: g.option(Sample::sample),
-            creator_id: g.option(Sample::sample),
+            creator_id: Sample::sample(g),
             target_id: g.option(Sample::sample),
             scenario_id: g.option(Sample::sample),
             server_id: g.option(Sample::sample),
@@ -3901,9 +3900,7 @@ impl Sample for LoginPacketPayload {
 }
 impl Sample for ManagedChatJoinInfo {
     fn sample(g: &mut Gen) -> Self {
-        Self {
-            enabled: g.option(Sample::sample),
-        }
+        Self { enabled: Sample::sample(g) }
     }
 }
 impl Sample for MapCreateLockedCopyPacketPayload {
@@ -3987,9 +3984,9 @@ impl Sample for MessageAndParams {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            message: g.option(Sample::sample),
-            parameter_list: g.option(|g| g.vec(Sample::sample)),
-            queue: g.option(Sample::sample),
+            message: Sample::sample(g),
+            parameter_list: g.vec(Sample::sample),
+            queue: Sample::sample(g),
         }
     }
 }
@@ -3997,7 +3994,7 @@ impl Sample for MessageOnly {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            message: g.option(Sample::sample),
+            message: Sample::sample(g),
         }
     }
 }
@@ -4578,7 +4575,7 @@ impl Sample for PlayerListAddEntry {
 impl Sample for PlayerListPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            entries: g.option(|g| g.vec(Sample::sample)),
+            entries: g.vec(Sample::sample),
         }
     }
 }
@@ -4661,8 +4658,8 @@ impl Sample for PlayerUpdateEntityOverridesPacketPayload {
 impl Sample for PlayerVideoCapturePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            start_video_capture: g.option(Sample::sample),
-            stop_video_capture: g.option(Sample::sample),
+            start_video_capture: Sample::sample(g),
+            stop_video_capture: Sample::sample(g),
         }
     }
 }
@@ -4742,7 +4739,7 @@ impl Sample for PrimitiveShapeDataPayload {
             color: g.option(Sample::sample),
             dimension_id: g.option(Sample::sample),
             attached_to_entity_id: g.option(Sample::sample),
-            extra_shape_data: g.option(Sample::sample),
+            extra_shape_data: Sample::sample(g),
         }
     }
 }
@@ -5084,10 +5081,10 @@ impl Sample for SerializedAbilitiesDataSerializedLayer {
 impl Sample for SerializedNoiseBlockSpecifier {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            noise: g.option(Sample::sample),
-            threshold: g.option(Sample::sample),
-            range: g.option(Sample::sample),
-            block: g.option(Sample::sample),
+            noise: Sample::sample(g),
+            threshold: Sample::sample(g),
+            range: Sample::sample(g),
+            block: Sample::sample(g),
         }
     }
 }
@@ -5233,7 +5230,7 @@ impl Sample for ServerboundCursorItemDragPacketPayload {
 impl Sample for ServerboundDataDrivenScreenClosedPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            form_id: g.option(Sample::sample),
+            form_id: Sample::sample(g),
             close_reason: Sample::sample(g),
         }
     }
@@ -5429,7 +5426,7 @@ impl Sample for SetPlayerInventoryOptionsPacketPayload {
 impl Sample for SetScorePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            score_info: g.option(|g| g.vec(Sample::sample)),
+            score_info: g.vec(Sample::sample),
         }
     }
 }
@@ -5732,7 +5729,7 @@ impl Sample for StringAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(Sample::sample),
+            operation: Sample::sample(g),
         }
     }
 }
@@ -5965,12 +5962,12 @@ impl Sample for TextDataPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             text: Sample::sample(g),
-            use_rotation: g.option(Sample::sample),
+            use_rotation: Sample::sample(g),
             background_color: g.option(Sample::sample),
-            line_gap_height: g.option(Sample::sample),
-            depth_test: g.option(Sample::sample),
-            show_backface: g.option(Sample::sample),
-            show_text_backface: g.option(Sample::sample),
+            line_gap_height: Sample::sample(g),
+            depth_test: Sample::sample(g),
+            show_backface: Sample::sample(g),
+            show_text_backface: Sample::sample(g),
         }
     }
 }
@@ -5979,8 +5976,8 @@ impl Sample for TextPacketPayload {
         Self {
             localize: Sample::sample(g),
             body: Sample::sample(g),
-            sender_s_xuid: g.option(Sample::sample),
-            platform_id: g.option(Sample::sample),
+            sender_s_xuid: Sample::sample(g),
+            platform_id: Sample::sample(g),
             filtered_message: g.option(Sample::sample),
         }
     }

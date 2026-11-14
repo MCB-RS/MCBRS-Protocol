@@ -86,6 +86,52 @@ pub enum EnumWire {
     Name,
 }
 
+/// Limits Mojang documents for a value. They never affect the layout; the
+/// generated `Validate` implementations check them.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+pub struct Constraints {
+    /// Inclusive bounds, as Rust `f64` literals.
+    pub minimum: Option<String>,
+    pub maximum: Option<String>,
+    /// String length, in bytes.
+    pub min_length: Option<u64>,
+    pub max_length: Option<u64>,
+    /// Element / entry count.
+    pub min_items: Option<u64>,
+    pub max_items: Option<u64>,
+}
+
+impl Constraints {
+    pub fn is_empty(&self) -> bool {
+        *self == Self::default()
+    }
+
+    /// Human-readable summary, for documentation.
+    pub fn describe(&self) -> String {
+        let mut parts = Vec::new();
+        let number = |text: &str| text.strip_suffix(".0").unwrap_or(text).to_owned();
+        if let Some(minimum) = &self.minimum {
+            parts.push(format!("minimum {}", number(minimum)));
+        }
+        if let Some(maximum) = &self.maximum {
+            parts.push(format!("maximum {}", number(maximum)));
+        }
+        if let Some(min) = self.min_length {
+            parts.push(format!("at least {min} byte(s)"));
+        }
+        if let Some(max) = self.max_length {
+            parts.push(format!("at most {max} byte(s)"));
+        }
+        if let Some(min) = self.min_items {
+            parts.push(format!("at least {min} element(s)"));
+        }
+        if let Some(max) = self.max_items {
+            parts.push(format!("at most {max} element(s)"));
+        }
+        parts.join(", ")
+    }
+}
+
 /// A type as used by a field: Rust type plus wire encoding.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Ty {
@@ -93,7 +139,12 @@ pub enum Ty {
     Int(Int, Enc),
     F32,
     F64,
+    /// C++ `std::string`: length-prefixed bytes, text or not.
     String,
+    /// A hand-written type of `crate::codec` (see `overrides.rs`).
+    Extern(String),
+    /// A type with documented limits; encoded exactly like the inner type.
+    Constrained(Box<Ty>, Constraints),
     /// Untyped field in the schema: network NBT.
     Nbt,
     /// `null` / empty object: nothing on the wire.
@@ -177,37 +228,20 @@ pub struct StructDef {
     pub fields: Vec<Field>,
 }
 
-impl StructDef {
-    /// The leading constant field, if any: it discriminates the struct when
-    /// used as a branch of a tagged variant.
-    pub fn tag(&self) -> Option<&Field> {
-        self.fields.first().filter(|field| field.constant.is_some())
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct Branch {
     pub name: String,
     pub ty: Ty,
-    /// For tagged variants: the enum variant selecting this branch.
-    pub tag_variant: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VariantKind {
-    /// `std::variant`: the branch index, then the branch.
-    Index(Int, Enc),
-    /// Every branch is a struct starting with a constant field of the same
-    /// enum: that field is the discriminator, no index is written.
-    Tagged { tag: Ty },
-}
-
+/// A `oneOf`: on the wire, the index of the active branch (in the encoding of
+/// `index`) followed by the branch itself.
 #[derive(Debug, Clone)]
 pub struct VariantDef {
     pub name: String,
     pub source: String,
     pub doc: Option<String>,
-    pub kind: VariantKind,
+    pub index: (Int, Enc),
     pub branches: Vec<Branch>,
 }
 

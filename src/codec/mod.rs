@@ -1,19 +1,39 @@
 //! Binary codec of the Bedrock protocol: the [`BedrockCodec`] trait, the
 //! [`ProtocolError`] type and all the wire primitives.
 
+pub mod connection;
 pub mod error;
+pub mod framing;
 pub mod io;
 pub mod nbt;
 pub mod primitives;
+pub mod string;
 
 pub use bytes::{Buf, BufMut};
 pub use error::{ProtocolError, Result};
 pub use io::*;
+pub use connection::ConnectionRequest;
+pub use framing::{
+    decode_batch, decode_framed, encode_batch, encode_framed, encode_framed_with, frames, get_batch_envelope,
+    put_batch_envelope, split_frame, Compression, Frames, RawFrame, GAME_PACKET_ID,
+};
 pub use nbt::{Nbt, NbtTag, NetworkNbt};
 pub use primitives::{
-    BlockPos, MaybeUnknown, PacketHeader, ProtocolEnum, SubChunkPos, Uuid, VarInt32, VarInt64, VarUInt32, VarUInt64,
-    Vec2, Vec3,
+    BlockPos, ChunkPos, MaybeUnknown, NetworkBlockPos, PacketHeader, ProtocolEnum, SubChunkPos, Uuid,
+    VarInt32, VarInt64, VarUInt32, VarUInt64, Vec2, Vec3,
 };
+pub use string::BedrockString;
+
+/// Checks a value against the limits Mojang documents for it (`maxLength`,
+/// `minItems` / `maxItems`, `minimum` / `maximum`, `maxProperties`).
+///
+/// Encoding and decoding never apply these limits: they describe what the
+/// game accepts, not how bytes are laid out. Call [`Validate::validate`] on
+/// what you receive from a peer, or on what you are about to send.
+pub trait Validate {
+    /// Returns the first violated constraint, as `ProtocolError::ConstraintViolated`.
+    fn validate(&self) -> Result<()>;
+}
 
 /// A value that can be written to and read from the Bedrock wire format.
 pub trait BedrockCodec: Sized {

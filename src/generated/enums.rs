@@ -41,6 +41,9 @@ impl ActorBlockSyncMessageMessageId {
 }
 impl ProtocolEnum for ActorBlockSyncMessageMessageId {
     const NAME: &'static str = "ActorBlockSyncMessage::MessageId";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -422,6 +425,9 @@ impl ActorEvent {
 }
 impl ProtocolEnum for ActorEvent {
     const NAME: &'static str = "ActorEvent";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -754,6 +760,9 @@ impl ActorLinkType {
 }
 impl ProtocolEnum for ActorLinkType {
     const NAME: &'static str = "ActorLinkType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -875,6 +884,9 @@ impl ActorSwingSource {
 }
 impl ProtocolEnum for ActorSwingSource {
     const NAME: &'static str = "ActorSwingSource";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -1780,6 +1792,9 @@ impl ActorType {
 }
 impl ProtocolEnum for ActorType {
     const NAME: &'static str = "ActorType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -2578,6 +2593,9 @@ impl AgentActionType {
 }
 impl ProtocolEnum for AgentActionType {
     const NAME: &'static str = "AgentActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -2721,6 +2739,9 @@ impl AgentAnimation {
 }
 impl ProtocolEnum for AgentAnimation {
     const NAME: &'static str = "Agent Animation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -2800,6 +2821,9 @@ impl AimAssistTargetMode {
 }
 impl ProtocolEnum for AimAssistTargetMode {
     const NAME: &'static str = "Aim-Assist Target Mode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -2897,6 +2921,9 @@ impl AnimatePacketPayloadAction {
 }
 impl ProtocolEnum for AnimatePacketPayloadAction {
     const NAME: &'static str = "AnimatePacketPayload Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -2992,6 +3019,9 @@ impl AnimationMode {
 }
 impl ProtocolEnum for AnimationMode {
     const NAME: &'static str = "AnimationMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3095,6 +3125,9 @@ impl AttributeModifierOperation {
 }
 impl ProtocolEnum for AttributeModifierOperation {
     const NAME: &'static str = "AttributeModifierOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3209,6 +3242,9 @@ impl AttributeOperands {
 }
 impl ProtocolEnum for AttributeOperands {
     const NAME: &'static str = "AttributeOperands";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3302,6 +3338,9 @@ impl AudioContentPlaybackType {
 }
 impl ProtocolEnum for AudioContentPlaybackType {
     const NAME: &'static str = "AudioContentPlaybackType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3389,6 +3428,9 @@ impl AuthorAndMessageMessageType {
 }
 impl ProtocolEnum for AuthorAndMessageMessageType {
     const NAME: &'static str = "AuthorAndMessage Message Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3490,6 +3532,9 @@ impl BiomeTemperatureCategory {
 }
 impl ProtocolEnum for BiomeTemperatureCategory {
     const NAME: &'static str = "BiomeTemperatureCategory";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3614,6 +3659,9 @@ impl BoolAttributeOperation {
 }
 impl ProtocolEnum for BoolAttributeOperation {
     const NAME: &'static str = "BoolAttributeOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3750,6 +3798,9 @@ impl BossBarColor {
 }
 impl ProtocolEnum for BossBarColor {
     const NAME: &'static str = "BossBarColor";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -3871,6 +3922,9 @@ impl BossBarOverlay {
 }
 impl ProtocolEnum for BossBarOverlay {
     const NAME: &'static str = "BossBarOverlay";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4000,6 +4054,9 @@ impl BossEventUpdateType {
 }
 impl ProtocolEnum for BossEventUpdateType {
     const NAME: &'static str = "BossEventUpdateType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4155,6 +4212,9 @@ impl BuildPlatform {
 }
 impl ProtocolEnum for BuildPlatform {
     const NAME: &'static str = "BuildPlatform";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4270,6 +4330,9 @@ impl CameraAimAssistPacketPayloadAction {
 }
 impl ProtocolEnum for CameraAimAssistPacketPayloadAction {
     const NAME: &'static str = "CameraAimAssistPacketPayload Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4349,6 +4412,9 @@ impl CameraAimAssistPacketPayloadTargetMode {
 }
 impl ProtocolEnum for CameraAimAssistPacketPayloadTargetMode {
     const NAME: &'static str = "CameraAimAssistPacketPayload TargetMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4428,6 +4494,9 @@ impl CameraAimAssistPresetsPacketOperation {
 }
 impl ProtocolEnum for CameraAimAssistPresetsPacketOperation {
     const NAME: &'static str = "CameraAimAssistPresetsPacketOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4507,6 +4576,9 @@ impl CameraShakeAction {
 }
 impl ProtocolEnum for CameraShakeAction {
     const NAME: &'static str = "CameraShakeAction";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4586,6 +4658,9 @@ impl CameraShakeType {
 }
 impl ProtocolEnum for CameraShakeType {
     const NAME: &'static str = "CameraShakeType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4669,6 +4744,9 @@ impl ChatRestrictionLevel {
 }
 impl ProtocolEnum for ChatRestrictionLevel {
     const NAME: &'static str = "ChatRestrictionLevel";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4756,6 +4834,9 @@ impl ClientCameraAimAssistPacketAction {
 }
 impl ProtocolEnum for ClientCameraAimAssistPacketAction {
     const NAME: &'static str = "ClientCameraAimAssistPacketAction";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4856,6 +4937,9 @@ impl ClientPlayMode {
 }
 impl ProtocolEnum for ClientPlayMode {
     const NAME: &'static str = "ClientPlayMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -4965,6 +5049,9 @@ impl ClientboundTextureShiftPacketPayloadAction {
 }
 impl ProtocolEnum for ClientboundTextureShiftPacketPayloadAction {
     const NAME: &'static str = "ClientboundTextureShiftPacketPayload::Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5079,6 +5166,9 @@ impl CodeBuilderExecutionStateCodeStatus {
 }
 impl ProtocolEnum for CodeBuilderExecutionStateCodeStatus {
     const NAME: &'static str = "CodeBuilderExecutionState CodeStatus";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5182,6 +5272,9 @@ impl CodeBuilderStorageQueryOptionsCategory {
 }
 impl ProtocolEnum for CodeBuilderStorageQueryOptionsCategory {
     const NAME: &'static str = "CodeBuilderStorageQueryOptions Category";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5273,6 +5366,9 @@ impl CodeBuilderStorageQueryOptionsOperation {
 }
 impl ProtocolEnum for CodeBuilderStorageQueryOptionsOperation {
     const NAME: &'static str = "CodeBuilderStorageQueryOptions Operation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5378,6 +5474,9 @@ impl ColorAttributeOperation {
 }
 impl ProtocolEnum for ColorAttributeOperation {
     const NAME: &'static str = "ColorAttributeOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5473,6 +5572,9 @@ impl CommandBlockMode {
 }
 impl ProtocolEnum for CommandBlockMode {
     const NAME: &'static str = "CommandBlockMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5571,6 +5673,9 @@ impl CommandOriginDataType {
 }
 impl ProtocolEnum for CommandOriginDataType {
     const NAME: &'static str = "CommandOriginData Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5731,6 +5836,9 @@ impl CommandOriginType {
 }
 impl ProtocolEnum for CommandOriginType {
     const NAME: &'static str = "CommandOriginType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5884,6 +5992,9 @@ impl CommandOutputType {
 }
 impl ProtocolEnum for CommandOutputType {
     const NAME: &'static str = "CommandOutputType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -5998,6 +6109,9 @@ impl CommandPermissionLevel {
 }
 impl ProtocolEnum for CommandPermissionLevel {
     const NAME: &'static str = "CommandPermissionLevel";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -6446,6 +6560,9 @@ impl ContainerEnumName {
 }
 impl ProtocolEnum for ContainerEnumName {
     const NAME: &'static str = "ContainerEnumName";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -6989,6 +7106,9 @@ impl ContainerID {
 }
 impl ProtocolEnum for ContainerID {
     const NAME: &'static str = "ContainerID";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7296,6 +7416,9 @@ impl ContainerType {
 }
 impl ProtocolEnum for ContainerType {
     const NAME: &'static str = "ContainerType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7549,6 +7672,9 @@ impl ControlScheme {
 }
 impl ProtocolEnum for ControlScheme {
     const NAME: &'static str = "Control Scheme";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7665,6 +7791,9 @@ impl CoordinateEvaluationOrder {
 }
 impl ProtocolEnum for CoordinateEvaluationOrder {
     const NAME: &'static str = "CoordinateEvaluationOrder";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7758,6 +7887,9 @@ impl CoordinatesLocationPacketType {
 }
 impl ProtocolEnum for CoordinatesLocationPacketType {
     const NAME: &'static str = "CoordinatesLocation Packet Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7855,6 +7987,9 @@ impl CreativeGroupInfoPayloadCreativeCategory {
 }
 impl ProtocolEnum for CreativeGroupInfoPayloadCreativeCategory {
     const NAME: &'static str = "CreativeGroupInfoPayload Creative Category";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -7977,6 +8112,9 @@ impl CreativeItemCategory {
 }
 impl ProtocolEnum for CreativeItemCategory {
     const NAME: &'static str = "CreativeItemCategory";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -8345,6 +8483,9 @@ impl CurrentCmdVersion {
 }
 impl ProtocolEnum for CurrentCmdVersion {
     const NAME: &'static str = "CurrentCmdVersion";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -8840,6 +8981,9 @@ impl CursorItemDragState {
 }
 impl ProtocolEnum for CursorItemDragState {
     const NAME: &'static str = "CursorItemDragState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -8937,6 +9081,9 @@ impl DataDrivenScreenClosedReason {
 }
 impl ProtocolEnum for DataDrivenScreenClosedReason {
     const NAME: &'static str = "DataDrivenScreenClosedReason";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -9066,6 +9213,9 @@ impl DataItemType {
 }
 impl ProtocolEnum for DataItemType {
     const NAME: &'static str = "DataItemType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -9183,6 +9333,9 @@ impl DebugRendererDataType {
 }
 impl ProtocolEnum for DebugRendererDataType {
     const NAME: &'static str = "DebugRendererData Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -9289,6 +9442,9 @@ impl Difficulty {
 }
 impl ProtocolEnum for Difficulty {
     const NAME: &'static str = "Difficulty";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -9412,6 +9568,9 @@ impl DimensionDefinitionGeneratorType {
 }
 impl ProtocolEnum for DimensionDefinitionGeneratorType {
     const NAME: &'static str = "DimensionDefinition Generator Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -10304,6 +10463,9 @@ impl DisconnectFailReason {
 }
 impl ProtocolEnum for DisconnectFailReason {
     const NAME: &'static str = "DisconnectFailReason";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -11419,6 +11581,9 @@ impl EasingFunction {
 }
 impl ProtocolEnum for EasingFunction {
     const NAME: &'static str = "easing_function";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -11618,6 +11783,9 @@ impl EditorLevelMigrationVersion {
 }
 impl ProtocolEnum for EditorLevelMigrationVersion {
     const NAME: &'static str = "EditorLevelMigrationVersion";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -11701,6 +11869,9 @@ impl EditorPackType {
 }
 impl ProtocolEnum for EditorPackType {
     const NAME: &'static str = "EditorPackType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -11797,6 +11968,9 @@ impl EditorWorldType {
 }
 impl ProtocolEnum for EditorWorldType {
     const NAME: &'static str = "EditorWorldType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -11892,6 +12066,9 @@ impl EducationEditionOffer {
 }
 impl ProtocolEnum for EducationEditionOffer {
     const NAME: &'static str = "EducationEditionOffer";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -12188,6 +12365,9 @@ impl EnchantType {
 }
 impl ProtocolEnum for EnchantType {
     const NAME: &'static str = "Enchant::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -12978,6 +13158,9 @@ impl ExpressionOp {
 }
 impl ProtocolEnum for ExpressionOp {
     const NAME: &'static str = "ExpressionOp";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -13517,6 +13700,9 @@ impl FloatAttributeOperation {
 }
 impl ProtocolEnum for FloatAttributeOperation {
     const NAME: &'static str = "FloatAttributeOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -13620,6 +13806,9 @@ impl FurnaceLayout {
 }
 impl ProtocolEnum for FurnaceLayout {
     const NAME: &'static str = "FurnaceLayout";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -13726,6 +13915,9 @@ impl FurnaceLeftTabIndex {
 }
 impl ProtocolEnum for FurnaceLeftTabIndex {
     const NAME: &'static str = "FurnaceLeftTabIndex";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -13839,6 +14031,9 @@ impl GamePublishSetting {
 }
 impl ProtocolEnum for GamePublishSetting {
     const NAME: &'static str = "GamePublishSetting";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -13955,6 +14150,9 @@ impl GameType {
 }
 impl ProtocolEnum for GameType {
     const NAME: &'static str = "GameType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -14080,6 +14278,9 @@ impl GeneratorType {
 }
 impl ProtocolEnum for GeneratorType {
     const NAME: &'static str = "GeneratorType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -14192,6 +14393,9 @@ impl GraphicsMode {
 }
 impl ProtocolEnum for GraphicsMode {
     const NAME: &'static str = "GraphicsMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -14636,6 +14840,9 @@ impl GraphicsOverrideParameterType {
 }
 impl ProtocolEnum for GraphicsOverrideParameterType {
     const NAME: &'static str = "GraphicsOverrideParameterType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -14930,6 +15137,9 @@ impl HandSlot {
 }
 impl ProtocolEnum for HandSlot {
     const NAME: &'static str = "HandSlot";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15007,6 +15217,9 @@ impl HiddenLocationPacketType {
 }
 impl ProtocolEnum for HiddenLocationPacketType {
     const NAME: &'static str = "HiddenLocation Packet Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15139,6 +15352,9 @@ impl HudElement {
 }
 impl ProtocolEnum for HudElement {
     const NAME: &'static str = "HudElement";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15262,6 +15478,9 @@ impl HudVisibility {
 }
 impl ProtocolEnum for HudVisibility {
     const NAME: &'static str = "HudVisibility";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15364,6 +15583,9 @@ impl InputMode {
 }
 impl ProtocolEnum for InputMode {
     const NAME: &'static str = "InputMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15477,6 +15699,9 @@ impl InteractPacketPayloadAction {
 }
 impl ProtocolEnum for InteractPacketPayloadAction {
     const NAME: &'static str = "InteractPacketPayload Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15581,6 +15806,9 @@ impl InventoryLayout {
 }
 impl ProtocolEnum for InventoryLayout {
     const NAME: &'static str = "InventoryLayout";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15696,6 +15924,9 @@ impl InventoryLeftTabIndex {
 }
 impl ProtocolEnum for InventoryLeftTabIndex {
     const NAME: &'static str = "InventoryLeftTabIndex";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15823,6 +16054,9 @@ impl InventoryLeftTabPocketIndex {
 }
 impl ProtocolEnum for InventoryLeftTabPocketIndex {
     const NAME: &'static str = "InventoryLeftTabPocketIndex";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -15935,6 +16169,9 @@ impl InventoryRightTabIndex {
 }
 impl ProtocolEnum for InventoryRightTabIndex {
     const NAME: &'static str = "InventoryRightTabIndex";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -16022,6 +16259,9 @@ impl InventorySourceFlags {
 }
 impl ProtocolEnum for InventorySourceFlags {
     const NAME: &'static str = "InventorySourceFlags";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -16119,6 +16359,9 @@ impl InventorySourceType {
 }
 impl ProtocolEnum for InventorySourceType {
     const NAME: &'static str = "InventorySourceType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -16228,6 +16471,9 @@ impl ItemDescriptorType {
 }
 impl ProtocolEnum for ItemDescriptorType {
     const NAME: &'static str = "ItemDescriptorType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -16315,6 +16561,9 @@ impl ItemReleaseActionType {
 }
 impl ProtocolEnum for ItemReleaseActionType {
     const NAME: &'static str = "ItemReleaseActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -16727,6 +16976,9 @@ impl ItemStackNetResult {
 }
 impl ProtocolEnum for ItemStackNetResult {
     const NAME: &'static str = "ItemStackNetResult";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -17302,6 +17554,9 @@ impl ItemStackRequestActionType {
 }
 impl ProtocolEnum for ItemStackRequestActionType {
     const NAME: &'static str = "ItemStackRequestActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -17787,6 +18042,9 @@ impl ItemStackResponseInfoResult {
 }
 impl ProtocolEnum for ItemStackResponseInfoResult {
     const NAME: &'static str = "ItemStackResponseInfo Result";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18350,6 +18608,9 @@ impl ItemUseActionType {
 }
 impl ProtocolEnum for ItemUseActionType {
     const NAME: &'static str = "ItemUseActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18437,6 +18698,9 @@ impl ItemUseClientCooldownState {
 }
 impl ProtocolEnum for ItemUseClientCooldownState {
     const NAME: &'static str = "ItemUseClientCooldownState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18520,6 +18784,9 @@ impl ItemUseOnActorActionType {
 }
 impl ProtocolEnum for ItemUseOnActorActionType {
     const NAME: &'static str = "ItemUseOnActorActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18603,6 +18870,9 @@ impl ItemUsePredictedResult {
 }
 impl ProtocolEnum for ItemUsePredictedResult {
     const NAME: &'static str = "ItemUsePredictedResult";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18690,6 +18960,9 @@ impl ItemUseTriggerType {
 }
 impl ProtocolEnum for ItemUseTriggerType {
     const NAME: &'static str = "ItemUseTriggerType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18777,6 +19050,9 @@ impl ItemVersion {
 }
 impl ProtocolEnum for ItemVersion {
     const NAME: &'static str = "ItemVersion";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -18868,6 +19144,9 @@ impl LabTablePacketPayloadType {
 }
 impl ProtocolEnum for LabTablePacketPayloadType {
     const NAME: &'static str = "LabTablePacketPayload::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -19009,6 +19288,9 @@ impl LabTableReactionType {
 }
 impl ProtocolEnum for LabTableReactionType {
     const NAME: &'static str = "LabTableReactionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -19285,6 +19567,9 @@ impl LegacyTelemetryEventPacketPayloadType {
 }
 impl ProtocolEnum for LegacyTelemetryEventPacketPayloadType {
     const NAME: &'static str = "LegacyTelemetryEventPacketPayload::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -19527,6 +19812,9 @@ impl LessonAction {
 }
 impl ProtocolEnum for LessonAction {
     const NAME: &'static str = "Lesson Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -22483,6 +22771,9 @@ impl LevelSoundEvent {
 }
 impl ProtocolEnum for LevelSoundEvent {
     const NAME: &'static str = "LevelSoundEvent";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -25178,6 +25469,9 @@ impl MapDecorationType {
 }
 impl ProtocolEnum for MapDecorationType {
     const NAME: &'static str = "MapDecoration::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -25377,6 +25671,9 @@ impl MapItemTrackedActorType {
 }
 impl ProtocolEnum for MapItemTrackedActorType {
     const NAME: &'static str = "MapItemTrackedActor Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -25498,6 +25795,9 @@ impl MatchmakingState {
 }
 impl ProtocolEnum for MatchmakingState {
     const NAME: &'static str = "MatchmakingState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -26153,6 +26453,9 @@ impl MemoryMemoryCategory {
 }
 impl ProtocolEnum for MemoryMemoryCategory {
     const NAME: &'static str = "Memory::MemoryCategory";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -26777,6 +27080,9 @@ impl MessageAndParamsMessageType {
 }
 impl ProtocolEnum for MessageAndParamsMessageType {
     const NAME: &'static str = "MessageAndParams Message Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -26883,6 +27189,9 @@ impl MessageOnlyMessageType {
 }
 impl ProtocolEnum for MessageOnlyMessageType {
     const NAME: &'static str = "MessageOnly Message Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -27386,6 +27695,9 @@ impl MinecraftEventingAchievementIds {
 }
 impl ProtocolEnum for MinecraftEventingAchievementIds {
     const NAME: &'static str = "MinecraftEventing::AchievementIds";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -27912,6 +28224,9 @@ impl MinecraftEventingInteractionType {
 }
 impl ProtocolEnum for MinecraftEventingInteractionType {
     const NAME: &'static str = "MinecraftEventing::InteractionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -28174,6 +28489,9 @@ impl MinecraftEventingPOIBlockInteractionType {
 }
 impl ProtocolEnum for MinecraftEventingPOIBlockInteractionType {
     const NAME: &'static str = "MinecraftEventing::POIBlockInteractionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -29476,6 +29794,9 @@ impl MinecraftPacketIds {
 }
 impl ProtocolEnum for MinecraftPacketIds {
     const NAME: &'static str = "MinecraftPacketIds";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -30641,6 +30962,9 @@ impl Mirror {
 }
 impl ProtocolEnum for Mirror {
     const NAME: &'static str = "Mirror";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -30741,6 +31065,9 @@ impl MobEffectPacketPayloadEvent {
 }
 impl ProtocolEnum for MobEffectPacketPayloadEvent {
     const NAME: &'static str = "MobEffectPacketPayload::Event";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -30828,6 +31155,9 @@ impl ModalFormCancelReason {
 }
 impl ProtocolEnum for ModalFormCancelReason {
     const NAME: &'static str = "ModalFormCancelReason";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -30982,6 +31312,9 @@ impl MolangVersion {
 }
 impl ProtocolEnum for MolangVersion {
     const NAME: &'static str = "MolangVersion";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31178,6 +31511,9 @@ impl MovePlayerPacketPayloadPositionMode {
 }
 impl ProtocolEnum for MovePlayerPacketPayloadPositionMode {
     const NAME: &'static str = "MovePlayerPacketPayload Position Mode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31273,6 +31609,9 @@ impl MovementEffectType {
 }
 impl ProtocolEnum for MovementEffectType {
     const NAME: &'static str = "MovementEffectType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31364,6 +31703,9 @@ impl MultiplayerSettingsPacketType {
 }
 impl ProtocolEnum for MultiplayerSettingsPacketType {
     const NAME: &'static str = "MultiplayerSettingsPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31460,6 +31802,9 @@ impl MusicPlaybackState {
 }
 impl ProtocolEnum for MusicPlaybackState {
     const NAME: &'static str = "MusicPlaybackState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31560,6 +31905,9 @@ impl NewInteractionModel {
 }
 impl ProtocolEnum for NewInteractionModel {
     const NAME: &'static str = "NewInteractionModel";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31643,6 +31991,9 @@ impl NoiseAlignmentType {
 }
 impl ProtocolEnum for NoiseAlignmentType {
     const NAME: &'static str = "NoiseAlignmentType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31717,6 +32068,9 @@ impl NpcDialogueActionType {
 }
 impl ProtocolEnum for NpcDialogueActionType {
     const NAME: &'static str = "NpcDialogueActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31824,6 +32178,9 @@ impl NpcRequestPacketPayloadRequestType {
 }
 impl ProtocolEnum for NpcRequestPacketPayloadRequestType {
     const NAME: &'static str = "NpcRequestPacketPayload RequestType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -31929,6 +32286,9 @@ impl ObjectiveSortOrder {
 }
 impl ProtocolEnum for ObjectiveSortOrder {
     const NAME: &'static str = "ObjectiveSortOrder";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32046,6 +32406,9 @@ impl PackType {
 }
 impl ProtocolEnum for PackType {
     const NAME: &'static str = "PackType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32157,6 +32520,9 @@ impl PacketCompressionAlgorithm {
 }
 impl ProtocolEnum for PacketCompressionAlgorithm {
     const NAME: &'static str = "PacketCompressionAlgorithm";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32253,6 +32619,9 @@ impl PacketViolationSeverity {
 }
 impl ProtocolEnum for PacketViolationSeverity {
     const NAME: &'static str = "PacketViolationSeverity";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32340,6 +32709,9 @@ impl PacketViolationType {
 }
 impl ProtocolEnum for PacketViolationType {
     const NAME: &'static str = "PacketViolationType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32423,6 +32795,9 @@ impl PartyDestinationCookieIntent {
 }
 impl ProtocolEnum for PartyDestinationCookieIntent {
     const NAME: &'static str = "PartyDestinationCookieIntent";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32510,6 +32885,9 @@ impl PassengerOfBlockArgumentsEmoteType {
 }
 impl ProtocolEnum for PassengerOfBlockArgumentsEmoteType {
     const NAME: &'static str = "PassengerOfBlockArguments::EmoteType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32601,6 +32979,9 @@ impl PayloadType {
 }
 impl ProtocolEnum for PayloadType {
     const NAME: &'static str = "PayloadType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32697,6 +33078,9 @@ impl PersonaAnimatedTextureType {
 }
 impl ProtocolEnum for PersonaAnimatedTextureType {
     const NAME: &'static str = "persona::AnimatedTextureType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32784,6 +33168,9 @@ impl PersonaAnimationExpression {
 }
 impl ProtocolEnum for PersonaAnimationExpression {
     const NAME: &'static str = "persona::AnimationExpression";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -32863,6 +33250,9 @@ impl PersonaArmSizeType {
 }
 impl ProtocolEnum for PersonaArmSizeType {
     const NAME: &'static str = "persona::ArmSize::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -33085,6 +33475,9 @@ impl PersonaPieceType {
 }
 impl ProtocolEnum for PersonaPieceType {
     const NAME: &'static str = "persona::PieceType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -33280,6 +33673,9 @@ impl PhotoType {
 }
 impl ProtocolEnum for PhotoType {
     const NAME: &'static str = "PhotoType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -33406,6 +33802,9 @@ impl PlayStatus {
 }
 impl ProtocolEnum for PlayStatus {
     const NAME: &'static str = "PlayStatus";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -33844,6 +34243,9 @@ impl PlayerActionType {
 }
 impl ProtocolEnum for PlayerActionType {
     const NAME: &'static str = "PlayerActionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -34363,6 +34765,9 @@ impl PlayerAuthInputData {
 }
 impl ProtocolEnum for PlayerAuthInputData {
     const NAME: &'static str = "PlayerAuthInputData";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -34690,6 +35095,9 @@ impl PlayerListAddEntryAction {
 }
 impl ProtocolEnum for PlayerListAddEntryAction {
     const NAME: &'static str = "PlayerListAddEntry Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -34764,6 +35172,9 @@ impl PlayerListPacketType {
 }
 impl ProtocolEnum for PlayerListPacketType {
     const NAME: &'static str = "PlayerListPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -34841,6 +35252,9 @@ impl PlayerListRemoveEntryAction {
 }
 impl ProtocolEnum for PlayerListRemoveEntryAction {
     const NAME: &'static str = "PlayerListRemoveEntry Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -34918,6 +35332,9 @@ impl PlayerLocationPacketType {
 }
 impl ProtocolEnum for PlayerLocationPacketType {
     const NAME: &'static str = "PlayerLocationPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35013,6 +35430,9 @@ impl PlayerPermissionLevel {
 }
 impl ProtocolEnum for PlayerPermissionLevel {
     const NAME: &'static str = "PlayerPermissionLevel";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35108,6 +35528,9 @@ impl PlayerRespawnState {
 }
 impl ProtocolEnum for PlayerRespawnState {
     const NAME: &'static str = "PlayerRespawnState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35204,6 +35627,9 @@ impl PositionMode {
 }
 impl ProtocolEnum for PositionMode {
     const NAME: &'static str = "PositionMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35287,6 +35713,9 @@ impl PositionTrackingDBClientRequestPacketPayloadAction {
 }
 impl ProtocolEnum for PositionTrackingDBClientRequestPacketPayloadAction {
     const NAME: &'static str = "PositionTrackingDBClientRequestPacketPayload::Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35365,6 +35794,9 @@ impl PositionTrackingDBServerBroadcastPacketPayloadAction {
 }
 impl ProtocolEnum for PositionTrackingDBServerBroadcastPacketPayloadAction {
     const NAME: &'static str = "PositionTrackingDBServerBroadcastPacketPayload::Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35476,6 +35908,9 @@ impl RandomDistributionType {
 }
 impl ProtocolEnum for RandomDistributionType {
     const NAME: &'static str = "RandomDistributionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35596,6 +36031,9 @@ impl RecipeUnlockingContext {
 }
 impl ProtocolEnum for RecipeUnlockingContext {
     const NAME: &'static str = "RecipeUnlockingContext";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35687,6 +36125,9 @@ impl RequestAbilityPacketPayloadType {
 }
 impl ProtocolEnum for RequestAbilityPacketPayloadType {
     const NAME: &'static str = "RequestAbilityPacketPayload::Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35783,6 +36224,9 @@ impl ResourcePackResponse {
 }
 impl ProtocolEnum for ResourcePackResponse {
     const NAME: &'static str = "ResourcePackResponse";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35873,6 +36317,9 @@ impl RewindType {
 }
 impl ProtocolEnum for RewindType {
     const NAME: &'static str = "RewindType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -35971,6 +36418,9 @@ impl Rotation {
 }
 impl ProtocolEnum for Rotation {
     const NAME: &'static str = "Rotation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36077,6 +36527,9 @@ impl ScorePacketEntryAction {
 }
 impl ProtocolEnum for ScorePacketEntryAction {
     const NAME: &'static str = "ScorePacketEntryAction";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36164,6 +36617,9 @@ impl ScoreboardIdentityPacketType {
 }
 impl ProtocolEnum for ScoreboardIdentityPacketType {
     const NAME: &'static str = "ScoreboardIdentityPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36286,6 +36742,9 @@ impl ScriptModuleMinecraftScriptPrimitiveShapeType {
 }
 impl ProtocolEnum for ScriptModuleMinecraftScriptPrimitiveShapeType {
     const NAME: &'static str = "ScriptModuleMinecraft::ScriptPrimitiveShapeType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36401,6 +36860,9 @@ impl SctpRecoveryProfile {
 }
 impl ProtocolEnum for SctpRecoveryProfile {
     const NAME: &'static str = "SctpRecoveryProfile";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36497,6 +36959,9 @@ impl ServerEditorConnectionPolicy {
 }
 impl ProtocolEnum for ServerEditorConnectionPolicy {
     const NAME: &'static str = "ServerEditorConnectionPolicy";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36597,6 +37062,9 @@ impl ServerWaypointGroupAction {
 }
 impl ProtocolEnum for ServerWaypointGroupAction {
     const NAME: &'static str = "ServerWaypointGroup::Action";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36686,6 +37154,9 @@ impl ServerboundCursorItemDragPacketPayloadState {
 }
 impl ProtocolEnum for ServerboundCursorItemDragPacketPayloadState {
     const NAME: &'static str = "ServerboundCursorItemDragPacketPayload State";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36765,6 +37236,9 @@ impl ServerboundLoadingScreenPacketPayloadLoadingScreenPacketType {
 }
 impl ProtocolEnum for ServerboundLoadingScreenPacketPayloadLoadingScreenPacketType {
     const NAME: &'static str = "ServerboundLoadingScreenPacketPayload Loading Screen Packet Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36863,6 +37337,9 @@ impl ServerboundLoadingScreenPacketType {
 }
 impl ProtocolEnum for ServerboundLoadingScreenPacketType {
     const NAME: &'static str = "ServerboundLoadingScreenPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -36969,6 +37446,9 @@ impl SetDefaultGameTypePacketPayloadDefaultGameType {
 }
 impl ProtocolEnum for SetDefaultGameTypePacketPayloadDefaultGameType {
     const NAME: &'static str = "SetDefaultGameTypePacketPayload Default Game Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37075,6 +37555,9 @@ impl SetPlayerFurnaceOptionsPacketPayloadFurnaceType {
 }
 impl ProtocolEnum for SetPlayerFurnaceOptionsPacketPayloadFurnaceType {
     const NAME: &'static str = "SetPlayerFurnaceOptionsPacketPayload FurnaceType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37167,6 +37650,9 @@ impl SetScoreboardIdentityPacketPayloadScoreboardIdentityPacketType {
 }
 impl ProtocolEnum for SetScoreboardIdentityPacketPayloadScoreboardIdentityPacketType {
     const NAME: &'static str = "SetScoreboardIdentityPacketPayload Scoreboard Identity Packet Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37295,6 +37781,9 @@ impl SetTitlePacketTitleType {
 }
 impl ProtocolEnum for SetTitlePacketTitleType {
     const NAME: &'static str = "SetTitlePacket TitleType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37402,6 +37891,9 @@ impl SharedTypesComprehensiveCameraPresetAudioListener {
 }
 impl ProtocolEnum for SharedTypesComprehensiveCameraPresetAudioListener {
     const NAME: &'static str = "SharedTypes::Comprehensive::CameraPreset::AudioListener";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37649,6 +38141,9 @@ impl SharedTypesLegacyActorDamageCause {
 }
 impl ProtocolEnum for SharedTypesLegacyActorDamageCause {
     const NAME: &'static str = "SharedTypes::Legacy::ActorDamageCause";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37878,6 +38373,9 @@ impl SharedTypesLegacyArmorSlot {
 }
 impl ProtocolEnum for SharedTypesLegacyArmorSlot {
     const NAME: &'static str = "SharedTypes::Legacy::ArmorSlot";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -37969,6 +38467,9 @@ impl ShowCreditsPacketPayloadCreditsState {
 }
 impl ProtocolEnum for ShowCreditsPacketPayloadCreditsState {
     const NAME: &'static str = "ShowCreditsPacketPayload::CreditsState";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38056,6 +38557,9 @@ impl ShowStoreOfferRedirectType {
 }
 impl ProtocolEnum for ShowStoreOfferRedirectType {
     const NAME: &'static str = "ShowStoreOfferRedirectType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38152,6 +38656,9 @@ impl SimulationType {
 }
 impl ProtocolEnum for SimulationType {
     const NAME: &'static str = "SimulationType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38243,6 +38750,9 @@ impl SoftEnumUpdateType {
 }
 impl ProtocolEnum for SoftEnumUpdateType {
     const NAME: &'static str = "SoftEnumUpdateType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38354,6 +38864,9 @@ impl SoundDataEventType {
 }
 impl ProtocolEnum for SoundDataEventType {
     const NAME: &'static str = "SoundDataEventType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38453,6 +38966,9 @@ impl SpawnBiomeType {
 }
 impl ProtocolEnum for SpawnBiomeType {
     const NAME: &'static str = "SpawnBiomeType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38532,6 +39048,9 @@ impl SpawnPositionType {
 }
 impl ProtocolEnum for SpawnPositionType {
     const NAME: &'static str = "SpawnPositionType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38607,6 +39126,9 @@ impl StringAttributeOperation {
 }
 impl ProtocolEnum for StringAttributeOperation {
     const NAME: &'static str = "StringAttributeOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38704,6 +39226,9 @@ impl StructureBlockType {
 }
 impl ProtocolEnum for StructureBlockType {
     const NAME: &'static str = "StructureBlockType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38799,6 +39324,9 @@ impl StructureRedstoneSaveMode {
 }
 impl ProtocolEnum for StructureRedstoneSaveMode {
     const NAME: &'static str = "StructureRedstoneSaveMode";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38891,6 +39419,9 @@ impl StructureTemplateRequestOperation {
 }
 impl ProtocolEnum for StructureTemplateRequestOperation {
     const NAME: &'static str = "StructureTemplateRequestOperation";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -38991,6 +39522,9 @@ impl StructureTemplateResponseType {
 }
 impl ProtocolEnum for StructureTemplateResponseType {
     const NAME: &'static str = "StructureTemplateResponseType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39089,6 +39623,9 @@ impl SubChunkHeightmapDataHeightMapType {
 }
 impl ProtocolEnum for SubChunkHeightmapDataHeightMapType {
     const NAME: &'static str = "SubChunkHeightmapData Height Map Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39196,6 +39733,9 @@ impl SubChunkHeightmapDataRenderHeightMapType {
 }
 impl ProtocolEnum for SubChunkHeightmapDataRenderHeightMapType {
     const NAME: &'static str = "SubChunkHeightmapData Render Height Map Type";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39312,6 +39852,9 @@ impl SubChunkPacketDataSubChunkRequestResult {
 }
 impl ProtocolEnum for SubChunkPacketDataSubChunkRequestResult {
     const NAME: &'static str = "SubChunkPacketData SubChunk Request Result";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39434,6 +39977,9 @@ impl SubChunkPacketPayloadHeightMapDataType {
 }
 impl ProtocolEnum for SubChunkPacketPayloadHeightMapDataType {
     const NAME: &'static str = "SubChunkPacketPayload::HeightMapDataType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39553,6 +40099,9 @@ impl SubChunkPacketPayloadSubChunkRequestResult {
 }
 impl ProtocolEnum for SubChunkPacketPayloadSubChunkRequestResult {
     const NAME: &'static str = "SubChunkPacketPayload::SubChunkRequestResult";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39677,6 +40226,9 @@ impl Subtype {
 }
 impl ProtocolEnum for Subtype {
     const NAME: &'static str = "Subtype";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -39843,6 +40395,9 @@ impl TextPacketType {
 }
 impl ProtocolEnum for TextPacketType {
     const NAME: &'static str = "TextPacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40040,6 +40595,9 @@ impl TextProcessingEventOrigin {
 }
 impl ProtocolEnum for TextProcessingEventOrigin {
     const NAME: &'static str = "TextProcessingEventOrigin";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40183,6 +40741,9 @@ impl TrustedSkinFlag {
 }
 impl ProtocolEnum for TrustedSkinFlag {
     const NAME: &'static str = "TrustedSkinFlag";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40284,6 +40845,9 @@ impl UnlockedRecipesPacketPayloadPacketType {
 }
 impl ProtocolEnum for UnlockedRecipesPacketPayloadPacketType {
     const NAME: &'static str = "UnlockedRecipesPacketPayload::PacketType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40400,6 +40964,9 @@ impl UpdateType {
 }
 impl ProtocolEnum for UpdateType {
     const NAME: &'static str = "UpdateType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40505,6 +41072,9 @@ impl VillageType {
 }
 impl ProtocolEnum for VillageType {
     const NAME: &'static str = "VillageType";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40629,6 +41199,9 @@ impl VirtualContainerCloseCause {
 }
 impl ProtocolEnum for VirtualContainerCloseCause {
     const NAME: &'static str = "VirtualContainerCloseCause";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40736,6 +41309,9 @@ impl VirtualContainerCloseKind {
 }
 impl ProtocolEnum for VirtualContainerCloseKind {
     const NAME: &'static str = "VirtualContainerCloseKind";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40854,6 +41430,9 @@ impl VirtualContainerClosePacketPayloadCause {
 }
 impl ProtocolEnum for VirtualContainerClosePacketPayloadCause {
     const NAME: &'static str = "VirtualContainerClosePacketPayload Cause";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
@@ -40972,6 +41551,9 @@ impl VirtualContainerClosePacketPayloadKind {
 }
 impl ProtocolEnum for VirtualContainerClosePacketPayloadKind {
     const NAME: &'static str = "VirtualContainerClosePacketPayload Kind";
+    fn all() -> &'static [Self] {
+        Self::ALL
+    }
     fn to_raw(self) -> i64 {
         self.value() as i64
     }
