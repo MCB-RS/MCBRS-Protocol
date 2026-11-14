@@ -5,7 +5,7 @@
 //!
 //! C++ enumerators sharing a value with an earlier one are exposed as
 //! associated constants (`Enum::Alias`) since Rust discriminants are unique.
-#![allow(non_upper_case_globals, clippy::all)]
+#![allow(non_upper_case_globals)]
 use crate::codec::{ProtocolEnum, ProtocolError};
 /// Protocol enum ActorBlockSyncMessage::MessageId.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -54,7 +54,20 @@ impl ProtocolEnum for ActorBlockSyncMessageMessageId {
             Self::Destroy => "DESTROY",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Create => "create",
+            Self::Destroy => "destroy",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NONE" => return Some(Self::None),
+            "CREATE" => return Some(Self::Create),
+            "DESTROY" => return Some(Self::Destroy),
+            _ => {}
+        }
         const NAMES: &[(&str, ActorBlockSyncMessageMessageId)] = &[
             ("NONE", ActorBlockSyncMessageMessageId::None),
             ("CREATE", ActorBlockSyncMessageMessageId::Create),
@@ -62,10 +75,7 @@ impl ProtocolEnum for ActorBlockSyncMessageMessageId {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -485,7 +495,144 @@ impl ProtocolEnum for ActorEvent {
             Self::HurtWithoutReceivingDamage => "HURT_WITHOUT_RECEIVING_DAMAGE",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Jump => "jump",
+            Self::Hurt => "hurt",
+            Self::Death => "death",
+            Self::StartAttacking => "start_attacking",
+            Self::StopAttacking => "stop_attacking",
+            Self::TamingFailed => "taming_failed",
+            Self::TamingSucceeded => "taming_succeeded",
+            Self::ShakeWetness => "shake_wetness",
+            Self::EatGrass => "eat_grass",
+            Self::FishhookBubble => "fishhook_bubble",
+            Self::FishhookFishpos => "fishhook_fishpos",
+            Self::FishhookHooktime => "fishhook_hooktime",
+            Self::FishhookTease => "fishhook_tease",
+            Self::SquidFleeing => "squid_fleeing",
+            Self::ZombieConverting => "zombie_converting",
+            Self::PlayAmbient => "play_ambient",
+            Self::SpawnAlive => "spawn_alive",
+            Self::StartOfferFlower => "start_offer_flower",
+            Self::StopOfferFlower => "stop_offer_flower",
+            Self::LoveHearts => "love_hearts",
+            Self::VillagerAngry => "villager_angry",
+            Self::VillagerHappy => "villager_happy",
+            Self::WitchHatMagic => "witch_hat_magic",
+            Self::FireworksExplode => "fireworks_explode",
+            Self::InLoveHearts => "in_love_hearts",
+            Self::SilverfishMergeAnim => "silverfish_merge_anim",
+            Self::GuardianAttackSound => "guardian_attack_sound",
+            Self::DrinkPotion => "drink_potion",
+            Self::ThrowPotion => "throw_potion",
+            Self::PrimeTntcart => "prime_tntcart",
+            Self::PrimeCreeper => "prime_creeper",
+            Self::AirSupply => "air_supply",
+            Self::DeprecatedAddPlayerLevels => "deprecated_add_player_levels",
+            Self::GuardianMiningFatigue => "guardian_mining_fatigue",
+            Self::AgentSwingArm => "agent_swing_arm",
+            Self::DragonStartDeathAnim => "dragon_start_death_anim",
+            Self::GroundDust => "ground_dust",
+            Self::Shake => "shake",
+            Self::Feed => "feed",
+            Self::BabyAge => "baby_age",
+            Self::InstantDeath => "instant_death",
+            Self::NotifyTrade => "notify_trade",
+            Self::LeashDestroyed => "leash_destroyed",
+            Self::CaravanUpdated => "caravan_updated",
+            Self::TalismanActivate => "talisman_activate",
+            Self::DeprecatedUpdateStructureFeature => {
+                "deprecated_update_structure_feature"
+            }
+            Self::PlayerSpawnedMob => "player_spawned_mob",
+            Self::Puke => "puke",
+            Self::UpdateStackSize => "update_stack_size",
+            Self::StartSwimming => "start_swimming",
+            Self::BalloonPop => "balloon_pop",
+            Self::TreasureHunt => "treasure_hunt",
+            Self::SummonAgent => "summon_agent",
+            Self::FinishedChargingItem => "finished_charging_item",
+            Self::ActorGrowUp => "actor_grow_up",
+            Self::VibrationDetected => "vibration_detected",
+            Self::DrinkMilk => "drink_milk",
+            Self::ShakeWetnessStop => "shake_wetness_stop",
+            Self::KineticDamageDealt => "kinetic_damage_dealt",
+            Self::HurtWithoutReceivingDamage => "hurt_without_receiving_damage",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NONE" => return Some(Self::None),
+            "JUMP" => return Some(Self::Jump),
+            "HURT" => return Some(Self::Hurt),
+            "DEATH" => return Some(Self::Death),
+            "START_ATTACKING" => return Some(Self::StartAttacking),
+            "STOP_ATTACKING" => return Some(Self::StopAttacking),
+            "TAMING_FAILED" => return Some(Self::TamingFailed),
+            "TAMING_SUCCEEDED" => return Some(Self::TamingSucceeded),
+            "SHAKE_WETNESS" => return Some(Self::ShakeWetness),
+            "EAT_GRASS" => return Some(Self::EatGrass),
+            "FISHHOOK_BUBBLE" => return Some(Self::FishhookBubble),
+            "FISHHOOK_FISHPOS" => return Some(Self::FishhookFishpos),
+            "FISHHOOK_HOOKTIME" => return Some(Self::FishhookHooktime),
+            "FISHHOOK_TEASE" => return Some(Self::FishhookTease),
+            "SQUID_FLEEING" => return Some(Self::SquidFleeing),
+            "ZOMBIE_CONVERTING" => return Some(Self::ZombieConverting),
+            "PLAY_AMBIENT" => return Some(Self::PlayAmbient),
+            "SPAWN_ALIVE" => return Some(Self::SpawnAlive),
+            "START_OFFER_FLOWER" => return Some(Self::StartOfferFlower),
+            "STOP_OFFER_FLOWER" => return Some(Self::StopOfferFlower),
+            "LOVE_HEARTS" => return Some(Self::LoveHearts),
+            "VILLAGER_ANGRY" => return Some(Self::VillagerAngry),
+            "VILLAGER_HAPPY" => return Some(Self::VillagerHappy),
+            "WITCH_HAT_MAGIC" => return Some(Self::WitchHatMagic),
+            "FIREWORKS_EXPLODE" => return Some(Self::FireworksExplode),
+            "IN_LOVE_HEARTS" => return Some(Self::InLoveHearts),
+            "SILVERFISH_MERGE_ANIM" => return Some(Self::SilverfishMergeAnim),
+            "GUARDIAN_ATTACK_SOUND" => return Some(Self::GuardianAttackSound),
+            "DRINK_POTION" => return Some(Self::DrinkPotion),
+            "THROW_POTION" => return Some(Self::ThrowPotion),
+            "PRIME_TNTCART" => return Some(Self::PrimeTntcart),
+            "PRIME_CREEPER" => return Some(Self::PrimeCreeper),
+            "AIR_SUPPLY" => return Some(Self::AirSupply),
+            "DEPRECATED_ADD_PLAYER_LEVELS" => {
+                return Some(Self::DeprecatedAddPlayerLevels);
+            }
+            "GUARDIAN_MINING_FATIGUE" => return Some(Self::GuardianMiningFatigue),
+            "AGENT_SWING_ARM" => return Some(Self::AgentSwingArm),
+            "DRAGON_START_DEATH_ANIM" => return Some(Self::DragonStartDeathAnim),
+            "GROUND_DUST" => return Some(Self::GroundDust),
+            "SHAKE" => return Some(Self::Shake),
+            "FEED" => return Some(Self::Feed),
+            "BABY_AGE" => return Some(Self::BabyAge),
+            "INSTANT_DEATH" => return Some(Self::InstantDeath),
+            "NOTIFY_TRADE" => return Some(Self::NotifyTrade),
+            "LEASH_DESTROYED" => return Some(Self::LeashDestroyed),
+            "CARAVAN_UPDATED" => return Some(Self::CaravanUpdated),
+            "TALISMAN_ACTIVATE" => return Some(Self::TalismanActivate),
+            "DEPRECATED_UPDATE_STRUCTURE_FEATURE" => {
+                return Some(Self::DeprecatedUpdateStructureFeature);
+            }
+            "PLAYER_SPAWNED_MOB" => return Some(Self::PlayerSpawnedMob),
+            "PUKE" => return Some(Self::Puke),
+            "UPDATE_STACK_SIZE" => return Some(Self::UpdateStackSize),
+            "START_SWIMMING" => return Some(Self::StartSwimming),
+            "BALLOON_POP" => return Some(Self::BalloonPop),
+            "TREASURE_HUNT" => return Some(Self::TreasureHunt),
+            "SUMMON_AGENT" => return Some(Self::SummonAgent),
+            "FINISHED_CHARGING_ITEM" => return Some(Self::FinishedChargingItem),
+            "ACTOR_GROW_UP" => return Some(Self::ActorGrowUp),
+            "VIBRATION_DETECTED" => return Some(Self::VibrationDetected),
+            "DRINK_MILK" => return Some(Self::DrinkMilk),
+            "SHAKE_WETNESS_STOP" => return Some(Self::ShakeWetnessStop),
+            "KINETIC_DAMAGE_DEALT" => return Some(Self::KineticDamageDealt),
+            "HURT_WITHOUT_RECEIVING_DAMAGE" => {
+                return Some(Self::HurtWithoutReceivingDamage);
+            }
+            _ => {}
+        }
         const NAMES: &[(&str, ActorEvent)] = &[
             ("NONE", ActorEvent::None),
             ("JUMP", ActorEvent::Jump),
@@ -554,10 +701,7 @@ impl ProtocolEnum for ActorEvent {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -623,7 +767,20 @@ impl ProtocolEnum for ActorLinkType {
             Self::Passenger => "Passenger",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Riding => "riding",
+            Self::Passenger => "passenger",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Riding" => return Some(Self::Riding),
+            "Passenger" => return Some(Self::Passenger),
+            _ => {}
+        }
         const NAMES: &[(&str, ActorLinkType)] = &[
             ("None", ActorLinkType::None),
             ("Riding", ActorLinkType::Riding),
@@ -631,10 +788,7 @@ impl ProtocolEnum for ActorLinkType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -740,7 +894,32 @@ impl ProtocolEnum for ActorSwingSource {
             Self::Event => "Event",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Build => "build",
+            Self::Mine => "mine",
+            Self::Interact => "interact",
+            Self::Attack => "attack",
+            Self::UseItem => "useitem",
+            Self::ThrowItem => "throwitem",
+            Self::DropItem => "dropitem",
+            Self::Event => "event",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Build" => return Some(Self::Build),
+            "Mine" => return Some(Self::Mine),
+            "Interact" => return Some(Self::Interact),
+            "Attack" => return Some(Self::Attack),
+            "UseItem" => return Some(Self::UseItem),
+            "ThrowItem" => return Some(Self::ThrowItem),
+            "DropItem" => return Some(Self::DropItem),
+            "Event" => return Some(Self::Event),
+            _ => {}
+        }
         const NAMES: &[(&str, ActorSwingSource)] = &[
             ("None", ActorSwingSource::None),
             ("Build", ActorSwingSource::Build),
@@ -754,10 +933,7 @@ impl ProtocolEnum for ActorSwingSource {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -1775,7 +1951,336 @@ impl ProtocolEnum for ActorType {
             Self::IceBall => "IceBall",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Undefined => "undefined",
+            Self::Mob => "mob",
+            Self::PathfinderMob => "pathfindermob",
+            Self::Monster => "monster",
+            Self::Animal => "animal",
+            Self::TamableAnimal => "tamableanimal",
+            Self::Ambient => "ambient",
+            Self::UndeadMonster => "undeadmonster",
+            Self::ZombieMonster => "zombiemonster",
+            Self::Arthropod => "arthropod",
+            Self::Minecart => "minecart",
+            Self::SkeletonMonster => "skeletonmonster",
+            Self::EquineAnimal => "equineanimal",
+            Self::Projectile => "projectile",
+            Self::AbstractArrow => "abstractarrow",
+            Self::WaterAnimal => "wateranimal",
+            Self::VillagerBase => "villagerbase",
+            Self::Chicken => "chicken",
+            Self::Cow => "cow",
+            Self::Pig => "pig",
+            Self::Sheep => "sheep",
+            Self::Wolf => "wolf",
+            Self::Villager => "villager",
+            Self::MushroomCow => "mushroomcow",
+            Self::Squid => "squid",
+            Self::Rabbit => "rabbit",
+            Self::Bat => "bat",
+            Self::IronGolem => "irongolem",
+            Self::SnowGolem => "snowgolem",
+            Self::Ocelot => "ocelot",
+            Self::Horse => "horse",
+            Self::PolarBear => "polarbear",
+            Self::Llama => "llama",
+            Self::Parrot => "parrot",
+            Self::Dolphin => "dolphin",
+            Self::Donkey => "donkey",
+            Self::Mule => "mule",
+            Self::SkeletonHorse => "skeletonhorse",
+            Self::ZombieHorse => "zombiehorse",
+            Self::Zombie => "zombie",
+            Self::Creeper => "creeper",
+            Self::Skeleton => "skeleton",
+            Self::Spider => "spider",
+            Self::PigZombie => "pigzombie",
+            Self::Slime => "slime",
+            Self::EnderMan => "enderman",
+            Self::Silverfish => "silverfish",
+            Self::CaveSpider => "cavespider",
+            Self::Ghast => "ghast",
+            Self::LavaSlime => "lavaslime",
+            Self::Blaze => "blaze",
+            Self::ZombieVillager => "zombievillager",
+            Self::Witch => "witch",
+            Self::Stray => "stray",
+            Self::Husk => "husk",
+            Self::WitherSkeleton => "witherskeleton",
+            Self::Guardian => "guardian",
+            Self::ElderGuardian => "elderguardian",
+            Self::Npc => "npc",
+            Self::WitherBoss => "witherboss",
+            Self::Dragon => "dragon",
+            Self::Shulker => "shulker",
+            Self::Endermite => "endermite",
+            Self::Agent => "agent",
+            Self::Vindicator => "vindicator",
+            Self::Phantom => "phantom",
+            Self::IllagerBeast => "illagerbeast",
+            Self::ArmorStand => "armorstand",
+            Self::TripodCamera => "tripodcamera",
+            Self::Player => "player",
+            Self::ItemEntity => "itementity",
+            Self::PrimedTnt => "primedtnt",
+            Self::FallingBlock => "fallingblock",
+            Self::MovingBlock => "movingblock",
+            Self::ExperiencePotion => "experiencepotion",
+            Self::Experience => "experience",
+            Self::EyeOfEnder => "eyeofender",
+            Self::EnderCrystal => "endercrystal",
+            Self::FireworksRocket => "fireworksrocket",
+            Self::Trident => "trident",
+            Self::Turtle => "turtle",
+            Self::Cat => "cat",
+            Self::ShulkerBullet => "shulkerbullet",
+            Self::FishingHook => "fishinghook",
+            Self::Chalkboard => "chalkboard",
+            Self::DragonFireball => "dragonfireball",
+            Self::Arrow => "arrow",
+            Self::Snowball => "snowball",
+            Self::ThrownEgg => "thrownegg",
+            Self::Painting => "painting",
+            Self::LargeFireball => "largefireball",
+            Self::ThrownPotion => "thrownpotion",
+            Self::Enderpearl => "enderpearl",
+            Self::LeashKnot => "leashknot",
+            Self::WitherSkull => "witherskull",
+            Self::BoatRideable => "boatrideable",
+            Self::WitherSkullDangerous => "witherskulldangerous",
+            Self::LightningBolt => "lightningbolt",
+            Self::SmallFireball => "smallfireball",
+            Self::AreaEffectCloud => "areaeffectcloud",
+            Self::LingeringPotion => "lingeringpotion",
+            Self::LlamaSpit => "llamaspit",
+            Self::EvocationFang => "evocationfang",
+            Self::EvocationIllager => "evocationillager",
+            Self::Vex => "vex",
+            Self::MinecartRideable => "minecartrideable",
+            Self::MinecartHopper => "minecarthopper",
+            Self::MinecartTNT => "minecarttnt",
+            Self::MinecartChest => "minecartchest",
+            Self::MinecartFurnace => "minecartfurnace",
+            Self::MinecartCommandBlock => "minecartcommandblock",
+            Self::IceBomb => "icebomb",
+            Self::Balloon => "balloon",
+            Self::Pufferfish => "pufferfish",
+            Self::Salmon => "salmon",
+            Self::Drowned => "drowned",
+            Self::Tropicalfish => "tropicalfish",
+            Self::Fish => "fish",
+            Self::Panda => "panda",
+            Self::Pillager => "pillager",
+            Self::VillagerV2 => "villagerv2",
+            Self::ZombieVillagerV2 => "zombievillagerv2",
+            Self::Shield => "shield",
+            Self::WanderingTrader => "wanderingtrader",
+            Self::Lectern => "lectern",
+            Self::ElderGuardianGhost => "elderguardianghost",
+            Self::Fox => "fox",
+            Self::Bee => "bee",
+            Self::Piglin => "piglin",
+            Self::Hoglin => "hoglin",
+            Self::Strider => "strider",
+            Self::Zoglin => "zoglin",
+            Self::PiglinBrute => "piglinbrute",
+            Self::Goat => "goat",
+            Self::GlowSquid => "glowsquid",
+            Self::Axolotl => "axolotl",
+            Self::Warden => "warden",
+            Self::Frog => "frog",
+            Self::Tadpole => "tadpole",
+            Self::Allay => "allay",
+            Self::ChestBoatRideable => "chestboatrideable",
+            Self::TraderLlama => "traderllama",
+            Self::Camel => "camel",
+            Self::Sniffer => "sniffer",
+            Self::Breeze => "breeze",
+            Self::BreezeWindChargeProjectile => "breezewindchargeprojectile",
+            Self::Armadillo => "armadillo",
+            Self::WindChargeProjectile => "windchargeprojectile",
+            Self::Bogged => "bogged",
+            Self::OminousItemSpawner => "ominousitemspawner",
+            Self::Creaking => "creaking",
+            Self::HappyGhast => "happyghast",
+            Self::CopperGolem => "coppergolem",
+            Self::Nautilus => "nautilus",
+            Self::ZombieNautilus => "zombienautilus",
+            Self::Parched => "parched",
+            Self::CamelHusk => "camelhusk",
+            Self::SulfurCube => "sulfurcube",
+            Self::Cushion => "cushion",
+            Self::Frostbite => "frostbite",
+            Self::IceBall => "iceball",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Undefined" => return Some(Self::Undefined),
+            "Mob" => return Some(Self::Mob),
+            "PathfinderMob" => return Some(Self::PathfinderMob),
+            "Monster" => return Some(Self::Monster),
+            "Animal" => return Some(Self::Animal),
+            "TamableAnimal" => return Some(Self::TamableAnimal),
+            "Ambient" => return Some(Self::Ambient),
+            "UndeadMonster" => return Some(Self::UndeadMonster),
+            "ZombieMonster" => return Some(Self::ZombieMonster),
+            "Arthropod" => return Some(Self::Arthropod),
+            "Minecart" => return Some(Self::Minecart),
+            "SkeletonMonster" => return Some(Self::SkeletonMonster),
+            "EquineAnimal" => return Some(Self::EquineAnimal),
+            "Projectile" => return Some(Self::Projectile),
+            "AbstractArrow" => return Some(Self::AbstractArrow),
+            "WaterAnimal" => return Some(Self::WaterAnimal),
+            "VillagerBase" => return Some(Self::VillagerBase),
+            "Chicken" => return Some(Self::Chicken),
+            "Cow" => return Some(Self::Cow),
+            "Pig" => return Some(Self::Pig),
+            "Sheep" => return Some(Self::Sheep),
+            "Wolf" => return Some(Self::Wolf),
+            "Villager" => return Some(Self::Villager),
+            "MushroomCow" => return Some(Self::MushroomCow),
+            "Squid" => return Some(Self::Squid),
+            "Rabbit" => return Some(Self::Rabbit),
+            "Bat" => return Some(Self::Bat),
+            "IronGolem" => return Some(Self::IronGolem),
+            "SnowGolem" => return Some(Self::SnowGolem),
+            "Ocelot" => return Some(Self::Ocelot),
+            "Horse" => return Some(Self::Horse),
+            "PolarBear" => return Some(Self::PolarBear),
+            "Llama" => return Some(Self::Llama),
+            "Parrot" => return Some(Self::Parrot),
+            "Dolphin" => return Some(Self::Dolphin),
+            "Donkey" => return Some(Self::Donkey),
+            "Mule" => return Some(Self::Mule),
+            "SkeletonHorse" => return Some(Self::SkeletonHorse),
+            "ZombieHorse" => return Some(Self::ZombieHorse),
+            "Zombie" => return Some(Self::Zombie),
+            "Creeper" => return Some(Self::Creeper),
+            "Skeleton" => return Some(Self::Skeleton),
+            "Spider" => return Some(Self::Spider),
+            "PigZombie" => return Some(Self::PigZombie),
+            "Slime" => return Some(Self::Slime),
+            "EnderMan" => return Some(Self::EnderMan),
+            "Silverfish" => return Some(Self::Silverfish),
+            "CaveSpider" => return Some(Self::CaveSpider),
+            "Ghast" => return Some(Self::Ghast),
+            "LavaSlime" => return Some(Self::LavaSlime),
+            "Blaze" => return Some(Self::Blaze),
+            "ZombieVillager" => return Some(Self::ZombieVillager),
+            "Witch" => return Some(Self::Witch),
+            "Stray" => return Some(Self::Stray),
+            "Husk" => return Some(Self::Husk),
+            "WitherSkeleton" => return Some(Self::WitherSkeleton),
+            "Guardian" => return Some(Self::Guardian),
+            "ElderGuardian" => return Some(Self::ElderGuardian),
+            "Npc" => return Some(Self::Npc),
+            "WitherBoss" => return Some(Self::WitherBoss),
+            "Dragon" => return Some(Self::Dragon),
+            "Shulker" => return Some(Self::Shulker),
+            "Endermite" => return Some(Self::Endermite),
+            "Agent" => return Some(Self::Agent),
+            "Vindicator" => return Some(Self::Vindicator),
+            "Phantom" => return Some(Self::Phantom),
+            "IllagerBeast" => return Some(Self::IllagerBeast),
+            "ArmorStand" => return Some(Self::ArmorStand),
+            "TripodCamera" => return Some(Self::TripodCamera),
+            "Player" => return Some(Self::Player),
+            "ItemEntity" => return Some(Self::ItemEntity),
+            "PrimedTnt" => return Some(Self::PrimedTnt),
+            "FallingBlock" => return Some(Self::FallingBlock),
+            "MovingBlock" => return Some(Self::MovingBlock),
+            "ExperiencePotion" => return Some(Self::ExperiencePotion),
+            "Experience" => return Some(Self::Experience),
+            "EyeOfEnder" => return Some(Self::EyeOfEnder),
+            "EnderCrystal" => return Some(Self::EnderCrystal),
+            "FireworksRocket" => return Some(Self::FireworksRocket),
+            "Trident" => return Some(Self::Trident),
+            "Turtle" => return Some(Self::Turtle),
+            "Cat" => return Some(Self::Cat),
+            "ShulkerBullet" => return Some(Self::ShulkerBullet),
+            "FishingHook" => return Some(Self::FishingHook),
+            "Chalkboard" => return Some(Self::Chalkboard),
+            "DragonFireball" => return Some(Self::DragonFireball),
+            "Arrow" => return Some(Self::Arrow),
+            "Snowball" => return Some(Self::Snowball),
+            "ThrownEgg" => return Some(Self::ThrownEgg),
+            "Painting" => return Some(Self::Painting),
+            "LargeFireball" => return Some(Self::LargeFireball),
+            "ThrownPotion" => return Some(Self::ThrownPotion),
+            "Enderpearl" => return Some(Self::Enderpearl),
+            "LeashKnot" => return Some(Self::LeashKnot),
+            "WitherSkull" => return Some(Self::WitherSkull),
+            "BoatRideable" => return Some(Self::BoatRideable),
+            "WitherSkullDangerous" => return Some(Self::WitherSkullDangerous),
+            "LightningBolt" => return Some(Self::LightningBolt),
+            "SmallFireball" => return Some(Self::SmallFireball),
+            "AreaEffectCloud" => return Some(Self::AreaEffectCloud),
+            "LingeringPotion" => return Some(Self::LingeringPotion),
+            "LlamaSpit" => return Some(Self::LlamaSpit),
+            "EvocationFang" => return Some(Self::EvocationFang),
+            "EvocationIllager" => return Some(Self::EvocationIllager),
+            "Vex" => return Some(Self::Vex),
+            "MinecartRideable" => return Some(Self::MinecartRideable),
+            "MinecartHopper" => return Some(Self::MinecartHopper),
+            "MinecartTNT" => return Some(Self::MinecartTNT),
+            "MinecartChest" => return Some(Self::MinecartChest),
+            "MinecartFurnace" => return Some(Self::MinecartFurnace),
+            "MinecartCommandBlock" => return Some(Self::MinecartCommandBlock),
+            "IceBomb" => return Some(Self::IceBomb),
+            "Balloon" => return Some(Self::Balloon),
+            "Pufferfish" => return Some(Self::Pufferfish),
+            "Salmon" => return Some(Self::Salmon),
+            "Drowned" => return Some(Self::Drowned),
+            "Tropicalfish" => return Some(Self::Tropicalfish),
+            "Fish" => return Some(Self::Fish),
+            "Panda" => return Some(Self::Panda),
+            "Pillager" => return Some(Self::Pillager),
+            "VillagerV2" => return Some(Self::VillagerV2),
+            "ZombieVillagerV2" => return Some(Self::ZombieVillagerV2),
+            "Shield" => return Some(Self::Shield),
+            "WanderingTrader" => return Some(Self::WanderingTrader),
+            "Lectern" => return Some(Self::Lectern),
+            "ElderGuardianGhost" => return Some(Self::ElderGuardianGhost),
+            "Fox" => return Some(Self::Fox),
+            "Bee" => return Some(Self::Bee),
+            "Piglin" => return Some(Self::Piglin),
+            "Hoglin" => return Some(Self::Hoglin),
+            "Strider" => return Some(Self::Strider),
+            "Zoglin" => return Some(Self::Zoglin),
+            "PiglinBrute" => return Some(Self::PiglinBrute),
+            "Goat" => return Some(Self::Goat),
+            "GlowSquid" => return Some(Self::GlowSquid),
+            "Axolotl" => return Some(Self::Axolotl),
+            "Warden" => return Some(Self::Warden),
+            "Frog" => return Some(Self::Frog),
+            "Tadpole" => return Some(Self::Tadpole),
+            "Allay" => return Some(Self::Allay),
+            "ChestBoatRideable" => return Some(Self::ChestBoatRideable),
+            "TraderLlama" => return Some(Self::TraderLlama),
+            "Camel" => return Some(Self::Camel),
+            "Sniffer" => return Some(Self::Sniffer),
+            "Breeze" => return Some(Self::Breeze),
+            "BreezeWindChargeProjectile" => return Some(Self::BreezeWindChargeProjectile),
+            "Armadillo" => return Some(Self::Armadillo),
+            "WindChargeProjectile" => return Some(Self::WindChargeProjectile),
+            "Bogged" => return Some(Self::Bogged),
+            "OminousItemSpawner" => return Some(Self::OminousItemSpawner),
+            "Creaking" => return Some(Self::Creaking),
+            "HappyGhast" => return Some(Self::HappyGhast),
+            "CopperGolem" => return Some(Self::CopperGolem),
+            "Nautilus" => return Some(Self::Nautilus),
+            "ZombieNautilus" => return Some(Self::ZombieNautilus),
+            "Parched" => return Some(Self::Parched),
+            "CamelHusk" => return Some(Self::CamelHusk),
+            "SulfurCube" => return Some(Self::SulfurCube),
+            "Cushion" => return Some(Self::Cushion),
+            "Frostbite" => return Some(Self::Frostbite),
+            "IceBall" => return Some(Self::IceBall),
+            _ => {}
+        }
         const NAMES: &[(&str, ActorType)] = &[
             ("Undefined", ActorType::Undefined),
             ("Mob", ActorType::Mob),
@@ -1941,10 +2446,7 @@ impl ProtocolEnum for ActorType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2104,7 +2606,50 @@ impl ProtocolEnum for AgentActionType {
             Self::Turn => "Turn",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Attack => "attack",
+            Self::Collect => "collect",
+            Self::Destroy => "destroy",
+            Self::DetectRedstone => "detectredstone",
+            Self::DetectObstacle => "detectobstacle",
+            Self::Drop => "drop",
+            Self::DropAll => "dropall",
+            Self::Inspect => "inspect",
+            Self::InspectData => "inspectdata",
+            Self::InspectItemCount => "inspectitemcount",
+            Self::InspectItemDetail => "inspectitemdetail",
+            Self::InspectItemSpace => "inspectitemspace",
+            Self::Interact => "interact",
+            Self::Move => "move",
+            Self::PlaceBlock => "placeblock",
+            Self::Till => "till",
+            Self::TransferItemTo => "transferitemto",
+            Self::Turn => "turn",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Attack" => return Some(Self::Attack),
+            "Collect" => return Some(Self::Collect),
+            "Destroy" => return Some(Self::Destroy),
+            "DetectRedstone" => return Some(Self::DetectRedstone),
+            "DetectObstacle" => return Some(Self::DetectObstacle),
+            "Drop" => return Some(Self::Drop),
+            "DropAll" => return Some(Self::DropAll),
+            "Inspect" => return Some(Self::Inspect),
+            "InspectData" => return Some(Self::InspectData),
+            "InspectItemCount" => return Some(Self::InspectItemCount),
+            "InspectItemDetail" => return Some(Self::InspectItemDetail),
+            "InspectItemSpace" => return Some(Self::InspectItemSpace),
+            "Interact" => return Some(Self::Interact),
+            "Move" => return Some(Self::Move),
+            "PlaceBlock" => return Some(Self::PlaceBlock),
+            "Till" => return Some(Self::Till),
+            "TransferItemTo" => return Some(Self::TransferItemTo),
+            "Turn" => return Some(Self::Turn),
+            _ => {}
+        }
         const NAMES: &[(&str, AgentActionType)] = &[
             ("Attack", AgentActionType::Attack),
             ("Collect", AgentActionType::Collect),
@@ -2127,10 +2672,7 @@ impl ProtocolEnum for AgentActionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2191,17 +2733,25 @@ impl ProtocolEnum for AgentAnimation {
             Self::Shrug => "Shrug",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ArmSwing => "armswing",
+            Self::Shrug => "shrug",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "ArmSwing" => return Some(Self::ArmSwing),
+            "Shrug" => return Some(Self::Shrug),
+            _ => {}
+        }
         const NAMES: &[(&str, AgentAnimation)] = &[
             ("ArmSwing", AgentAnimation::ArmSwing),
             ("Shrug", AgentAnimation::Shrug),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2262,17 +2812,25 @@ impl ProtocolEnum for AimAssistTargetMode {
             Self::Distance => "distance",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Angle => "angle",
+            Self::Distance => "distance",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "angle" => return Some(Self::Angle),
+            "distance" => return Some(Self::Distance),
+            _ => {}
+        }
         const NAMES: &[(&str, AimAssistTargetMode)] = &[
             ("angle", AimAssistTargetMode::Angle),
             ("distance", AimAssistTargetMode::Distance),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2354,7 +2912,24 @@ impl ProtocolEnum for AnimatePacketPayloadAction {
             Self::MagicCriticalHit => "MagicCriticalHit",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoAction => "noaction",
+            Self::Swing => "swing",
+            Self::WakeUp => "wakeup",
+            Self::CriticalHit => "criticalhit",
+            Self::MagicCriticalHit => "magiccriticalhit",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NoAction" => return Some(Self::NoAction),
+            "Swing" => return Some(Self::Swing),
+            "WakeUp" => return Some(Self::WakeUp),
+            "CriticalHit" => return Some(Self::CriticalHit),
+            "MagicCriticalHit" => return Some(Self::MagicCriticalHit),
+            _ => {}
+        }
         const NAMES: &[(&str, AnimatePacketPayloadAction)] = &[
             ("NoAction", AnimatePacketPayloadAction::NoAction),
             ("Swing", AnimatePacketPayloadAction::Swing),
@@ -2364,10 +2939,7 @@ impl ProtocolEnum for AnimatePacketPayloadAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2433,7 +3005,20 @@ impl ProtocolEnum for AnimationMode {
             Self::Blocks => "Blocks",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Layers => "layers",
+            Self::Blocks => "blocks",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Layers" => return Some(Self::Layers),
+            "Blocks" => return Some(Self::Blocks),
+            _ => {}
+        }
         const NAMES: &[(&str, AnimationMode)] = &[
             ("None", AnimationMode::None),
             ("Layers", AnimationMode::Layers),
@@ -2441,10 +3026,7 @@ impl ProtocolEnum for AnimationMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2528,7 +3110,25 @@ impl ProtocolEnum for AttributeModifierOperation {
             Self::TotalOperations => "TOTAL_OPERATIONS",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::OperationAddition => "operation_addition",
+            Self::OperationMultiplyBase => "operation_multiply_base",
+            Self::OperationMultiplyTotal => "operation_multiply_total",
+            Self::OperationCap => "operation_cap",
+            Self::TotalOperations => "total_operations",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "OPERATION_ADDITION" => return Some(Self::OperationAddition),
+            "OPERATION_MULTIPLY_BASE" => return Some(Self::OperationMultiplyBase),
+            "OPERATION_MULTIPLY_TOTAL" => return Some(Self::OperationMultiplyTotal),
+            "OPERATION_CAP" => return Some(Self::OperationCap),
+            "TOTAL_OPERATIONS" => return Some(Self::TotalOperations),
+            "OPERATION_INVALID" => return Some(Self::TotalOperations),
+            _ => {}
+        }
         const NAMES: &[(&str, AttributeModifierOperation)] = &[
             ("OPERATION_ADDITION", AttributeModifierOperation::OperationAddition),
             (
@@ -2545,10 +3145,7 @@ impl ProtocolEnum for AttributeModifierOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2626,7 +3223,23 @@ impl ProtocolEnum for AttributeOperands {
             Self::TotalOperands => "TOTAL_OPERANDS",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::OperandMin => "operand_min",
+            Self::OperandMax => "operand_max",
+            Self::OperandCurrent => "operand_current",
+            Self::TotalOperands => "total_operands",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "OPERAND_MIN" => return Some(Self::OperandMin),
+            "OPERAND_MAX" => return Some(Self::OperandMax),
+            "OPERAND_CURRENT" => return Some(Self::OperandCurrent),
+            "TOTAL_OPERANDS" => return Some(Self::TotalOperands),
+            "OPERAND_INVALID" => return Some(Self::TotalOperands),
+            _ => {}
+        }
         const NAMES: &[(&str, AttributeOperands)] = &[
             ("OPERAND_MIN", AttributeOperands::OperandMin),
             ("OPERAND_MAX", AttributeOperands::OperandMax),
@@ -2636,10 +3249,7 @@ impl ProtocolEnum for AttributeOperands {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2705,7 +3315,20 @@ impl ProtocolEnum for AudioContentPlaybackType {
             Self::ConcurrentMusic => "ConcurrentMusic",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Music => "music",
+            Self::Sound => "sound",
+            Self::ConcurrentMusic => "concurrentmusic",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Music" => return Some(Self::Music),
+            "Sound" => return Some(Self::Sound),
+            "ConcurrentMusic" => return Some(Self::ConcurrentMusic),
+            _ => {}
+        }
         const NAMES: &[(&str, AudioContentPlaybackType)] = &[
             ("Music", AudioContentPlaybackType::Music),
             ("Sound", AudioContentPlaybackType::Sound),
@@ -2713,10 +3336,7 @@ impl ProtocolEnum for AudioContentPlaybackType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2782,7 +3402,20 @@ impl ProtocolEnum for AuthorAndMessageMessageType {
             Self::Announcement => "announcement",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Chat => "chat",
+            Self::Whisper => "whisper",
+            Self::Announcement => "announcement",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "chat" => return Some(Self::Chat),
+            "whisper" => return Some(Self::Whisper),
+            "announcement" => return Some(Self::Announcement),
+            _ => {}
+        }
         const NAMES: &[(&str, AuthorAndMessageMessageType)] = &[
             ("chat", AuthorAndMessageMessageType::Chat),
             ("whisper", AuthorAndMessageMessageType::Whisper),
@@ -2790,10 +3423,7 @@ impl ProtocolEnum for AuthorAndMessageMessageType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2875,7 +3505,24 @@ impl ProtocolEnum for BiomeTemperatureCategory {
             Self::Frozen => "Frozen",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Medium => "medium",
+            Self::Warm => "warm",
+            Self::Lukewarm => "lukewarm",
+            Self::Cold => "cold",
+            Self::Frozen => "frozen",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Medium" => return Some(Self::Medium),
+            "Warm" => return Some(Self::Warm),
+            "Lukewarm" => return Some(Self::Lukewarm),
+            "Cold" => return Some(Self::Cold),
+            "Frozen" => return Some(Self::Frozen),
+            _ => {}
+        }
         const NAMES: &[(&str, BiomeTemperatureCategory)] = &[
             ("Medium", BiomeTemperatureCategory::Medium),
             ("Warm", BiomeTemperatureCategory::Warm),
@@ -2885,10 +3532,7 @@ impl ProtocolEnum for BiomeTemperatureCategory {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -2988,7 +3632,30 @@ impl ProtocolEnum for BoolAttributeOperation {
             Self::Xnor => "XNOR",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Override => "override",
+            Self::AlphaBlend => "alpha_blend",
+            Self::And => "and",
+            Self::Nand => "nand",
+            Self::Or => "or",
+            Self::Nor => "nor",
+            Self::Xor => "xor",
+            Self::Xnor => "xnor",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "OVERRIDE" => return Some(Self::Override),
+            "ALPHA_BLEND" => return Some(Self::AlphaBlend),
+            "AND" => return Some(Self::And),
+            "NAND" => return Some(Self::Nand),
+            "OR" => return Some(Self::Or),
+            "NOR" => return Some(Self::Nor),
+            "XOR" => return Some(Self::Xor),
+            "XNOR" => return Some(Self::Xnor),
+            _ => {}
+        }
         const NAMES: &[(&str, BoolAttributeOperation)] = &[
             ("OVERRIDE", BoolAttributeOperation::Override),
             ("ALPHA_BLEND", BoolAttributeOperation::AlphaBlend),
@@ -3001,10 +3668,7 @@ impl ProtocolEnum for BoolAttributeOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3104,7 +3768,30 @@ impl ProtocolEnum for BossBarColor {
             Self::White => "WHITE",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Pink => "pink",
+            Self::Blue => "blue",
+            Self::Red => "red",
+            Self::Green => "green",
+            Self::Yellow => "yellow",
+            Self::Purple => "purple",
+            Self::RebeccaPurple => "rebecca_purple",
+            Self::White => "white",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "PINK" => return Some(Self::Pink),
+            "BLUE" => return Some(Self::Blue),
+            "RED" => return Some(Self::Red),
+            "GREEN" => return Some(Self::Green),
+            "YELLOW" => return Some(Self::Yellow),
+            "PURPLE" => return Some(Self::Purple),
+            "REBECCA_PURPLE" => return Some(Self::RebeccaPurple),
+            "WHITE" => return Some(Self::White),
+            _ => {}
+        }
         const NAMES: &[(&str, BossBarColor)] = &[
             ("PINK", BossBarColor::Pink),
             ("BLUE", BossBarColor::Blue),
@@ -3117,10 +3804,7 @@ impl ProtocolEnum for BossBarColor {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3202,7 +3886,24 @@ impl ProtocolEnum for BossBarOverlay {
             Self::Notched20 => "NOTCHED_20",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Progress => "progress",
+            Self::Notched6 => "notched_6",
+            Self::Notched10 => "notched_10",
+            Self::Notched12 => "notched_12",
+            Self::Notched20 => "notched_20",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "PROGRESS" => return Some(Self::Progress),
+            "NOTCHED_6" => return Some(Self::Notched6),
+            "NOTCHED_10" => return Some(Self::Notched10),
+            "NOTCHED_12" => return Some(Self::Notched12),
+            "NOTCHED_20" => return Some(Self::Notched20),
+            _ => {}
+        }
         const NAMES: &[(&str, BossBarOverlay)] = &[
             ("PROGRESS", BossBarOverlay::Progress),
             ("NOTCHED_6", BossBarOverlay::Notched6),
@@ -3212,10 +3913,7 @@ impl ProtocolEnum for BossBarOverlay {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3321,7 +4019,32 @@ impl ProtocolEnum for BossEventUpdateType {
             Self::Query => "Query",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Add => "add",
+            Self::PlayerAdded => "playeradded",
+            Self::Remove => "remove",
+            Self::PlayerRemoved => "playerremoved",
+            Self::UpdatePercent => "update_percent",
+            Self::UpdateName => "update_name",
+            Self::UpdateProperties => "update_properties",
+            Self::UpdateStyle => "update_style",
+            Self::Query => "query",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Add" => return Some(Self::Add),
+            "PlayerAdded" => return Some(Self::PlayerAdded),
+            "Remove" => return Some(Self::Remove),
+            "PlayerRemoved" => return Some(Self::PlayerRemoved),
+            "Update_Percent" => return Some(Self::UpdatePercent),
+            "Update_Name" => return Some(Self::UpdateName),
+            "Update_Properties" => return Some(Self::UpdateProperties),
+            "Update_Style" => return Some(Self::UpdateStyle),
+            "Query" => return Some(Self::Query),
+            _ => {}
+        }
         const NAMES: &[(&str, BossEventUpdateType)] = &[
             ("Add", BossEventUpdateType::Add),
             ("PlayerAdded", BossEventUpdateType::PlayerAdded),
@@ -3335,10 +4058,7 @@ impl ProtocolEnum for BossEventUpdateType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3456,7 +4176,36 @@ impl ProtocolEnum for BuildPlatform {
             Self::Unknown => "Unknown",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Google => "google",
+            Self::IOS => "ios",
+            Self::Osx => "osx",
+            Self::Amazon => "amazon",
+            Self::Win32 => "win32",
+            Self::Dedicated => "dedicated",
+            Self::Sony => "sony",
+            Self::Nintendo => "nintendo",
+            Self::Xbox => "xbox",
+            Self::Linux => "linux",
+            Self::Unknown => "unknown",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Google" => return Some(Self::Google),
+            "iOS" => return Some(Self::IOS),
+            "OSX" => return Some(Self::Osx),
+            "Amazon" => return Some(Self::Amazon),
+            "Win32" => return Some(Self::Win32),
+            "Dedicated" => return Some(Self::Dedicated),
+            "Sony" => return Some(Self::Sony),
+            "Nintendo" => return Some(Self::Nintendo),
+            "Xbox" => return Some(Self::Xbox),
+            "Linux" => return Some(Self::Linux),
+            "Unknown" => return Some(Self::Unknown),
+            _ => {}
+        }
         const NAMES: &[(&str, BuildPlatform)] = &[
             ("Google", BuildPlatform::Google),
             ("iOS", BuildPlatform::IOS),
@@ -3472,10 +4221,7 @@ impl ProtocolEnum for BuildPlatform {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3536,17 +4282,25 @@ impl ProtocolEnum for CameraAimAssistPacketPayloadAction {
             Self::Clear => "Clear",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Set => "set",
+            Self::Clear => "clear",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Set" => return Some(Self::Set),
+            "Clear" => return Some(Self::Clear),
+            _ => {}
+        }
         const NAMES: &[(&str, CameraAimAssistPacketPayloadAction)] = &[
             ("Set", CameraAimAssistPacketPayloadAction::Set),
             ("Clear", CameraAimAssistPacketPayloadAction::Clear),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3607,17 +4361,25 @@ impl ProtocolEnum for CameraAimAssistPacketPayloadTargetMode {
             Self::Distance => "Distance",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Angle => "angle",
+            Self::Distance => "distance",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Angle" => return Some(Self::Angle),
+            "Distance" => return Some(Self::Distance),
+            _ => {}
+        }
         const NAMES: &[(&str, CameraAimAssistPacketPayloadTargetMode)] = &[
             ("Angle", CameraAimAssistPacketPayloadTargetMode::Angle),
             ("Distance", CameraAimAssistPacketPayloadTargetMode::Distance),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3678,17 +4440,25 @@ impl ProtocolEnum for CameraAimAssistPresetsPacketOperation {
             Self::AddToExisting => "AddToExisting",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Set => "set",
+            Self::AddToExisting => "addtoexisting",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Set" => return Some(Self::Set),
+            "AddToExisting" => return Some(Self::AddToExisting),
+            _ => {}
+        }
         const NAMES: &[(&str, CameraAimAssistPresetsPacketOperation)] = &[
             ("Set", CameraAimAssistPresetsPacketOperation::Set),
             ("AddToExisting", CameraAimAssistPresetsPacketOperation::AddToExisting),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3749,17 +4519,25 @@ impl ProtocolEnum for CameraShakeAction {
             Self::Stop => "Stop",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Add => "add",
+            Self::Stop => "stop",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Add" => return Some(Self::Add),
+            "Stop" => return Some(Self::Stop),
+            _ => {}
+        }
         const NAMES: &[(&str, CameraShakeAction)] = &[
             ("Add", CameraShakeAction::Add),
             ("Stop", CameraShakeAction::Stop),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3820,17 +4598,25 @@ impl ProtocolEnum for CameraShakeType {
             Self::Rotational => "Rotational",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Positional => "positional",
+            Self::Rotational => "rotational",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Positional" => return Some(Self::Positional),
+            "Rotational" => return Some(Self::Rotational),
+            _ => {}
+        }
         const NAMES: &[(&str, CameraShakeType)] = &[
             ("Positional", CameraShakeType::Positional),
             ("Rotational", CameraShakeType::Rotational),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3896,7 +4682,20 @@ impl ProtocolEnum for ChatRestrictionLevel {
             Self::Disabled => "Disabled",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Dropped => "dropped",
+            Self::Disabled => "disabled",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Dropped" => return Some(Self::Dropped),
+            "Disabled" => return Some(Self::Disabled),
+            _ => {}
+        }
         const NAMES: &[(&str, ChatRestrictionLevel)] = &[
             ("None", ChatRestrictionLevel::None),
             ("Dropped", ChatRestrictionLevel::Dropped),
@@ -3904,10 +4703,7 @@ impl ProtocolEnum for ChatRestrictionLevel {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -3972,7 +4768,18 @@ impl ProtocolEnum for ClientCameraAimAssistPacketAction {
             Self::Clear => "Clear",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SetFromCameraPreset => "setfromcamerapreset",
+            Self::Clear => "clear",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SetFromCameraPreset" => return Some(Self::SetFromCameraPreset),
+            "Clear" => return Some(Self::Clear),
+            _ => {}
+        }
         const NAMES: &[(&str, ClientCameraAimAssistPacketAction)] = &[
             (
                 "SetFromCameraPreset",
@@ -3982,10 +4789,7 @@ impl ProtocolEnum for ClientCameraAimAssistPacketAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4067,7 +4871,24 @@ impl ProtocolEnum for ClientPlayMode {
             Self::NumModes => "NumModes",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Teaser => "teaser",
+            Self::Screen => "screen",
+            Self::ExitLevel => "exitlevel",
+            Self::NumModes => "nummodes",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Normal" => return Some(Self::Normal),
+            "Teaser" => return Some(Self::Teaser),
+            "Screen" => return Some(Self::Screen),
+            "ExitLevel" => return Some(Self::ExitLevel),
+            "NumModes" => return Some(Self::NumModes),
+            _ => {}
+        }
         const NAMES: &[(&str, ClientPlayMode)] = &[
             ("Normal", ClientPlayMode::Normal),
             ("Teaser", ClientPlayMode::Teaser),
@@ -4077,10 +4898,7 @@ impl ProtocolEnum for ClientPlayMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4162,7 +4980,24 @@ impl ProtocolEnum for ClientboundTextureShiftPacketPayloadAction {
             Self::Sync => "Sync",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::Initialize => "initialize",
+            Self::Start => "start",
+            Self::SetEnabled => "setenabled",
+            Self::Sync => "sync",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "Initialize" => return Some(Self::Initialize),
+            "Start" => return Some(Self::Start),
+            "SetEnabled" => return Some(Self::SetEnabled),
+            "Sync" => return Some(Self::Sync),
+            _ => {}
+        }
         const NAMES: &[(&str, ClientboundTextureShiftPacketPayloadAction)] = &[
             ("Invalid", ClientboundTextureShiftPacketPayloadAction::Invalid),
             ("Initialize", ClientboundTextureShiftPacketPayloadAction::Initialize),
@@ -4172,10 +5007,7 @@ impl ProtocolEnum for ClientboundTextureShiftPacketPayloadAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4263,7 +5095,26 @@ impl ProtocolEnum for CodeBuilderExecutionStateCodeStatus {
             Self::Succeeded => "Succeeded",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::NotStarted => "notstarted",
+            Self::InProgress => "inprogress",
+            Self::Paused => "paused",
+            Self::Error => "error",
+            Self::Succeeded => "succeeded",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "NotStarted" => return Some(Self::NotStarted),
+            "InProgress" => return Some(Self::InProgress),
+            "Paused" => return Some(Self::Paused),
+            "Error" => return Some(Self::Error),
+            "Succeeded" => return Some(Self::Succeeded),
+            _ => {}
+        }
         const NAMES: &[(&str, CodeBuilderExecutionStateCodeStatus)] = &[
             ("None", CodeBuilderExecutionStateCodeStatus::None),
             ("NotStarted", CodeBuilderExecutionStateCodeStatus::NotStarted),
@@ -4274,10 +5125,7 @@ impl ProtocolEnum for CodeBuilderExecutionStateCodeStatus {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4347,7 +5195,20 @@ impl ProtocolEnum for CodeBuilderStorageQueryOptionsCategory {
             Self::Instantiation => "Instantiation",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::CodeStatus => "codestatus",
+            Self::Instantiation => "instantiation",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "CodeStatus" => return Some(Self::CodeStatus),
+            "Instantiation" => return Some(Self::Instantiation),
+            _ => {}
+        }
         const NAMES: &[(&str, CodeBuilderStorageQueryOptionsCategory)] = &[
             ("None", CodeBuilderStorageQueryOptionsCategory::None),
             ("CodeStatus", CodeBuilderStorageQueryOptionsCategory::CodeStatus),
@@ -4355,10 +5216,7 @@ impl ProtocolEnum for CodeBuilderStorageQueryOptionsCategory {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4429,7 +5287,22 @@ impl ProtocolEnum for CodeBuilderStorageQueryOptionsOperation {
             Self::Reset => "Reset",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Get => "get",
+            Self::Set => "set",
+            Self::Reset => "reset",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Get" => return Some(Self::Get),
+            "Set" => return Some(Self::Set),
+            "Reset" => return Some(Self::Reset),
+            _ => {}
+        }
         const NAMES: &[(&str, CodeBuilderStorageQueryOptionsOperation)] = &[
             ("None", CodeBuilderStorageQueryOptionsOperation::None),
             ("Get", CodeBuilderStorageQueryOptionsOperation::Get),
@@ -4438,10 +5311,7 @@ impl ProtocolEnum for CodeBuilderStorageQueryOptionsOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4523,7 +5393,24 @@ impl ProtocolEnum for ColorAttributeOperation {
             Self::Multiply => "MULTIPLY",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Override => "override",
+            Self::AlphaBlend => "alpha_blend",
+            Self::Add => "add",
+            Self::Subtract => "subtract",
+            Self::Multiply => "multiply",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "OVERRIDE" => return Some(Self::Override),
+            "ALPHA_BLEND" => return Some(Self::AlphaBlend),
+            "ADD" => return Some(Self::Add),
+            "SUBTRACT" => return Some(Self::Subtract),
+            "MULTIPLY" => return Some(Self::Multiply),
+            _ => {}
+        }
         const NAMES: &[(&str, ColorAttributeOperation)] = &[
             ("OVERRIDE", ColorAttributeOperation::Override),
             ("ALPHA_BLEND", ColorAttributeOperation::AlphaBlend),
@@ -4533,10 +5420,7 @@ impl ProtocolEnum for ColorAttributeOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4602,7 +5486,20 @@ impl ProtocolEnum for CommandBlockMode {
             Self::Chain => "Chain",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Repeating => "repeating",
+            Self::Chain => "chain",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Normal" => return Some(Self::Normal),
+            "Repeating" => return Some(Self::Repeating),
+            "Chain" => return Some(Self::Chain),
+            _ => {}
+        }
         const NAMES: &[(&str, CommandBlockMode)] = &[
             ("Normal", CommandBlockMode::Normal),
             ("Repeating", CommandBlockMode::Repeating),
@@ -4610,10 +5507,7 @@ impl ProtocolEnum for CommandBlockMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4691,7 +5585,22 @@ impl ProtocolEnum for CommandOriginDataType {
             Self::AutomationPlayer => "AutomationPlayer",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Player => "player",
+            Self::DevConsole => "devconsole",
+            Self::Test => "test",
+            Self::AutomationPlayer => "automationplayer",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Player" => return Some(Self::Player),
+            "DevConsole" => return Some(Self::DevConsole),
+            "Test" => return Some(Self::Test),
+            "AutomationPlayer" => return Some(Self::AutomationPlayer),
+            _ => {}
+        }
         const NAMES: &[(&str, CommandOriginDataType)] = &[
             ("Player", CommandOriginDataType::Player),
             ("DevConsole", CommandOriginDataType::DevConsole),
@@ -4700,10 +5609,7 @@ impl ProtocolEnum for CommandOriginDataType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4851,7 +5757,46 @@ impl ProtocolEnum for CommandOriginType {
             Self::ExecuteContext => "ExecuteContext",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Player => "player",
+            Self::CommandBlock => "commandblock",
+            Self::MinecartCommandBlock => "minecartcommandblock",
+            Self::DevConsole => "devconsole",
+            Self::Test => "test",
+            Self::AutomationPlayer => "automationplayer",
+            Self::ClientAutomation => "clientautomation",
+            Self::DedicatedServer => "dedicatedserver",
+            Self::Entity => "entity",
+            Self::Virtual => "virtual",
+            Self::GameArgument => "gameargument",
+            Self::EntityServer => "entityserver",
+            Self::Precompiled => "precompiled",
+            Self::GameDirectorEntityServer => "gamedirectorentityserver",
+            Self::Scripting => "scripting",
+            Self::ExecuteContext => "executecontext",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Player" => return Some(Self::Player),
+            "CommandBlock" => return Some(Self::CommandBlock),
+            "MinecartCommandBlock" => return Some(Self::MinecartCommandBlock),
+            "DevConsole" => return Some(Self::DevConsole),
+            "Test" => return Some(Self::Test),
+            "AutomationPlayer" => return Some(Self::AutomationPlayer),
+            "ClientAutomation" => return Some(Self::ClientAutomation),
+            "DedicatedServer" => return Some(Self::DedicatedServer),
+            "Entity" => return Some(Self::Entity),
+            "Virtual" => return Some(Self::Virtual),
+            "GameArgument" => return Some(Self::GameArgument),
+            "EntityServer" => return Some(Self::EntityServer),
+            "Precompiled" => return Some(Self::Precompiled),
+            "GameDirectorEntityServer" => return Some(Self::GameDirectorEntityServer),
+            "Scripting" => return Some(Self::Scripting),
+            "ExecuteContext" => return Some(Self::ExecuteContext),
+            _ => {}
+        }
         const NAMES: &[(&str, CommandOriginType)] = &[
             ("Player", CommandOriginType::Player),
             ("CommandBlock", CommandOriginType::CommandBlock),
@@ -4872,10 +5817,7 @@ impl ProtocolEnum for CommandOriginType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -4957,7 +5899,24 @@ impl ProtocolEnum for CommandOutputType {
             Self::DataSet => "DataSet",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::LastOutput => "lastoutput",
+            Self::Silent => "silent",
+            Self::AllOutput => "alloutput",
+            Self::DataSet => "dataset",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "LastOutput" => return Some(Self::LastOutput),
+            "Silent" => return Some(Self::Silent),
+            "AllOutput" => return Some(Self::AllOutput),
+            "DataSet" => return Some(Self::DataSet),
+            _ => {}
+        }
         const NAMES: &[(&str, CommandOutputType)] = &[
             ("None", CommandOutputType::None),
             ("LastOutput", CommandOutputType::LastOutput),
@@ -4967,10 +5926,7 @@ impl ProtocolEnum for CommandOutputType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -5058,7 +6014,26 @@ impl ProtocolEnum for CommandPermissionLevel {
             Self::Internal => "Internal",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Any => "any",
+            Self::GameDirectors => "gamedirectors",
+            Self::Admin => "admin",
+            Self::Host => "host",
+            Self::Owner => "owner",
+            Self::Internal => "internal",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Any" => return Some(Self::Any),
+            "GameDirectors" => return Some(Self::GameDirectors),
+            "Admin" => return Some(Self::Admin),
+            "Host" => return Some(Self::Host),
+            "Owner" => return Some(Self::Owner),
+            "Internal" => return Some(Self::Internal),
+            _ => {}
+        }
         const NAMES: &[(&str, CommandPermissionLevel)] = &[
             ("Any", CommandPermissionLevel::Any),
             ("GameDirectors", CommandPermissionLevel::GameDirectors),
@@ -5069,10 +6044,7 @@ impl ProtocolEnum for CommandPermissionLevel {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -5564,7 +6536,212 @@ impl ProtocolEnum for ContainerEnumName {
             Self::VirtualContainer => "VirtualContainer",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::AnvilInputContainer => "anvilinputcontainer",
+            Self::AnvilMaterialContainer => "anvilmaterialcontainer",
+            Self::AnvilResultPreviewContainer => "anvilresultpreviewcontainer",
+            Self::SmithingTableInputContainer => "smithingtableinputcontainer",
+            Self::SmithingTableMaterialContainer => "smithingtablematerialcontainer",
+            Self::SmithingTableResultPreviewContainer => {
+                "smithingtableresultpreviewcontainer"
+            }
+            Self::ArmorContainer => "armorcontainer",
+            Self::LevelEntityContainer => "levelentitycontainer",
+            Self::BeaconPaymentContainer => "beaconpaymentcontainer",
+            Self::BrewingStandInputContainer => "brewingstandinputcontainer",
+            Self::BrewingStandResultContainer => "brewingstandresultcontainer",
+            Self::BrewingStandFuelContainer => "brewingstandfuelcontainer",
+            Self::CombinedHotbarAndInventoryContainer => {
+                "combinedhotbarandinventorycontainer"
+            }
+            Self::CraftingInputContainer => "craftinginputcontainer",
+            Self::CraftingOutputPreviewContainer => "craftingoutputpreviewcontainer",
+            Self::RecipeConstructionContainer => "recipeconstructioncontainer",
+            Self::RecipeNatureContainer => "recipenaturecontainer",
+            Self::RecipeItemsContainer => "recipeitemscontainer",
+            Self::RecipeFoodContainer => "recipefoodcontainer",
+            Self::RecipeBlocksContainer => "recipeblockscontainer",
+            Self::RecipeFurnaceItemsContainer => "recipefurnaceitemscontainer",
+            Self::RecipeSearchContainer => "recipesearchcontainer",
+            Self::RecipeSearchBarContainer => "recipesearchbarcontainer",
+            Self::RecipeEquipmentContainer => "recipeequipmentcontainer",
+            Self::RecipeBookContainer => "recipebookcontainer",
+            Self::EnchantingInputContainer => "enchantinginputcontainer",
+            Self::EnchantingMaterialContainer => "enchantingmaterialcontainer",
+            Self::FurnaceFuelContainer => "furnacefuelcontainer",
+            Self::FurnaceIngredientContainer => "furnaceingredientcontainer",
+            Self::FurnaceResultContainer => "furnaceresultcontainer",
+            Self::HorseEquipContainer => "horseequipcontainer",
+            Self::HotbarContainer => "hotbarcontainer",
+            Self::InventoryContainer => "inventorycontainer",
+            Self::ShulkerBoxContainer => "shulkerboxcontainer",
+            Self::TradeIngredient1Container => "tradeingredient1container",
+            Self::TradeIngredient2Container => "tradeingredient2container",
+            Self::TradeResultPreviewContainer => "traderesultpreviewcontainer",
+            Self::OffhandContainer => "offhandcontainer",
+            Self::CompoundCreatorInput => "compoundcreatorinput",
+            Self::CompoundCreatorOutputPreview => "compoundcreatoroutputpreview",
+            Self::ElementConstructorOutputPreview => "elementconstructoroutputpreview",
+            Self::MaterialReducerInput => "materialreducerinput",
+            Self::MaterialReducerOutput => "materialreduceroutput",
+            Self::LabTableInput => "labtableinput",
+            Self::LoomInputContainer => "loominputcontainer",
+            Self::LoomDyeContainer => "loomdyecontainer",
+            Self::LoomMaterialContainer => "loommaterialcontainer",
+            Self::LoomResultPreviewContainer => "loomresultpreviewcontainer",
+            Self::BlastFurnaceIngredientContainer => "blastfurnaceingredientcontainer",
+            Self::SmokerIngredientContainer => "smokeringredientcontainer",
+            Self::Trade2Ingredient1Container => "trade2ingredient1container",
+            Self::Trade2Ingredient2Container => "trade2ingredient2container",
+            Self::Trade2ResultPreviewContainer => "trade2resultpreviewcontainer",
+            Self::GrindstoneInputContainer => "grindstoneinputcontainer",
+            Self::GrindstoneAdditionalContainer => "grindstoneadditionalcontainer",
+            Self::GrindstoneResultPreviewContainer => "grindstoneresultpreviewcontainer",
+            Self::StonecutterInputContainer => "stonecutterinputcontainer",
+            Self::StonecutterResultPreviewContainer => {
+                "stonecutterresultpreviewcontainer"
+            }
+            Self::CartographyInputContainer => "cartographyinputcontainer",
+            Self::CartographyAdditionalContainer => "cartographyadditionalcontainer",
+            Self::CartographyResultPreviewContainer => {
+                "cartographyresultpreviewcontainer"
+            }
+            Self::BarrelContainer => "barrelcontainer",
+            Self::CursorContainer => "cursorcontainer",
+            Self::CreatedOutputContainer => "createdoutputcontainer",
+            Self::SmithingTableTemplateContainer => "smithingtabletemplatecontainer",
+            Self::CrafterLevelEntityContainer => "crafterlevelentitycontainer",
+            Self::DynamicContainer => "dynamiccontainer",
+            Self::DiscPressBlockContainer => "discpressblockcontainer",
+            Self::DiscPressDyeContainer => "discpressdyecontainer",
+            Self::DiscPressDiscContainer => "discpressdisccontainer",
+            Self::DiscPressResultPreviewContainer => "discpressresultpreviewcontainer",
+            Self::VirtualContainer => "virtualcontainer",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "AnvilInputContainer" => return Some(Self::AnvilInputContainer),
+            "AnvilMaterialContainer" => return Some(Self::AnvilMaterialContainer),
+            "AnvilResultPreviewContainer" => {
+                return Some(Self::AnvilResultPreviewContainer);
+            }
+            "SmithingTableInputContainer" => {
+                return Some(Self::SmithingTableInputContainer);
+            }
+            "SmithingTableMaterialContainer" => {
+                return Some(Self::SmithingTableMaterialContainer);
+            }
+            "SmithingTableResultPreviewContainer" => {
+                return Some(Self::SmithingTableResultPreviewContainer);
+            }
+            "ArmorContainer" => return Some(Self::ArmorContainer),
+            "LevelEntityContainer" => return Some(Self::LevelEntityContainer),
+            "BeaconPaymentContainer" => return Some(Self::BeaconPaymentContainer),
+            "BrewingStandInputContainer" => return Some(Self::BrewingStandInputContainer),
+            "BrewingStandResultContainer" => {
+                return Some(Self::BrewingStandResultContainer);
+            }
+            "BrewingStandFuelContainer" => return Some(Self::BrewingStandFuelContainer),
+            "CombinedHotbarAndInventoryContainer" => {
+                return Some(Self::CombinedHotbarAndInventoryContainer);
+            }
+            "CraftingInputContainer" => return Some(Self::CraftingInputContainer),
+            "CraftingOutputPreviewContainer" => {
+                return Some(Self::CraftingOutputPreviewContainer);
+            }
+            "RecipeConstructionContainer" => {
+                return Some(Self::RecipeConstructionContainer);
+            }
+            "RecipeNatureContainer" => return Some(Self::RecipeNatureContainer),
+            "RecipeItemsContainer" => return Some(Self::RecipeItemsContainer),
+            "RecipeFoodContainer" => return Some(Self::RecipeFoodContainer),
+            "RecipeBlocksContainer" => return Some(Self::RecipeBlocksContainer),
+            "RecipeFurnaceItemsContainer" => {
+                return Some(Self::RecipeFurnaceItemsContainer);
+            }
+            "RecipeSearchContainer" => return Some(Self::RecipeSearchContainer),
+            "RecipeSearchBarContainer" => return Some(Self::RecipeSearchBarContainer),
+            "RecipeEquipmentContainer" => return Some(Self::RecipeEquipmentContainer),
+            "RecipeBookContainer" => return Some(Self::RecipeBookContainer),
+            "EnchantingInputContainer" => return Some(Self::EnchantingInputContainer),
+            "EnchantingMaterialContainer" => {
+                return Some(Self::EnchantingMaterialContainer);
+            }
+            "FurnaceFuelContainer" => return Some(Self::FurnaceFuelContainer),
+            "FurnaceIngredientContainer" => return Some(Self::FurnaceIngredientContainer),
+            "FurnaceResultContainer" => return Some(Self::FurnaceResultContainer),
+            "HorseEquipContainer" => return Some(Self::HorseEquipContainer),
+            "HotbarContainer" => return Some(Self::HotbarContainer),
+            "InventoryContainer" => return Some(Self::InventoryContainer),
+            "ShulkerBoxContainer" => return Some(Self::ShulkerBoxContainer),
+            "TradeIngredient1Container" => return Some(Self::TradeIngredient1Container),
+            "TradeIngredient2Container" => return Some(Self::TradeIngredient2Container),
+            "TradeResultPreviewContainer" => {
+                return Some(Self::TradeResultPreviewContainer);
+            }
+            "OffhandContainer" => return Some(Self::OffhandContainer),
+            "CompoundCreatorInput" => return Some(Self::CompoundCreatorInput),
+            "CompoundCreatorOutputPreview" => {
+                return Some(Self::CompoundCreatorOutputPreview);
+            }
+            "ElementConstructorOutputPreview" => {
+                return Some(Self::ElementConstructorOutputPreview);
+            }
+            "MaterialReducerInput" => return Some(Self::MaterialReducerInput),
+            "MaterialReducerOutput" => return Some(Self::MaterialReducerOutput),
+            "LabTableInput" => return Some(Self::LabTableInput),
+            "LoomInputContainer" => return Some(Self::LoomInputContainer),
+            "LoomDyeContainer" => return Some(Self::LoomDyeContainer),
+            "LoomMaterialContainer" => return Some(Self::LoomMaterialContainer),
+            "LoomResultPreviewContainer" => return Some(Self::LoomResultPreviewContainer),
+            "BlastFurnaceIngredientContainer" => {
+                return Some(Self::BlastFurnaceIngredientContainer);
+            }
+            "SmokerIngredientContainer" => return Some(Self::SmokerIngredientContainer),
+            "Trade2Ingredient1Container" => return Some(Self::Trade2Ingredient1Container),
+            "Trade2Ingredient2Container" => return Some(Self::Trade2Ingredient2Container),
+            "Trade2ResultPreviewContainer" => {
+                return Some(Self::Trade2ResultPreviewContainer);
+            }
+            "GrindstoneInputContainer" => return Some(Self::GrindstoneInputContainer),
+            "GrindstoneAdditionalContainer" => {
+                return Some(Self::GrindstoneAdditionalContainer);
+            }
+            "GrindstoneResultPreviewContainer" => {
+                return Some(Self::GrindstoneResultPreviewContainer);
+            }
+            "StonecutterInputContainer" => return Some(Self::StonecutterInputContainer),
+            "StonecutterResultPreviewContainer" => {
+                return Some(Self::StonecutterResultPreviewContainer);
+            }
+            "CartographyInputContainer" => return Some(Self::CartographyInputContainer),
+            "CartographyAdditionalContainer" => {
+                return Some(Self::CartographyAdditionalContainer);
+            }
+            "CartographyResultPreviewContainer" => {
+                return Some(Self::CartographyResultPreviewContainer);
+            }
+            "BarrelContainer" => return Some(Self::BarrelContainer),
+            "CursorContainer" => return Some(Self::CursorContainer),
+            "CreatedOutputContainer" => return Some(Self::CreatedOutputContainer),
+            "SmithingTableTemplateContainer" => {
+                return Some(Self::SmithingTableTemplateContainer);
+            }
+            "CrafterLevelEntityContainer" => {
+                return Some(Self::CrafterLevelEntityContainer);
+            }
+            "DynamicContainer" => return Some(Self::DynamicContainer),
+            "DiscPressBlockContainer" => return Some(Self::DiscPressBlockContainer),
+            "DiscPressDyeContainer" => return Some(Self::DiscPressDyeContainer),
+            "DiscPressDiscContainer" => return Some(Self::DiscPressDiscContainer),
+            "DiscPressResultPreviewContainer" => {
+                return Some(Self::DiscPressResultPreviewContainer);
+            }
+            "VirtualContainer" => return Some(Self::VirtualContainer),
+            _ => {}
+        }
         const NAMES: &[(&str, ContainerEnumName)] = &[
             ("AnvilInputContainer", ContainerEnumName::AnvilInputContainer),
             ("AnvilMaterialContainer", ContainerEnumName::AnvilMaterialContainer),
@@ -5725,10 +6902,7 @@ impl ProtocolEnum for ContainerEnumName {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -5834,7 +7008,34 @@ impl ProtocolEnum for ContainerID {
             Self::ContainerIdRegistry => "CONTAINER_ID_REGISTRY",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ContainerIdNone => "container_id_none",
+            Self::ContainerIdInventory => "container_id_inventory",
+            Self::ContainerIdFirst => "container_id_first",
+            Self::ContainerIdLast => "container_id_last",
+            Self::ContainerIdOffhand => "container_id_offhand",
+            Self::ContainerIdArmor => "container_id_armor",
+            Self::ContainerIdSelectionSlots => "container_id_selection_slots",
+            Self::ContainerIdPlayerOnlyUi => "container_id_player_only_ui",
+            Self::ContainerIdRegistry => "container_id_registry",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "CONTAINER_ID_NONE" => return Some(Self::ContainerIdNone),
+            "CONTAINER_ID_INVENTORY" => return Some(Self::ContainerIdInventory),
+            "CONTAINER_ID_FIRST" => return Some(Self::ContainerIdFirst),
+            "CONTAINER_ID_LAST" => return Some(Self::ContainerIdLast),
+            "CONTAINER_ID_OFFHAND" => return Some(Self::ContainerIdOffhand),
+            "CONTAINER_ID_ARMOR" => return Some(Self::ContainerIdArmor),
+            "CONTAINER_ID_SELECTION_SLOTS" => {
+                return Some(Self::ContainerIdSelectionSlots);
+            }
+            "CONTAINER_ID_PLAYER_ONLY_UI" => return Some(Self::ContainerIdPlayerOnlyUi),
+            "CONTAINER_ID_REGISTRY" => return Some(Self::ContainerIdRegistry),
+            _ => {}
+        }
         const NAMES: &[(&str, ContainerID)] = &[
             ("CONTAINER_ID_NONE", ContainerID::ContainerIdNone),
             ("CONTAINER_ID_INVENTORY", ContainerID::ContainerIdInventory),
@@ -5848,10 +7049,7 @@ impl ProtocolEnum for ContainerID {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6149,7 +7347,96 @@ impl ProtocolEnum for ContainerType {
             Self::VirtualContainer => "VIRTUAL_CONTAINER",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Inventory => "inventory",
+            Self::Container => "container",
+            Self::Workbench => "workbench",
+            Self::Furnace => "furnace",
+            Self::Enchantment => "enchantment",
+            Self::BrewingStand => "brewing_stand",
+            Self::Anvil => "anvil",
+            Self::Dispenser => "dispenser",
+            Self::Dropper => "dropper",
+            Self::Hopper => "hopper",
+            Self::Cauldron => "cauldron",
+            Self::MinecartChest => "minecart_chest",
+            Self::MinecartHopper => "minecart_hopper",
+            Self::Horse => "horse",
+            Self::Beacon => "beacon",
+            Self::StructureEditor => "structure_editor",
+            Self::Trade => "trade",
+            Self::CommandBlock => "command_block",
+            Self::Jukebox => "jukebox",
+            Self::Armor => "armor",
+            Self::Hand => "hand",
+            Self::CompoundCreator => "compound_creator",
+            Self::ElementConstructor => "element_constructor",
+            Self::MaterialReducer => "material_reducer",
+            Self::LabTable => "lab_table",
+            Self::Loom => "loom",
+            Self::Lectern => "lectern",
+            Self::Grindstone => "grindstone",
+            Self::BlastFurnace => "blast_furnace",
+            Self::Smoker => "smoker",
+            Self::Stonecutter => "stonecutter",
+            Self::Cartography => "cartography",
+            Self::Hud => "hud",
+            Self::JigsawEditor => "jigsaw_editor",
+            Self::SmithingTable => "smithing_table",
+            Self::ChestBoat => "chest_boat",
+            Self::DecoratedPot => "decorated_pot",
+            Self::Crafter => "crafter",
+            Self::DiscPress => "disc_press",
+            Self::VirtualContainer => "virtual_container",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NONE" => return Some(Self::None),
+            "INVENTORY" => return Some(Self::Inventory),
+            "CONTAINER" => return Some(Self::Container),
+            "WORKBENCH" => return Some(Self::Workbench),
+            "FURNACE" => return Some(Self::Furnace),
+            "ENCHANTMENT" => return Some(Self::Enchantment),
+            "BREWING_STAND" => return Some(Self::BrewingStand),
+            "ANVIL" => return Some(Self::Anvil),
+            "DISPENSER" => return Some(Self::Dispenser),
+            "DROPPER" => return Some(Self::Dropper),
+            "HOPPER" => return Some(Self::Hopper),
+            "CAULDRON" => return Some(Self::Cauldron),
+            "MINECART_CHEST" => return Some(Self::MinecartChest),
+            "MINECART_HOPPER" => return Some(Self::MinecartHopper),
+            "HORSE" => return Some(Self::Horse),
+            "BEACON" => return Some(Self::Beacon),
+            "STRUCTURE_EDITOR" => return Some(Self::StructureEditor),
+            "TRADE" => return Some(Self::Trade),
+            "COMMAND_BLOCK" => return Some(Self::CommandBlock),
+            "JUKEBOX" => return Some(Self::Jukebox),
+            "ARMOR" => return Some(Self::Armor),
+            "HAND" => return Some(Self::Hand),
+            "COMPOUND_CREATOR" => return Some(Self::CompoundCreator),
+            "ELEMENT_CONSTRUCTOR" => return Some(Self::ElementConstructor),
+            "MATERIAL_REDUCER" => return Some(Self::MaterialReducer),
+            "LAB_TABLE" => return Some(Self::LabTable),
+            "LOOM" => return Some(Self::Loom),
+            "LECTERN" => return Some(Self::Lectern),
+            "GRINDSTONE" => return Some(Self::Grindstone),
+            "BLAST_FURNACE" => return Some(Self::BlastFurnace),
+            "SMOKER" => return Some(Self::Smoker),
+            "STONECUTTER" => return Some(Self::Stonecutter),
+            "CARTOGRAPHY" => return Some(Self::Cartography),
+            "HUD" => return Some(Self::Hud),
+            "JIGSAW_EDITOR" => return Some(Self::JigsawEditor),
+            "SMITHING_TABLE" => return Some(Self::SmithingTable),
+            "CHEST_BOAT" => return Some(Self::ChestBoat),
+            "DECORATED_POT" => return Some(Self::DecoratedPot),
+            "CRAFTER" => return Some(Self::Crafter),
+            "DISC_PRESS" => return Some(Self::DiscPress),
+            "VIRTUAL_CONTAINER" => return Some(Self::VirtualContainer),
+            _ => {}
+        }
         const NAMES: &[(&str, ContainerType)] = &[
             ("NONE", ContainerType::None),
             ("INVENTORY", ContainerType::Inventory),
@@ -6195,10 +7482,7 @@ impl ProtocolEnum for ContainerType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6280,7 +7564,26 @@ impl ProtocolEnum for ControlScheme {
             Self::PlayerRelativeStrafe => "player_relative_strafe",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::LockedPlayerRelativeStrafe => "locked_player_relative_strafe",
+            Self::CameraRelative => "camera_relative",
+            Self::CameraRelativeStrafe => "camera_relative_strafe",
+            Self::PlayerRelative => "player_relative",
+            Self::PlayerRelativeStrafe => "player_relative_strafe",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "locked_player_relative_strafe" => {
+                return Some(Self::LockedPlayerRelativeStrafe);
+            }
+            "camera_relative" => return Some(Self::CameraRelative),
+            "camera_relative_strafe" => return Some(Self::CameraRelativeStrafe),
+            "player_relative" => return Some(Self::PlayerRelative),
+            "player_relative_strafe" => return Some(Self::PlayerRelativeStrafe),
+            _ => {}
+        }
         const NAMES: &[(&str, ControlScheme)] = &[
             ("locked_player_relative_strafe", ControlScheme::LockedPlayerRelativeStrafe),
             ("camera_relative", ControlScheme::CameraRelative),
@@ -6290,10 +7593,7 @@ impl ProtocolEnum for ControlScheme {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6381,7 +7681,26 @@ impl ProtocolEnum for CoordinateEvaluationOrder {
             Self::Zyx => "ZYX",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Xyz => "xyz",
+            Self::Xzy => "xzy",
+            Self::Yxz => "yxz",
+            Self::Yzx => "yzx",
+            Self::Zxy => "zxy",
+            Self::Zyx => "zyx",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "XYZ" => return Some(Self::Xyz),
+            "XZY" => return Some(Self::Xzy),
+            "YXZ" => return Some(Self::Yxz),
+            "YZX" => return Some(Self::Yzx),
+            "ZXY" => return Some(Self::Zxy),
+            "ZYX" => return Some(Self::Zyx),
+            _ => {}
+        }
         const NAMES: &[(&str, CoordinateEvaluationOrder)] = &[
             ("XYZ", CoordinateEvaluationOrder::Xyz),
             ("XZY", CoordinateEvaluationOrder::Xzy),
@@ -6392,10 +7711,7 @@ impl ProtocolEnum for CoordinateEvaluationOrder {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6453,7 +7769,15 @@ impl ProtocolEnum for CoordinatesLocationPacketType {
             Self::PlayerLocationCoordinates => "PLAYER_LOCATION_COORDINATES",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::PlayerLocationCoordinates => "player_location_coordinates",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "PLAYER_LOCATION_COORDINATES" {
+            return Some(Self::PlayerLocationCoordinates);
+        }
         const NAMES: &[(&str, CoordinatesLocationPacketType)] = &[
             (
                 "PLAYER_LOCATION_COORDINATES",
@@ -6462,10 +7786,7 @@ impl ProtocolEnum for CoordinatesLocationPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6549,7 +7870,24 @@ impl ProtocolEnum for CreativeGroupInfoPayloadCreativeCategory {
             Self::ItemCommandOnly => "ItemCommandOnly",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Construction => "construction",
+            Self::Nature => "nature",
+            Self::Equipment => "equipment",
+            Self::Items => "items",
+            Self::ItemCommandOnly => "itemcommandonly",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Construction" => return Some(Self::Construction),
+            "Nature" => return Some(Self::Nature),
+            "Equipment" => return Some(Self::Equipment),
+            "Items" => return Some(Self::Items),
+            "ItemCommandOnly" => return Some(Self::ItemCommandOnly),
+            _ => {}
+        }
         const NAMES: &[(&str, CreativeGroupInfoPayloadCreativeCategory)] = &[
             ("Construction", CreativeGroupInfoPayloadCreativeCategory::Construction),
             ("Nature", CreativeGroupInfoPayloadCreativeCategory::Nature),
@@ -6562,10 +7900,7 @@ impl ProtocolEnum for CreativeGroupInfoPayloadCreativeCategory {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -6659,7 +7994,28 @@ impl ProtocolEnum for CreativeItemCategory {
             Self::Undefined => "Undefined",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::All => "all",
+            Self::Construction => "construction",
+            Self::Nature => "nature",
+            Self::Equipment => "equipment",
+            Self::Items => "items",
+            Self::ItemCommandOnly => "itemcommandonly",
+            Self::Undefined => "undefined",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "All" => return Some(Self::All),
+            "Construction" => return Some(Self::Construction),
+            "Nature" => return Some(Self::Nature),
+            "Equipment" => return Some(Self::Equipment),
+            "Items" => return Some(Self::Items),
+            "ItemCommandOnly" => return Some(Self::ItemCommandOnly),
+            "Undefined" => return Some(Self::Undefined),
+            _ => {}
+        }
         const NAMES: &[(&str, CreativeItemCategory)] = &[
             ("All", CreativeItemCategory::All),
             ("Construction", CreativeItemCategory::Construction),
@@ -6671,10 +8027,7 @@ impl ProtocolEnum for CreativeItemCategory {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7088,7 +8441,219 @@ impl ProtocolEnum for CurrentCmdVersion {
             Self::Count => "Count",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::Initial => "initial",
+            Self::TpRotationClamping => "tprotationclamping",
+            Self::NewBedrockCmdSystem => "newbedrockcmdsystem",
+            Self::ExecuteUsesVec3 => "executeusesvec3",
+            Self::CloneFixes => "clonefixes",
+            Self::UpdateAquatic => "updateaquatic",
+            Self::EntitySelectorUsesVec3 => "entityselectorusesvec3",
+            Self::ContainersDontDropItemsAnymore => "containersdontdropitemsanymore",
+            Self::FiltersObeyDimensions => "filtersobeydimensions",
+            Self::ExecuteAndBlockCommandAndSelfSelectorFixes => {
+                "executeandblockcommandandselfselectorfixes"
+            }
+            Self::InstantEffectsUseTicks => "instanteffectsuseticks",
+            Self::DontRegisterBrokenFunctionCommands => {
+                "dontregisterbrokenfunctioncommands"
+            }
+            Self::ClearSpawnPointCommand => "clearspawnpointcommand",
+            Self::CloneAndTeleportRotationFixes => "cloneandteleportrotationfixes",
+            Self::TeleportDimensionFixes => "teleportdimensionfixes",
+            Self::CloneUpdateBlockAndTimeFixes => "cloneupdateblockandtimefixes",
+            Self::CloneIntersectFix => "cloneintersectfix",
+            Self::FunctionExecuteOrderAndChestSlotFix => {
+                "functionexecuteorderandchestslotfix"
+            }
+            Self::NonTickingAreasNoLongerConsideredLoaded => {
+                "nontickingareasnolongerconsideredloaded"
+            }
+            Self::SpreadplayersHazardAndResolvePlayerByNameFix => {
+                "spreadplayershazardandresolveplayerbynamefix"
+            }
+            Self::NewExecuteCommandSyntaxExperimentAndChestLootTableFixAndTeleportFacingVerticalUnclampedAndLocateBiomeAndFeatureMerged => {
+                "newexecutecommandsyntaxexperimentandchestloottablefixandteleportfacingverticalunclampedandlocatebiomeandfeaturemerged"
+            }
+            Self::WaterloggingAddedToStructureCommand => {
+                "waterloggingaddedtostructurecommand"
+            }
+            Self::SelectorDistanceFilteredAndRelativeRotationFix => {
+                "selectordistancefilteredandrelativerotationfix"
+            }
+            Self::NewSummonCommandAddedRotationOptionsAndBubbleColumnCloneFixAndExecuteInDimensionTeleportFixAndNewExecuteRotationFix => {
+                "newsummoncommandaddedrotationoptionsandbubblecolumnclonefixandexecuteindimensionteleportfixandnewexecuterotationfix"
+            }
+            Self::NewExecuteCommandReleaseEnchantCommandLevelFixAndHasItemDataFixAndCommandDeferral => {
+                "newexecutecommandreleaseenchantcommandlevelfixandhasitemdatafixandcommanddeferral"
+            }
+            Self::ExecuteIfScoreFixes => "executeifscorefixes",
+            Self::ReplaceItemAndLootReplaceBlockCommandsDoNotPlaceItemsIntoCauldronsFix => {
+                "replaceitemandlootreplaceblockcommandsdonotplaceitemsintocauldronsfix"
+            }
+            Self::ChangesToCommandOriginRotation => "changestocommandoriginrotation",
+            Self::RemoveAuxValueParameterFromBlockCommands => {
+                "removeauxvalueparameterfromblockcommands"
+            }
+            Self::VolumeSelectorFixes => "volumeselectorfixes",
+            Self::EnableSummonRotation => "enablesummonrotation",
+            Self::SummonCommandDefaultRotation => "summoncommanddefaultrotation",
+            Self::PositionalDimensionFiltering => "positionaldimensionfiltering",
+            Self::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction => {
+                "commandselectorhasitemfilternolongercallssameitemfunction"
+            }
+            Self::BlockStateEquals => "blockstateequals",
+            Self::CommandSelectorHasItemFilterUsesDataAsDamageForSelectingDamageableItems => {
+                "commandselectorhasitemfilterusesdataasdamageforselectingdamageableitems"
+            }
+            Self::ExecuteDetectConditionSubcommandNotAllowNonLoadedBlocks => {
+                "executedetectconditionsubcommandnotallownonloadedblocks"
+            }
+            Self::RemoveSuicideKeyword => "removesuicidekeyword",
+            Self::CloneContainerBlockEntityRemovalFix => {
+                "clonecontainerblockentityremovalfix"
+            }
+            Self::StopSoundMusicFix => "stopsoundmusicfix",
+            Self::SpreadPlayersStuckInGroundFixAndMaxHeightParameter => {
+                "spreadplayersstuckingroundfixandmaxheightparameter"
+            }
+            Self::LocateStructureOutput => "locatestructureoutput",
+            Self::PostBlockFlattening => "postblockflattening",
+            Self::TestForBlockCommandDoesNotIgnoreBlockState => {
+                "testforblockcommanddoesnotignoreblockstate"
+            }
+            Self::GameTestRunSetMultiTag => "gametestrunsetmultitag",
+            Self::SameActorBlockReplacementRetainsItemsFix => {
+                "sameactorblockreplacementretainsitemsfix"
+            }
+            Self::Count => "count",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "Initial" => return Some(Self::Initial),
+            "TpRotationClamping" => return Some(Self::TpRotationClamping),
+            "NewBedrockCmdSystem" => return Some(Self::NewBedrockCmdSystem),
+            "ExecuteUsesVec3" => return Some(Self::ExecuteUsesVec3),
+            "CloneFixes" => return Some(Self::CloneFixes),
+            "UpdateAquatic" => return Some(Self::UpdateAquatic),
+            "EntitySelectorUsesVec3" => return Some(Self::EntitySelectorUsesVec3),
+            "ContainersDontDropItemsAnymore" => {
+                return Some(Self::ContainersDontDropItemsAnymore);
+            }
+            "FiltersObeyDimensions" => return Some(Self::FiltersObeyDimensions),
+            "ExecuteAndBlockCommandAndSelfSelectorFixes" => {
+                return Some(Self::ExecuteAndBlockCommandAndSelfSelectorFixes);
+            }
+            "InstantEffectsUseTicks" => return Some(Self::InstantEffectsUseTicks),
+            "DontRegisterBrokenFunctionCommands" => {
+                return Some(Self::DontRegisterBrokenFunctionCommands);
+            }
+            "ClearSpawnPointCommand" => return Some(Self::ClearSpawnPointCommand),
+            "CloneAndTeleportRotationFixes" => {
+                return Some(Self::CloneAndTeleportRotationFixes);
+            }
+            "TeleportDimensionFixes" => return Some(Self::TeleportDimensionFixes),
+            "CloneUpdateBlockAndTimeFixes" => {
+                return Some(Self::CloneUpdateBlockAndTimeFixes);
+            }
+            "CloneIntersectFix" => return Some(Self::CloneIntersectFix),
+            "FunctionExecuteOrderAndChestSlotFix" => {
+                return Some(Self::FunctionExecuteOrderAndChestSlotFix);
+            }
+            "NonTickingAreasNoLongerConsideredLoaded" => {
+                return Some(Self::NonTickingAreasNoLongerConsideredLoaded);
+            }
+            "SpreadplayersHazardAndResolvePlayerByNameFix" => {
+                return Some(Self::SpreadplayersHazardAndResolvePlayerByNameFix);
+            }
+            "NewExecuteCommandSyntaxExperimentAndChestLootTableFixAndTeleportFacingVerticalUnclampedAndLocateBiomeAndFeatureMerged" => {
+                return Some(
+                    Self::NewExecuteCommandSyntaxExperimentAndChestLootTableFixAndTeleportFacingVerticalUnclampedAndLocateBiomeAndFeatureMerged,
+                );
+            }
+            "WaterloggingAddedToStructureCommand" => {
+                return Some(Self::WaterloggingAddedToStructureCommand);
+            }
+            "SelectorDistanceFilteredAndRelativeRotationFix" => {
+                return Some(Self::SelectorDistanceFilteredAndRelativeRotationFix);
+            }
+            "NewSummonCommandAddedRotationOptionsAndBubbleColumnCloneFixAndExecuteInDimensionTeleportFixAndNewExecuteRotationFix" => {
+                return Some(
+                    Self::NewSummonCommandAddedRotationOptionsAndBubbleColumnCloneFixAndExecuteInDimensionTeleportFixAndNewExecuteRotationFix,
+                );
+            }
+            "NewExecuteCommandReleaseEnchantCommandLevelFixAndHasItemDataFixAndCommandDeferral" => {
+                return Some(
+                    Self::NewExecuteCommandReleaseEnchantCommandLevelFixAndHasItemDataFixAndCommandDeferral,
+                );
+            }
+            "ExecuteIfScoreFixes" => return Some(Self::ExecuteIfScoreFixes),
+            "ReplaceItemAndLootReplaceBlockCommandsDoNotPlaceItemsIntoCauldronsFix" => {
+                return Some(
+                    Self::ReplaceItemAndLootReplaceBlockCommandsDoNotPlaceItemsIntoCauldronsFix,
+                );
+            }
+            "ChangesToCommandOriginRotation" => {
+                return Some(Self::ChangesToCommandOriginRotation);
+            }
+            "RemoveAuxValueParameterFromBlockCommands" => {
+                return Some(Self::RemoveAuxValueParameterFromBlockCommands);
+            }
+            "VolumeSelectorFixes" => return Some(Self::VolumeSelectorFixes),
+            "EnableSummonRotation" => return Some(Self::EnableSummonRotation),
+            "SummonCommandDefaultRotation" => {
+                return Some(Self::SummonCommandDefaultRotation);
+            }
+            "PositionalDimensionFiltering" => {
+                return Some(Self::PositionalDimensionFiltering);
+            }
+            "CommandSelectorHasItemFilterNoLongerCallsSameItemFunction" => {
+                return Some(
+                    Self::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction,
+                );
+            }
+            "BlockStateEquals" => return Some(Self::BlockStateEquals),
+            "CommandSelectorHasItemFilterUsesDataAsDamageForSelectingDamageableItems" => {
+                return Some(
+                    Self::CommandSelectorHasItemFilterUsesDataAsDamageForSelectingDamageableItems,
+                );
+            }
+            "ExecuteDetectConditionSubcommandNotAllowNonLoadedBlocks" => {
+                return Some(
+                    Self::ExecuteDetectConditionSubcommandNotAllowNonLoadedBlocks,
+                );
+            }
+            "RemoveSuicideKeyword" => return Some(Self::RemoveSuicideKeyword),
+            "CloneContainerBlockEntityRemovalFix" => {
+                return Some(Self::CloneContainerBlockEntityRemovalFix);
+            }
+            "StopSoundMusicFix" => return Some(Self::StopSoundMusicFix),
+            "SpreadPlayersStuckInGroundFixAndMaxHeightParameter" => {
+                return Some(Self::SpreadPlayersStuckInGroundFixAndMaxHeightParameter);
+            }
+            "LocateStructureOutput" => return Some(Self::LocateStructureOutput),
+            "PostBlockFlattening" => return Some(Self::PostBlockFlattening),
+            "TestForBlockCommandDoesNotIgnoreBlockState" => {
+                return Some(Self::TestForBlockCommandDoesNotIgnoreBlockState);
+            }
+            "GameTestRunSetMultiTag" => return Some(Self::GameTestRunSetMultiTag),
+            "SameActorBlockReplacementRetainsItemsFix" => {
+                return Some(Self::SameActorBlockReplacementRetainsItemsFix);
+            }
+            "Count" => return Some(Self::Count),
+            "AgentSweepingBlockTest" => {
+                return Some(
+                    Self::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction,
+                );
+            }
+            "CommandPositionFix" => return Some(Self::BlockStateEquals),
+            "Latest" => return Some(Self::SameActorBlockReplacementRetainsItemsFix),
+            _ => {}
+        }
         const NAMES: &[(&str, CurrentCmdVersion)] = &[
             ("Invalid", CurrentCmdVersion::Invalid),
             ("Initial", CurrentCmdVersion::Initial),
@@ -7222,10 +8787,7 @@ impl ProtocolEnum for CurrentCmdVersion {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7290,17 +8852,25 @@ impl ProtocolEnum for CursorItemDragState {
             Self::Stop => "Stop",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Start => "start",
+            Self::Stop => "stop",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Start" => return Some(Self::Start),
+            "Stop" => return Some(Self::Stop),
+            _ => {}
+        }
         const NAMES: &[(&str, CursorItemDragState)] = &[
             ("Start", CursorItemDragState::Start),
             ("Stop", CursorItemDragState::Stop),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7382,7 +8952,24 @@ impl ProtocolEnum for DataDrivenScreenClosedReason {
             Self::InvalidForm => "InvalidForm",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ProgrammaticClose => "programmaticclose",
+            Self::ProgrammaticCloseAll => "programmaticcloseall",
+            Self::ClientCanceled => "clientcanceled",
+            Self::UserBusy => "userbusy",
+            Self::InvalidForm => "invalidform",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "ProgrammaticClose" => return Some(Self::ProgrammaticClose),
+            "ProgrammaticCloseAll" => return Some(Self::ProgrammaticCloseAll),
+            "ClientCanceled" => return Some(Self::ClientCanceled),
+            "UserBusy" => return Some(Self::UserBusy),
+            "InvalidForm" => return Some(Self::InvalidForm),
+            _ => {}
+        }
         const NAMES: &[(&str, DataDrivenScreenClosedReason)] = &[
             ("ProgrammaticClose", DataDrivenScreenClosedReason::ProgrammaticClose),
             ("ProgrammaticCloseAll", DataDrivenScreenClosedReason::ProgrammaticCloseAll),
@@ -7392,10 +8979,7 @@ impl ProtocolEnum for DataDrivenScreenClosedReason {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7501,7 +9085,32 @@ impl ProtocolEnum for DataItemType {
             Self::Vec3 => "Vec3",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Byte => "byte",
+            Self::Short => "short",
+            Self::Int => "int",
+            Self::Float => "float",
+            Self::String => "string",
+            Self::CompoundTag => "compoundtag",
+            Self::Pos => "pos",
+            Self::Int64 => "int64",
+            Self::Vec3 => "vec3",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Byte" => return Some(Self::Byte),
+            "Short" => return Some(Self::Short),
+            "Int" => return Some(Self::Int),
+            "Float" => return Some(Self::Float),
+            "String" => return Some(Self::String),
+            "CompoundTag" => return Some(Self::CompoundTag),
+            "Pos" => return Some(Self::Pos),
+            "Int64" => return Some(Self::Int64),
+            "Vec3" => return Some(Self::Vec3),
+            _ => {}
+        }
         const NAMES: &[(&str, DataItemType)] = &[
             ("Byte", DataItemType::Byte),
             ("Short", DataItemType::Short),
@@ -7515,10 +9124,7 @@ impl ProtocolEnum for DataItemType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7590,7 +9196,20 @@ impl ProtocolEnum for DebugRendererDataType {
             Self::AddDebugMarkerCube => "AddDebugMarkerCube",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::ClearDebugMarkers => "cleardebugmarkers",
+            Self::AddDebugMarkerCube => "adddebugmarkercube",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "ClearDebugMarkers" => return Some(Self::ClearDebugMarkers),
+            "AddDebugMarkerCube" => return Some(Self::AddDebugMarkerCube),
+            _ => {}
+        }
         const NAMES: &[(&str, DebugRendererDataType)] = &[
             ("Invalid", DebugRendererDataType::Invalid),
             ("ClearDebugMarkers", DebugRendererDataType::ClearDebugMarkers),
@@ -7598,10 +9217,7 @@ impl ProtocolEnum for DebugRendererDataType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7689,7 +9305,26 @@ impl ProtocolEnum for Difficulty {
             Self::Unknown => "Unknown",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Peaceful => "peaceful",
+            Self::Easy => "easy",
+            Self::Normal => "normal",
+            Self::Hard => "hard",
+            Self::Count => "count",
+            Self::Unknown => "unknown",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Peaceful" => return Some(Self::Peaceful),
+            "Easy" => return Some(Self::Easy),
+            "Normal" => return Some(Self::Normal),
+            "Hard" => return Some(Self::Hard),
+            "Count" => return Some(Self::Count),
+            "Unknown" => return Some(Self::Unknown),
+            _ => {}
+        }
         const NAMES: &[(&str, Difficulty)] = &[
             ("Peaceful", Difficulty::Peaceful),
             ("Easy", Difficulty::Easy),
@@ -7700,10 +9335,7 @@ impl ProtocolEnum for Difficulty {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -7797,7 +9429,28 @@ impl ProtocolEnum for DimensionDefinitionGeneratorType {
             Self::Undefined => "Undefined",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Legacy => "legacy",
+            Self::Overworld => "overworld",
+            Self::Flat => "flat",
+            Self::Nether => "nether",
+            Self::TheEnd => "theend",
+            Self::Void => "void",
+            Self::Undefined => "undefined",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Legacy" => return Some(Self::Legacy),
+            "Overworld" => return Some(Self::Overworld),
+            "Flat" => return Some(Self::Flat),
+            "Nether" => return Some(Self::Nether),
+            "TheEnd" => return Some(Self::TheEnd),
+            "Void" => return Some(Self::Void),
+            "Undefined" => return Some(Self::Undefined),
+            _ => {}
+        }
         const NAMES: &[(&str, DimensionDefinitionGeneratorType)] = &[
             ("Legacy", DimensionDefinitionGeneratorType::Legacy),
             ("Overworld", DimensionDefinitionGeneratorType::Overworld),
@@ -7809,10 +9462,7 @@ impl ProtocolEnum for DimensionDefinitionGeneratorType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -8850,7 +10500,430 @@ impl ProtocolEnum for DisconnectFailReason {
             Self::BrokenData => "BrokenData",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::CantConnectNoInternet => "cantconnectnointernet",
+            Self::NoPermissions => "nopermissions",
+            Self::UnrecoverableError => "unrecoverableerror",
+            Self::ThirdPartyBlocked => "thirdpartyblocked",
+            Self::ThirdPartyNoInternet => "thirdpartynointernet",
+            Self::ThirdPartyBadIP => "thirdpartybadip",
+            Self::ThirdPartyNoServerOrServerLocked => "thirdpartynoserverorserverlocked",
+            Self::VersionMismatch => "versionmismatch",
+            Self::SkinIssue => "skinissue",
+            Self::InviteSessionNotFound => "invitesessionnotfound",
+            Self::EduLevelSettingsMissing => "edulevelsettingsmissing",
+            Self::LocalServerNotFound => "localservernotfound",
+            Self::LegacyDisconnect => "legacydisconnect",
+            Self::InternalUserLeaveGameAttempted => "internal_userleavegameattempted",
+            Self::PlatformLockedSkinsError => "platformlockedskinserror",
+            Self::RealmsWorldUnassigned => "realmsworldunassigned",
+            Self::RealmsServerCantConnect => "realmsservercantconnect",
+            Self::RealmsServerHidden => "realmsserverhidden",
+            Self::RealmsServerDisabledBeta => "realmsserverdisabledbeta",
+            Self::RealmsServerDisabled => "realmsserverdisabled",
+            Self::CrossPlatformDisabled => "crossplatformdisabled",
+            Self::TestonlyCantConnect => "testonly_cantconnect",
+            Self::SessionNotFound => "sessionnotfound",
+            Self::ClientSettingsIncompatibleWithServer => {
+                "clientsettingsincompatiblewithserver"
+            }
+            Self::ServerFull => "serverfull",
+            Self::InvalidPlatformSkin => "invalidplatformskin",
+            Self::EditionVersionMismatch => "editionversionmismatch",
+            Self::EditionMismatch => "editionmismatch",
+            Self::LevelNewerThanExeVersion => "levelnewerthanexeversion",
+            Self::InternalNoFailOccurred => "internal_nofailoccurred",
+            Self::BannedSkin => "bannedskin",
+            Self::Timeout => "timeout",
+            Self::ServerNotFound => "servernotfound",
+            Self::OutdatedServer => "outdatedserver",
+            Self::OutdatedClient => "outdatedclient",
+            Self::NoPremiumPlatform => "nopremiumplatform",
+            Self::MultiplayerDisabled => "multiplayerdisabled",
+            Self::NoWiFi => "nowifi",
+            Self::WorldCorruption => "worldcorruption",
+            Self::NoReason => "noreason",
+            Self::Disconnected => "disconnected",
+            Self::InvalidPlayer => "invalidplayer",
+            Self::LoggedInOtherLocation => "loggedinotherlocation",
+            Self::ServerIdConflict => "serveridconflict",
+            Self::NotAllowed => "notallowed",
+            Self::NotAuthenticated => "notauthenticated",
+            Self::InvalidTenant => "invalidtenant",
+            Self::UnknownPacket => "unknownpacket",
+            Self::UnexpectedPacket => "unexpectedpacket",
+            Self::InvalidCommandRequestPacket => "invalidcommandrequestpacket",
+            Self::HostSuspended => "hostsuspended",
+            Self::LoginPacketNoRequest => "loginpacketnorequest",
+            Self::LoginPacketNoCert => "loginpacketnocert",
+            Self::MissingClient => "missingclient",
+            Self::Kicked => "kicked",
+            Self::KickedForExploit => "kickedforexploit",
+            Self::KickedForIdle => "kickedforidle",
+            Self::ResourcePackProblem => "resourcepackproblem",
+            Self::IncompatiblePack => "incompatiblepack",
+            Self::OutOfStorage => "outofstorage",
+            Self::InvalidLevel => "invalidlevel",
+            Self::DisconnectPacket => "disconnectpacket",
+            Self::BlockMismatch => "blockmismatch",
+            Self::InvalidHeights => "invalidheights",
+            Self::InvalidWidths => "invalidwidths",
+            Self::ConnectionLost => "connectionlost",
+            Self::ZombieConnection => "zombieconnection",
+            Self::Shutdown => "shutdown",
+            Self::ReasonNotSet => "reasonnotset",
+            Self::LoadingStateTimeout => "loadingstatetimeout",
+            Self::ResourcePackLoadingFailed => "resourcepackloadingfailed",
+            Self::SearchingForSessionLoadingScreenFailed => {
+                "searchingforsessionloadingscreenfailed"
+            }
+            Self::NetherNetProtocolVersion => "nethernetprotocolversion",
+            Self::SubsystemStatusError => "subsystemstatuserror",
+            Self::EmptyAuthFromDiscovery => "emptyauthfromdiscovery",
+            Self::EmptyUrlFromDiscovery => "emptyurlfromdiscovery",
+            Self::ExpiredAuthFromDiscovery => "expiredauthfromdiscovery",
+            Self::UnknownSignalServiceSignInFailure => {
+                "unknownsignalservicesigninfailure"
+            }
+            Self::XBLJoinLobbyFailure => "xbljoinlobbyfailure",
+            Self::UnspecifiedClientInstanceDisconnection => {
+                "unspecifiedclientinstancedisconnection"
+            }
+            Self::NetherNetSessionNotFound => "nethernetsessionnotfound",
+            Self::NetherNetCreatePeerConnection => "nethernetcreatepeerconnection",
+            Self::NetherNetICE => "nethernetice",
+            Self::NetherNetConnectRequest => "nethernetconnectrequest",
+            Self::NetherNetConnectResponse => "nethernetconnectresponse",
+            Self::NetherNetNegotiationTimeout => "nethernetnegotiationtimeout",
+            Self::NetherNetInactivityTimeout => "nethernetinactivitytimeout",
+            Self::StaleConnectionBeingReplaced => "staleconnectionbeingreplaced",
+            Self::RealmsSessionNotFound => "realmssessionnotfound",
+            Self::BadPacket => "badpacket",
+            Self::NetherNetFailedToCreateOffer => "nethernetfailedtocreateoffer",
+            Self::NetherNetFailedToCreateAnswer => "nethernetfailedtocreateanswer",
+            Self::NetherNetFailedToSetLocalDescription => {
+                "nethernetfailedtosetlocaldescription"
+            }
+            Self::NetherNetFailedToSetRemoteDescription => {
+                "nethernetfailedtosetremotedescription"
+            }
+            Self::NetherNetNegotiationTimeoutWaitingForResponse => {
+                "nethernetnegotiationtimeoutwaitingforresponse"
+            }
+            Self::NetherNetNegotiationTimeoutWaitingForAccept => {
+                "nethernetnegotiationtimeoutwaitingforaccept"
+            }
+            Self::NetherNetIncomingConnectionIgnored => {
+                "nethernetincomingconnectionignored"
+            }
+            Self::NetherNetSignalingParsingFailure => "nethernetsignalingparsingfailure",
+            Self::NetherNetSignalingUnknownError => "nethernetsignalingunknownerror",
+            Self::NetherNetSignalingUnicastDeliveryFailed => {
+                "nethernetsignalingunicastdeliveryfailed"
+            }
+            Self::NetherNetSignalingBroadcastDeliveryFailed => {
+                "nethernetsignalingbroadcastdeliveryfailed"
+            }
+            Self::NetherNetSignalingGenericDeliveryFailed => {
+                "nethernetsignalinggenericdeliveryfailed"
+            }
+            Self::EditorMismatchEditorWorld => "editormismatcheditorworld",
+            Self::EditorMismatchVanillaWorld => "editormismatchvanillaworld",
+            Self::WorldTransferNotPrimaryClient => "worldtransfernotprimaryclient",
+            Self::InternalRequestServerShutdown => "internal_requestservershutdown",
+            Self::ClientGameSetupCancelled => "clientgamesetupcancelled",
+            Self::ClientGameSetupFailed => "clientgamesetupfailed",
+            Self::NoVenue => "novenue",
+            Self::NetherNetSignalingSigninFailed => "nethernetsignalingsigninfailed",
+            Self::SessionAccessDenied => "sessionaccessdenied",
+            Self::ServiceSigninIssue => "servicesigninissue",
+            Self::NetherNetNoSignalingChannel => "nethernetnosignalingchannel",
+            Self::NetherNetNotLoggedIn => "nethernetnotloggedin",
+            Self::NetherNetClientSignalingError => "nethernetclientsignalingerror",
+            Self::SubClientLoginDisabled => "subclientlogindisabled",
+            Self::DeepLinkTryingToOpenDemoWorldWhileSignedIn => {
+                "deeplinktryingtoopendemoworldwhilesignedin"
+            }
+            Self::AsyncJoinTaskDenied => "asyncjointaskdenied",
+            Self::RealmsTimelineRequired => "realmstimelinerequired",
+            Self::GuestWithoutHost => "guestwithouthost",
+            Self::FailedToJoinExperience => "failedtojoinexperience",
+            Self::NetherNetDataChannelClosed => "nethernetdatachannelclosed",
+            Self::DiscoveryEnvironmentMismatch => "discoveryenvironmentmismatch",
+            Self::HostWithoutKeys => "hostwithoutkeys",
+            Self::HostSignedOut => "hostsignedout",
+            Self::ScriptWatchdogException => "scriptwatchdogexception",
+            Self::ScriptMemoryLimitExceeded => "scriptmemorylimitexceeded",
+            Self::StorageLowDuringGameplay => "storagelowduringgameplay",
+            Self::StorageFullDuringGameplay => "storagefullduringgameplay",
+            Self::LevelStorageCorruption => "levelstoragecorruption",
+            Self::EditionMismatchVanillaToEdu => "editionmismatchvanillatoedu",
+            Self::EditionMismatchEduToVanilla => "editionmismatchedutovanilla",
+            Self::EditorMismatchEditorToVanilla => "editormismatcheditortovanilla",
+            Self::EditorMismatchVanillaToEditor => "editormismatchvanillatoeditor",
+            Self::DenyListed => "denylisted",
+            Self::NonceMissing => "noncemissing",
+            Self::NonceNotFound => "noncenotfound",
+            Self::NonceExpired => "nonceexpired",
+            Self::NonceNotValid => "noncenotvalid",
+            Self::HostDisconnected => "hostdisconnected",
+            Self::EditorJoinIntentPolicyFailure => "editorjoinintentpolicyfailure",
+            Self::NetherNetIdentityNotAllowed => "nethernetidentitynotallowed",
+            Self::InvalidName => "invalidname",
+            Self::ExpiredToken => "expiredtoken",
+            Self::HostAcceptsNoTypeOfAuth => "hostacceptsnotypeofauth",
+            Self::NotAuthenticatedFastFail => "notauthenticatedfastfail",
+            Self::EditorNotAllowed => "editornotallowed",
+            Self::MissingStructureData => "missingstructuredata",
+            Self::UnsupportedTransport => "unsupportedtransport",
+            Self::SubClientLoginNotBound => "subclientloginnotbound",
+            Self::SessionRuntimeError => "sessionruntimeerror",
+            Self::SessionInvalidResponse => "sessioninvalidresponse",
+            Self::SessionNetworkError => "sessionnetworkerror",
+            Self::SessionServiceError => "sessionserviceerror",
+            Self::SessionServiceUnavailable => "sessionserviceunavailable",
+            Self::SessionThrottled => "sessionthrottled",
+            Self::SessionRequestRejected => "sessionrequestrejected",
+            Self::SessionUnknownError => "sessionunknownerror",
+            Self::BrokenData => "brokendata",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "CantConnectNoInternet" => return Some(Self::CantConnectNoInternet),
+            "NoPermissions" => return Some(Self::NoPermissions),
+            "UnrecoverableError" => return Some(Self::UnrecoverableError),
+            "ThirdPartyBlocked" => return Some(Self::ThirdPartyBlocked),
+            "ThirdPartyNoInternet" => return Some(Self::ThirdPartyNoInternet),
+            "ThirdPartyBadIP" => return Some(Self::ThirdPartyBadIP),
+            "ThirdPartyNoServerOrServerLocked" => {
+                return Some(Self::ThirdPartyNoServerOrServerLocked);
+            }
+            "VersionMismatch" => return Some(Self::VersionMismatch),
+            "SkinIssue" => return Some(Self::SkinIssue),
+            "InviteSessionNotFound" => return Some(Self::InviteSessionNotFound),
+            "EduLevelSettingsMissing" => return Some(Self::EduLevelSettingsMissing),
+            "LocalServerNotFound" => return Some(Self::LocalServerNotFound),
+            "LegacyDisconnect" => return Some(Self::LegacyDisconnect),
+            "INTERNAL_UserLeaveGameAttempted" => {
+                return Some(Self::InternalUserLeaveGameAttempted);
+            }
+            "PlatformLockedSkinsError" => return Some(Self::PlatformLockedSkinsError),
+            "RealmsWorldUnassigned" => return Some(Self::RealmsWorldUnassigned),
+            "RealmsServerCantConnect" => return Some(Self::RealmsServerCantConnect),
+            "RealmsServerHidden" => return Some(Self::RealmsServerHidden),
+            "RealmsServerDisabledBeta" => return Some(Self::RealmsServerDisabledBeta),
+            "RealmsServerDisabled" => return Some(Self::RealmsServerDisabled),
+            "CrossPlatformDisabled" => return Some(Self::CrossPlatformDisabled),
+            "TESTONLY_CantConnect" => return Some(Self::TestonlyCantConnect),
+            "SessionNotFound" => return Some(Self::SessionNotFound),
+            "ClientSettingsIncompatibleWithServer" => {
+                return Some(Self::ClientSettingsIncompatibleWithServer);
+            }
+            "ServerFull" => return Some(Self::ServerFull),
+            "InvalidPlatformSkin" => return Some(Self::InvalidPlatformSkin),
+            "EditionVersionMismatch" => return Some(Self::EditionVersionMismatch),
+            "EditionMismatch" => return Some(Self::EditionMismatch),
+            "LevelNewerThanExeVersion" => return Some(Self::LevelNewerThanExeVersion),
+            "INTERNAL_NoFailOccurred" => return Some(Self::InternalNoFailOccurred),
+            "BannedSkin" => return Some(Self::BannedSkin),
+            "Timeout" => return Some(Self::Timeout),
+            "ServerNotFound" => return Some(Self::ServerNotFound),
+            "OutdatedServer" => return Some(Self::OutdatedServer),
+            "OutdatedClient" => return Some(Self::OutdatedClient),
+            "NoPremiumPlatform" => return Some(Self::NoPremiumPlatform),
+            "MultiplayerDisabled" => return Some(Self::MultiplayerDisabled),
+            "NoWiFi" => return Some(Self::NoWiFi),
+            "WorldCorruption" => return Some(Self::WorldCorruption),
+            "NoReason" => return Some(Self::NoReason),
+            "Disconnected" => return Some(Self::Disconnected),
+            "InvalidPlayer" => return Some(Self::InvalidPlayer),
+            "LoggedInOtherLocation" => return Some(Self::LoggedInOtherLocation),
+            "ServerIdConflict" => return Some(Self::ServerIdConflict),
+            "NotAllowed" => return Some(Self::NotAllowed),
+            "NotAuthenticated" => return Some(Self::NotAuthenticated),
+            "InvalidTenant" => return Some(Self::InvalidTenant),
+            "UnknownPacket" => return Some(Self::UnknownPacket),
+            "UnexpectedPacket" => return Some(Self::UnexpectedPacket),
+            "InvalidCommandRequestPacket" => {
+                return Some(Self::InvalidCommandRequestPacket);
+            }
+            "HostSuspended" => return Some(Self::HostSuspended),
+            "LoginPacketNoRequest" => return Some(Self::LoginPacketNoRequest),
+            "LoginPacketNoCert" => return Some(Self::LoginPacketNoCert),
+            "MissingClient" => return Some(Self::MissingClient),
+            "Kicked" => return Some(Self::Kicked),
+            "KickedForExploit" => return Some(Self::KickedForExploit),
+            "KickedForIdle" => return Some(Self::KickedForIdle),
+            "ResourcePackProblem" => return Some(Self::ResourcePackProblem),
+            "IncompatiblePack" => return Some(Self::IncompatiblePack),
+            "OutOfStorage" => return Some(Self::OutOfStorage),
+            "InvalidLevel" => return Some(Self::InvalidLevel),
+            "DisconnectPacket" => return Some(Self::DisconnectPacket),
+            "BlockMismatch" => return Some(Self::BlockMismatch),
+            "InvalidHeights" => return Some(Self::InvalidHeights),
+            "InvalidWidths" => return Some(Self::InvalidWidths),
+            "ConnectionLost" => return Some(Self::ConnectionLost),
+            "ZombieConnection" => return Some(Self::ZombieConnection),
+            "Shutdown" => return Some(Self::Shutdown),
+            "ReasonNotSet" => return Some(Self::ReasonNotSet),
+            "LoadingStateTimeout" => return Some(Self::LoadingStateTimeout),
+            "ResourcePackLoadingFailed" => return Some(Self::ResourcePackLoadingFailed),
+            "SearchingForSessionLoadingScreenFailed" => {
+                return Some(Self::SearchingForSessionLoadingScreenFailed);
+            }
+            "NetherNetProtocolVersion" => return Some(Self::NetherNetProtocolVersion),
+            "SubsystemStatusError" => return Some(Self::SubsystemStatusError),
+            "EmptyAuthFromDiscovery" => return Some(Self::EmptyAuthFromDiscovery),
+            "EmptyUrlFromDiscovery" => return Some(Self::EmptyUrlFromDiscovery),
+            "ExpiredAuthFromDiscovery" => return Some(Self::ExpiredAuthFromDiscovery),
+            "UnknownSignalServiceSignInFailure" => {
+                return Some(Self::UnknownSignalServiceSignInFailure);
+            }
+            "XBLJoinLobbyFailure" => return Some(Self::XBLJoinLobbyFailure),
+            "UnspecifiedClientInstanceDisconnection" => {
+                return Some(Self::UnspecifiedClientInstanceDisconnection);
+            }
+            "NetherNetSessionNotFound" => return Some(Self::NetherNetSessionNotFound),
+            "NetherNetCreatePeerConnection" => {
+                return Some(Self::NetherNetCreatePeerConnection);
+            }
+            "NetherNetICE" => return Some(Self::NetherNetICE),
+            "NetherNetConnectRequest" => return Some(Self::NetherNetConnectRequest),
+            "NetherNetConnectResponse" => return Some(Self::NetherNetConnectResponse),
+            "NetherNetNegotiationTimeout" => {
+                return Some(Self::NetherNetNegotiationTimeout);
+            }
+            "NetherNetInactivityTimeout" => return Some(Self::NetherNetInactivityTimeout),
+            "StaleConnectionBeingReplaced" => {
+                return Some(Self::StaleConnectionBeingReplaced);
+            }
+            "RealmsSessionNotFound" => return Some(Self::RealmsSessionNotFound),
+            "BadPacket" => return Some(Self::BadPacket),
+            "NetherNetFailedToCreateOffer" => {
+                return Some(Self::NetherNetFailedToCreateOffer);
+            }
+            "NetherNetFailedToCreateAnswer" => {
+                return Some(Self::NetherNetFailedToCreateAnswer);
+            }
+            "NetherNetFailedToSetLocalDescription" => {
+                return Some(Self::NetherNetFailedToSetLocalDescription);
+            }
+            "NetherNetFailedToSetRemoteDescription" => {
+                return Some(Self::NetherNetFailedToSetRemoteDescription);
+            }
+            "NetherNetNegotiationTimeoutWaitingForResponse" => {
+                return Some(Self::NetherNetNegotiationTimeoutWaitingForResponse);
+            }
+            "NetherNetNegotiationTimeoutWaitingForAccept" => {
+                return Some(Self::NetherNetNegotiationTimeoutWaitingForAccept);
+            }
+            "NetherNetIncomingConnectionIgnored" => {
+                return Some(Self::NetherNetIncomingConnectionIgnored);
+            }
+            "NetherNetSignalingParsingFailure" => {
+                return Some(Self::NetherNetSignalingParsingFailure);
+            }
+            "NetherNetSignalingUnknownError" => {
+                return Some(Self::NetherNetSignalingUnknownError);
+            }
+            "NetherNetSignalingUnicastDeliveryFailed" => {
+                return Some(Self::NetherNetSignalingUnicastDeliveryFailed);
+            }
+            "NetherNetSignalingBroadcastDeliveryFailed" => {
+                return Some(Self::NetherNetSignalingBroadcastDeliveryFailed);
+            }
+            "NetherNetSignalingGenericDeliveryFailed" => {
+                return Some(Self::NetherNetSignalingGenericDeliveryFailed);
+            }
+            "EditorMismatchEditorWorld" => return Some(Self::EditorMismatchEditorWorld),
+            "EditorMismatchVanillaWorld" => return Some(Self::EditorMismatchVanillaWorld),
+            "WorldTransferNotPrimaryClient" => {
+                return Some(Self::WorldTransferNotPrimaryClient);
+            }
+            "INTERNAL_RequestServerShutdown" => {
+                return Some(Self::InternalRequestServerShutdown);
+            }
+            "ClientGameSetupCancelled" => return Some(Self::ClientGameSetupCancelled),
+            "ClientGameSetupFailed" => return Some(Self::ClientGameSetupFailed),
+            "NoVenue" => return Some(Self::NoVenue),
+            "NetherNetSignalingSigninFailed" => {
+                return Some(Self::NetherNetSignalingSigninFailed);
+            }
+            "SessionAccessDenied" => return Some(Self::SessionAccessDenied),
+            "ServiceSigninIssue" => return Some(Self::ServiceSigninIssue),
+            "NetherNetNoSignalingChannel" => {
+                return Some(Self::NetherNetNoSignalingChannel);
+            }
+            "NetherNetNotLoggedIn" => return Some(Self::NetherNetNotLoggedIn),
+            "NetherNetClientSignalingError" => {
+                return Some(Self::NetherNetClientSignalingError);
+            }
+            "SubClientLoginDisabled" => return Some(Self::SubClientLoginDisabled),
+            "DeepLinkTryingToOpenDemoWorldWhileSignedIn" => {
+                return Some(Self::DeepLinkTryingToOpenDemoWorldWhileSignedIn);
+            }
+            "AsyncJoinTaskDenied" => return Some(Self::AsyncJoinTaskDenied),
+            "RealmsTimelineRequired" => return Some(Self::RealmsTimelineRequired),
+            "GuestWithoutHost" => return Some(Self::GuestWithoutHost),
+            "FailedToJoinExperience" => return Some(Self::FailedToJoinExperience),
+            "NetherNetDataChannelClosed" => return Some(Self::NetherNetDataChannelClosed),
+            "DiscoveryEnvironmentMismatch" => {
+                return Some(Self::DiscoveryEnvironmentMismatch);
+            }
+            "HostWithoutKeys" => return Some(Self::HostWithoutKeys),
+            "HostSignedOut" => return Some(Self::HostSignedOut),
+            "ScriptWatchdogException" => return Some(Self::ScriptWatchdogException),
+            "ScriptMemoryLimitExceeded" => return Some(Self::ScriptMemoryLimitExceeded),
+            "StorageLowDuringGameplay" => return Some(Self::StorageLowDuringGameplay),
+            "StorageFullDuringGameplay" => return Some(Self::StorageFullDuringGameplay),
+            "LevelStorageCorruption" => return Some(Self::LevelStorageCorruption),
+            "EditionMismatchVanillaToEdu" => {
+                return Some(Self::EditionMismatchVanillaToEdu);
+            }
+            "EditionMismatchEduToVanilla" => {
+                return Some(Self::EditionMismatchEduToVanilla);
+            }
+            "EditorMismatchEditorToVanilla" => {
+                return Some(Self::EditorMismatchEditorToVanilla);
+            }
+            "EditorMismatchVanillaToEditor" => {
+                return Some(Self::EditorMismatchVanillaToEditor);
+            }
+            "DenyListed" => return Some(Self::DenyListed),
+            "NonceMissing" => return Some(Self::NonceMissing),
+            "NonceNotFound" => return Some(Self::NonceNotFound),
+            "NonceExpired" => return Some(Self::NonceExpired),
+            "NonceNotValid" => return Some(Self::NonceNotValid),
+            "HostDisconnected" => return Some(Self::HostDisconnected),
+            "EditorJoinIntentPolicyFailure" => {
+                return Some(Self::EditorJoinIntentPolicyFailure);
+            }
+            "NetherNetIdentityNotAllowed" => {
+                return Some(Self::NetherNetIdentityNotAllowed);
+            }
+            "InvalidName" => return Some(Self::InvalidName),
+            "ExpiredToken" => return Some(Self::ExpiredToken),
+            "HostAcceptsNoTypeOfAuth" => return Some(Self::HostAcceptsNoTypeOfAuth),
+            "NotAuthenticatedFastFail" => return Some(Self::NotAuthenticatedFastFail),
+            "EditorNotAllowed" => return Some(Self::EditorNotAllowed),
+            "MissingStructureData" => return Some(Self::MissingStructureData),
+            "UnsupportedTransport" => return Some(Self::UnsupportedTransport),
+            "SubClientLoginNotBound" => return Some(Self::SubClientLoginNotBound),
+            "SessionRuntimeError" => return Some(Self::SessionRuntimeError),
+            "SessionInvalidResponse" => return Some(Self::SessionInvalidResponse),
+            "SessionNetworkError" => return Some(Self::SessionNetworkError),
+            "SessionServiceError" => return Some(Self::SessionServiceError),
+            "SessionServiceUnavailable" => return Some(Self::SessionServiceUnavailable),
+            "SessionThrottled" => return Some(Self::SessionThrottled),
+            "SessionRequestRejected" => return Some(Self::SessionRequestRejected),
+            "SessionUnknownError" => return Some(Self::SessionUnknownError),
+            "BrokenData" => return Some(Self::BrokenData),
+            _ => {}
+        }
         const NAMES: &[(&str, DisconnectFailReason)] = &[
             ("Unknown", DisconnectFailReason::Unknown),
             ("CantConnectNoInternet", DisconnectFailReason::CantConnectNoInternet),
@@ -9144,10 +11217,7 @@ impl ProtocolEnum for DisconnectFailReason {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -9391,7 +11461,78 @@ impl ProtocolEnum for EasingFunction {
             Self::InOutElastic => "in_out_elastic",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Linear => "linear",
+            Self::Spring => "spring",
+            Self::InQuad => "in_quad",
+            Self::OutQuad => "out_quad",
+            Self::InOutQuad => "in_out_quad",
+            Self::InCubic => "in_cubic",
+            Self::OutCubic => "out_cubic",
+            Self::InOutCubic => "in_out_cubic",
+            Self::InQuart => "in_quart",
+            Self::OutQuart => "out_quart",
+            Self::InOutQuart => "in_out_quart",
+            Self::InQuint => "in_quint",
+            Self::OutQuint => "out_quint",
+            Self::InOutQuint => "in_out_quint",
+            Self::InSine => "in_sine",
+            Self::OutSine => "out_sine",
+            Self::InOutSine => "in_out_sine",
+            Self::InExpo => "in_expo",
+            Self::OutExpo => "out_expo",
+            Self::InOutExpo => "in_out_expo",
+            Self::InCirc => "in_circ",
+            Self::OutCirc => "out_circ",
+            Self::InOutCirc => "in_out_circ",
+            Self::InBounce => "in_bounce",
+            Self::OutBounce => "out_bounce",
+            Self::InOutBounce => "in_out_bounce",
+            Self::InBack => "in_back",
+            Self::OutBack => "out_back",
+            Self::InOutBack => "in_out_back",
+            Self::InElastic => "in_elastic",
+            Self::OutElastic => "out_elastic",
+            Self::InOutElastic => "in_out_elastic",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "linear" => return Some(Self::Linear),
+            "spring" => return Some(Self::Spring),
+            "in_quad" => return Some(Self::InQuad),
+            "out_quad" => return Some(Self::OutQuad),
+            "in_out_quad" => return Some(Self::InOutQuad),
+            "in_cubic" => return Some(Self::InCubic),
+            "out_cubic" => return Some(Self::OutCubic),
+            "in_out_cubic" => return Some(Self::InOutCubic),
+            "in_quart" => return Some(Self::InQuart),
+            "out_quart" => return Some(Self::OutQuart),
+            "in_out_quart" => return Some(Self::InOutQuart),
+            "in_quint" => return Some(Self::InQuint),
+            "out_quint" => return Some(Self::OutQuint),
+            "in_out_quint" => return Some(Self::InOutQuint),
+            "in_sine" => return Some(Self::InSine),
+            "out_sine" => return Some(Self::OutSine),
+            "in_out_sine" => return Some(Self::InOutSine),
+            "in_expo" => return Some(Self::InExpo),
+            "out_expo" => return Some(Self::OutExpo),
+            "in_out_expo" => return Some(Self::InOutExpo),
+            "in_circ" => return Some(Self::InCirc),
+            "out_circ" => return Some(Self::OutCirc),
+            "in_out_circ" => return Some(Self::InOutCirc),
+            "in_bounce" => return Some(Self::InBounce),
+            "out_bounce" => return Some(Self::OutBounce),
+            "in_out_bounce" => return Some(Self::InOutBounce),
+            "in_back" => return Some(Self::InBack),
+            "out_back" => return Some(Self::OutBack),
+            "in_out_back" => return Some(Self::InOutBack),
+            "in_elastic" => return Some(Self::InElastic),
+            "out_elastic" => return Some(Self::OutElastic),
+            "in_out_elastic" => return Some(Self::InOutElastic),
+            _ => {}
+        }
         const NAMES: &[(&str, EasingFunction)] = &[
             ("linear", EasingFunction::Linear),
             ("spring", EasingFunction::Spring),
@@ -9428,10 +11569,7 @@ impl ProtocolEnum for EasingFunction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -9492,17 +11630,25 @@ impl ProtocolEnum for EditorLevelMigrationVersion {
             Self::EditorAchievements => "EditorAchievements",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Legacy => "legacy",
+            Self::EditorAchievements => "editorachievements",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Legacy" => return Some(Self::Legacy),
+            "EditorAchievements" => return Some(Self::EditorAchievements),
+            _ => {}
+        }
         const NAMES: &[(&str, EditorLevelMigrationVersion)] = &[
             ("Legacy", EditorLevelMigrationVersion::Legacy),
             ("EditorAchievements", EditorLevelMigrationVersion::EditorAchievements),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -9568,7 +11714,20 @@ impl ProtocolEnum for EditorPackType {
             Self::Annotation => "Annotation",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Core => "core",
+            Self::Annotation => "annotation",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Core" => return Some(Self::Core),
+            "Annotation" => return Some(Self::Annotation),
+            _ => {}
+        }
         const NAMES: &[(&str, EditorPackType)] = &[
             ("None", EditorPackType::None),
             ("Core", EditorPackType::Core),
@@ -9576,10 +11735,7 @@ impl ProtocolEnum for EditorPackType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -9655,7 +11811,22 @@ impl ProtocolEnum for EditorWorldType {
             Self::EditorRealmsUpload => "EditorRealmsUpload",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NonEditor => "noneditor",
+            Self::EditorProject => "editorproject",
+            Self::EditorTestLevel => "editortestlevel",
+            Self::EditorRealmsUpload => "editorrealmsupload",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NonEditor" => return Some(Self::NonEditor),
+            "EditorProject" => return Some(Self::EditorProject),
+            "EditorTestLevel" => return Some(Self::EditorTestLevel),
+            "EditorRealmsUpload" => return Some(Self::EditorRealmsUpload),
+            _ => {}
+        }
         const NAMES: &[(&str, EditorWorldType)] = &[
             ("NonEditor", EditorWorldType::NonEditor),
             ("EditorProject", EditorWorldType::EditorProject),
@@ -9664,10 +11835,7 @@ impl ProtocolEnum for EditorWorldType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -9737,7 +11905,20 @@ impl ProtocolEnum for EducationEditionOffer {
             Self::ChinaDeprecated => "China_Deprecated",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::RestOfWorld => "restofworld",
+            Self::ChinaDeprecated => "china_deprecated",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "RestOfWorld" => return Some(Self::RestOfWorld),
+            "China_Deprecated" => return Some(Self::ChinaDeprecated),
+            _ => {}
+        }
         const NAMES: &[(&str, EducationEditionOffer)] = &[
             ("None", EducationEditionOffer::None),
             ("RestOfWorld", EducationEditionOffer::RestOfWorld),
@@ -9745,10 +11926,7 @@ impl ProtocolEnum for EducationEditionOffer {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -10064,7 +12242,102 @@ impl ProtocolEnum for EnchantType {
             Self::InvalidEnchantment => "InvalidEnchantment",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Protection => "protection",
+            Self::FireProtection => "fireprotection",
+            Self::FeatherFalling => "featherfalling",
+            Self::BlastProtection => "blastprotection",
+            Self::ProjectileProtection => "projectileprotection",
+            Self::Thorns => "thorns",
+            Self::Respiration => "respiration",
+            Self::DepthStrider => "depthstrider",
+            Self::AquaAffinity => "aquaaffinity",
+            Self::Sharpness => "sharpness",
+            Self::Smite => "smite",
+            Self::BaneOfArthropods => "baneofarthropods",
+            Self::Knockback => "knockback",
+            Self::FireAspect => "fireaspect",
+            Self::Looting => "looting",
+            Self::Efficiency => "efficiency",
+            Self::SilkTouch => "silktouch",
+            Self::Unbreaking => "unbreaking",
+            Self::Fortune => "fortune",
+            Self::Power => "power",
+            Self::Punch => "punch",
+            Self::Flame => "flame",
+            Self::Infinity => "infinity",
+            Self::LuckOfTheSea => "luckofthesea",
+            Self::Lure => "lure",
+            Self::FrostWalker => "frostwalker",
+            Self::Mending => "mending",
+            Self::CurseOfBinding => "curseofbinding",
+            Self::CurseOfVanishing => "curseofvanishing",
+            Self::Impaling => "impaling",
+            Self::Riptide => "riptide",
+            Self::Loyalty => "loyalty",
+            Self::Channeling => "channeling",
+            Self::Multishot => "multishot",
+            Self::Piercing => "piercing",
+            Self::QuickCharge => "quickcharge",
+            Self::SoulSpeed => "soulspeed",
+            Self::SwiftSneak => "swiftsneak",
+            Self::WindBurst => "windburst",
+            Self::Density => "density",
+            Self::Breach => "breach",
+            Self::Lunge => "lunge",
+            Self::NumEnchantments => "numenchantments",
+            Self::InvalidEnchantment => "invalidenchantment",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Protection" => return Some(Self::Protection),
+            "FireProtection" => return Some(Self::FireProtection),
+            "FeatherFalling" => return Some(Self::FeatherFalling),
+            "BlastProtection" => return Some(Self::BlastProtection),
+            "ProjectileProtection" => return Some(Self::ProjectileProtection),
+            "Thorns" => return Some(Self::Thorns),
+            "Respiration" => return Some(Self::Respiration),
+            "DepthStrider" => return Some(Self::DepthStrider),
+            "AquaAffinity" => return Some(Self::AquaAffinity),
+            "Sharpness" => return Some(Self::Sharpness),
+            "Smite" => return Some(Self::Smite),
+            "BaneOfArthropods" => return Some(Self::BaneOfArthropods),
+            "Knockback" => return Some(Self::Knockback),
+            "FireAspect" => return Some(Self::FireAspect),
+            "Looting" => return Some(Self::Looting),
+            "Efficiency" => return Some(Self::Efficiency),
+            "SilkTouch" => return Some(Self::SilkTouch),
+            "Unbreaking" => return Some(Self::Unbreaking),
+            "Fortune" => return Some(Self::Fortune),
+            "Power" => return Some(Self::Power),
+            "Punch" => return Some(Self::Punch),
+            "Flame" => return Some(Self::Flame),
+            "Infinity" => return Some(Self::Infinity),
+            "LuckOfTheSea" => return Some(Self::LuckOfTheSea),
+            "Lure" => return Some(Self::Lure),
+            "FrostWalker" => return Some(Self::FrostWalker),
+            "Mending" => return Some(Self::Mending),
+            "CurseOfBinding" => return Some(Self::CurseOfBinding),
+            "CurseOfVanishing" => return Some(Self::CurseOfVanishing),
+            "Impaling" => return Some(Self::Impaling),
+            "Riptide" => return Some(Self::Riptide),
+            "Loyalty" => return Some(Self::Loyalty),
+            "Channeling" => return Some(Self::Channeling),
+            "Multishot" => return Some(Self::Multishot),
+            "Piercing" => return Some(Self::Piercing),
+            "QuickCharge" => return Some(Self::QuickCharge),
+            "SoulSpeed" => return Some(Self::SoulSpeed),
+            "SwiftSneak" => return Some(Self::SwiftSneak),
+            "WindBurst" => return Some(Self::WindBurst),
+            "Density" => return Some(Self::Density),
+            "Breach" => return Some(Self::Breach),
+            "Lunge" => return Some(Self::Lunge),
+            "NumEnchantments" => return Some(Self::NumEnchantments),
+            "InvalidEnchantment" => return Some(Self::InvalidEnchantment),
+            _ => {}
+        }
         const NAMES: &[(&str, EnchantType)] = &[
             ("Protection", EnchantType::Protection),
             ("FireProtection", EnchantType::FireProtection),
@@ -10113,10 +12386,7 @@ impl ProtocolEnum for EnchantType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -10828,7 +13098,234 @@ impl ProtocolEnum for ExpressionOp {
             Self::EaseInOutElastic => "EaseInOutElastic",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::LeftBrace => "leftbrace",
+            Self::RightBrace => "rightbrace",
+            Self::LeftBracket => "leftbracket",
+            Self::RightBracket => "rightbracket",
+            Self::LeftParenthesis => "leftparenthesis",
+            Self::RightParenthesis => "rightparenthesis",
+            Self::Negate => "negate",
+            Self::LogicalNot => "logicalnot",
+            Self::Abs => "abs",
+            Self::Add => "add",
+            Self::Acos => "acos",
+            Self::Asin => "asin",
+            Self::Atan => "atan",
+            Self::Atan2 => "atan2",
+            Self::Ceil => "ceil",
+            Self::Clamp => "clamp",
+            Self::CopySign => "copysign",
+            Self::Cos => "cos",
+            Self::DieRoll => "dieroll",
+            Self::DieRollInt => "dierollint",
+            Self::Div => "div",
+            Self::Exp => "exp",
+            Self::Floor => "floor",
+            Self::HermiteBlend => "hermiteblend",
+            Self::Lerp => "lerp",
+            Self::LerpRotate => "lerprotate",
+            Self::Ln => "ln",
+            Self::Max => "max",
+            Self::Min => "min",
+            Self::MinAngle => "minangle",
+            Self::Mod => "mod",
+            Self::Mul => "mul",
+            Self::Pow => "pow",
+            Self::Random => "random",
+            Self::RandomInt => "randomint",
+            Self::Round => "round",
+            Self::Sin => "sin",
+            Self::Sign => "sign",
+            Self::Sqrt => "sqrt",
+            Self::Trunc => "trunc",
+            Self::QueryFunction => "queryfunction",
+            Self::ArrayVariable => "arrayvariable",
+            Self::ContextVariable => "contextvariable",
+            Self::EntityVariable => "entityvariable",
+            Self::TempVariable => "tempvariable",
+            Self::MemberAccessor => "memberaccessor",
+            Self::HashedStringHash => "hashedstringhash",
+            Self::GeometryVariable => "geometryvariable",
+            Self::MaterialVariable => "materialvariable",
+            Self::TextureVariable => "texturevariable",
+            Self::LessThan => "lessthan",
+            Self::LessEqual => "lessequal",
+            Self::GreaterEqual => "greaterequal",
+            Self::GreaterThan => "greaterthan",
+            Self::LogicalEqual => "logicalequal",
+            Self::LogicalNotEqual => "logicalnotequal",
+            Self::LogicalOr => "logicalor",
+            Self::LogicalAnd => "logicaland",
+            Self::NullCoalescing => "nullcoalescing",
+            Self::Conditional => "conditional",
+            Self::ConditionalElse => "conditionalelse",
+            Self::Float => "float",
+            Self::Pi => "pi",
+            Self::Array => "array",
+            Self::Geometry => "geometry",
+            Self::Material => "material",
+            Self::Texture => "texture",
+            Self::Loop => "loop",
+            Self::ForEach => "foreach",
+            Self::Break => "break",
+            Self::Continue => "continue",
+            Self::Assignment => "assignment",
+            Self::Pointer => "pointer",
+            Self::Semicolon => "semicolon",
+            Self::Return => "return",
+            Self::Comma => "comma",
+            Self::This => "this",
+            Self::InternalNonEvaluatedArray => "internal_nonevaluatedarray",
+            Self::InverseLerp => "inverselerp",
+            Self::EaseInQuad => "easeinquad",
+            Self::EaseOutQuad => "easeoutquad",
+            Self::EaseInOutQuad => "easeinoutquad",
+            Self::EaseInCubic => "easeincubic",
+            Self::EaseOutCubic => "easeoutcubic",
+            Self::EaseInOutCubic => "easeinoutcubic",
+            Self::EaseInQuart => "easeinquart",
+            Self::EaseOutQuart => "easeoutquart",
+            Self::EaseInOutQuart => "easeinoutquart",
+            Self::EaseInQuint => "easeinquint",
+            Self::EaseOutQuint => "easeoutquint",
+            Self::EaseInOutQuint => "easeinoutquint",
+            Self::EaseInSine => "easeinsine",
+            Self::EaseOutSine => "easeoutsine",
+            Self::EaseInOutSine => "easeinoutsine",
+            Self::EaseInExpo => "easeinexpo",
+            Self::EaseOutExpo => "easeoutexpo",
+            Self::EaseInOutExpo => "easeinoutexpo",
+            Self::EaseInCirc => "easeincirc",
+            Self::EaseOutCirc => "easeoutcirc",
+            Self::EaseInOutCirc => "easeinoutcirc",
+            Self::EaseInBounce => "easeinbounce",
+            Self::EaseOutBounce => "easeoutbounce",
+            Self::EaseInOutBounce => "easeinoutbounce",
+            Self::EaseInBack => "easeinback",
+            Self::EaseOutBack => "easeoutback",
+            Self::EaseInOutBack => "easeinoutback",
+            Self::EaseInElastic => "easeinelastic",
+            Self::EaseOutElastic => "easeoutelastic",
+            Self::EaseInOutElastic => "easeinoutelastic",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "LeftBrace" => return Some(Self::LeftBrace),
+            "RightBrace" => return Some(Self::RightBrace),
+            "LeftBracket" => return Some(Self::LeftBracket),
+            "RightBracket" => return Some(Self::RightBracket),
+            "LeftParenthesis" => return Some(Self::LeftParenthesis),
+            "RightParenthesis" => return Some(Self::RightParenthesis),
+            "Negate" => return Some(Self::Negate),
+            "LogicalNot" => return Some(Self::LogicalNot),
+            "Abs" => return Some(Self::Abs),
+            "Add" => return Some(Self::Add),
+            "Acos" => return Some(Self::Acos),
+            "Asin" => return Some(Self::Asin),
+            "Atan" => return Some(Self::Atan),
+            "Atan2" => return Some(Self::Atan2),
+            "Ceil" => return Some(Self::Ceil),
+            "Clamp" => return Some(Self::Clamp),
+            "CopySign" => return Some(Self::CopySign),
+            "Cos" => return Some(Self::Cos),
+            "DieRoll" => return Some(Self::DieRoll),
+            "DieRollInt" => return Some(Self::DieRollInt),
+            "Div" => return Some(Self::Div),
+            "Exp" => return Some(Self::Exp),
+            "Floor" => return Some(Self::Floor),
+            "HermiteBlend" => return Some(Self::HermiteBlend),
+            "Lerp" => return Some(Self::Lerp),
+            "LerpRotate" => return Some(Self::LerpRotate),
+            "Ln" => return Some(Self::Ln),
+            "Max" => return Some(Self::Max),
+            "Min" => return Some(Self::Min),
+            "MinAngle" => return Some(Self::MinAngle),
+            "Mod" => return Some(Self::Mod),
+            "Mul" => return Some(Self::Mul),
+            "Pow" => return Some(Self::Pow),
+            "Random" => return Some(Self::Random),
+            "RandomInt" => return Some(Self::RandomInt),
+            "Round" => return Some(Self::Round),
+            "Sin" => return Some(Self::Sin),
+            "Sign" => return Some(Self::Sign),
+            "Sqrt" => return Some(Self::Sqrt),
+            "Trunc" => return Some(Self::Trunc),
+            "QueryFunction" => return Some(Self::QueryFunction),
+            "ArrayVariable" => return Some(Self::ArrayVariable),
+            "ContextVariable" => return Some(Self::ContextVariable),
+            "EntityVariable" => return Some(Self::EntityVariable),
+            "TempVariable" => return Some(Self::TempVariable),
+            "MemberAccessor" => return Some(Self::MemberAccessor),
+            "HashedStringHash" => return Some(Self::HashedStringHash),
+            "GeometryVariable" => return Some(Self::GeometryVariable),
+            "MaterialVariable" => return Some(Self::MaterialVariable),
+            "TextureVariable" => return Some(Self::TextureVariable),
+            "LessThan" => return Some(Self::LessThan),
+            "LessEqual" => return Some(Self::LessEqual),
+            "GreaterEqual" => return Some(Self::GreaterEqual),
+            "GreaterThan" => return Some(Self::GreaterThan),
+            "LogicalEqual" => return Some(Self::LogicalEqual),
+            "LogicalNotEqual" => return Some(Self::LogicalNotEqual),
+            "LogicalOr" => return Some(Self::LogicalOr),
+            "LogicalAnd" => return Some(Self::LogicalAnd),
+            "NullCoalescing" => return Some(Self::NullCoalescing),
+            "Conditional" => return Some(Self::Conditional),
+            "ConditionalElse" => return Some(Self::ConditionalElse),
+            "Float" => return Some(Self::Float),
+            "Pi" => return Some(Self::Pi),
+            "Array" => return Some(Self::Array),
+            "Geometry" => return Some(Self::Geometry),
+            "Material" => return Some(Self::Material),
+            "Texture" => return Some(Self::Texture),
+            "Loop" => return Some(Self::Loop),
+            "ForEach" => return Some(Self::ForEach),
+            "Break" => return Some(Self::Break),
+            "Continue" => return Some(Self::Continue),
+            "Assignment" => return Some(Self::Assignment),
+            "Pointer" => return Some(Self::Pointer),
+            "Semicolon" => return Some(Self::Semicolon),
+            "Return" => return Some(Self::Return),
+            "Comma" => return Some(Self::Comma),
+            "This" => return Some(Self::This),
+            "Internal_NonEvaluatedArray" => return Some(Self::InternalNonEvaluatedArray),
+            "InverseLerp" => return Some(Self::InverseLerp),
+            "EaseInQuad" => return Some(Self::EaseInQuad),
+            "EaseOutQuad" => return Some(Self::EaseOutQuad),
+            "EaseInOutQuad" => return Some(Self::EaseInOutQuad),
+            "EaseInCubic" => return Some(Self::EaseInCubic),
+            "EaseOutCubic" => return Some(Self::EaseOutCubic),
+            "EaseInOutCubic" => return Some(Self::EaseInOutCubic),
+            "EaseInQuart" => return Some(Self::EaseInQuart),
+            "EaseOutQuart" => return Some(Self::EaseOutQuart),
+            "EaseInOutQuart" => return Some(Self::EaseInOutQuart),
+            "EaseInQuint" => return Some(Self::EaseInQuint),
+            "EaseOutQuint" => return Some(Self::EaseOutQuint),
+            "EaseInOutQuint" => return Some(Self::EaseInOutQuint),
+            "EaseInSine" => return Some(Self::EaseInSine),
+            "EaseOutSine" => return Some(Self::EaseOutSine),
+            "EaseInOutSine" => return Some(Self::EaseInOutSine),
+            "EaseInExpo" => return Some(Self::EaseInExpo),
+            "EaseOutExpo" => return Some(Self::EaseOutExpo),
+            "EaseInOutExpo" => return Some(Self::EaseInOutExpo),
+            "EaseInCirc" => return Some(Self::EaseInCirc),
+            "EaseOutCirc" => return Some(Self::EaseOutCirc),
+            "EaseInOutCirc" => return Some(Self::EaseInOutCirc),
+            "EaseInBounce" => return Some(Self::EaseInBounce),
+            "EaseOutBounce" => return Some(Self::EaseOutBounce),
+            "EaseInOutBounce" => return Some(Self::EaseInOutBounce),
+            "EaseInBack" => return Some(Self::EaseInBack),
+            "EaseOutBack" => return Some(Self::EaseOutBack),
+            "EaseInOutBack" => return Some(Self::EaseInOutBack),
+            "EaseInElastic" => return Some(Self::EaseInElastic),
+            "EaseOutElastic" => return Some(Self::EaseOutElastic),
+            "EaseInOutElastic" => return Some(Self::EaseInOutElastic),
+            _ => {}
+        }
         const NAMES: &[(&str, ExpressionOp)] = &[
             ("Unknown", ExpressionOp::Unknown),
             ("LeftBrace", ExpressionOp::LeftBrace),
@@ -10943,10 +13440,7 @@ impl ProtocolEnum for ExpressionOp {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11040,7 +13534,28 @@ impl ProtocolEnum for FloatAttributeOperation {
             Self::Maximum => "MAXIMUM",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Override => "override",
+            Self::AlphaBlend => "alpha_blend",
+            Self::Add => "add",
+            Self::Subtract => "subtract",
+            Self::Multiply => "multiply",
+            Self::Minimum => "minimum",
+            Self::Maximum => "maximum",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "OVERRIDE" => return Some(Self::Override),
+            "ALPHA_BLEND" => return Some(Self::AlphaBlend),
+            "ADD" => return Some(Self::Add),
+            "SUBTRACT" => return Some(Self::Subtract),
+            "MULTIPLY" => return Some(Self::Multiply),
+            "MINIMUM" => return Some(Self::Minimum),
+            "MAXIMUM" => return Some(Self::Maximum),
+            _ => {}
+        }
         const NAMES: &[(&str, FloatAttributeOperation)] = &[
             ("OVERRIDE", FloatAttributeOperation::Override),
             ("ALPHA_BLEND", FloatAttributeOperation::AlphaBlend),
@@ -11052,10 +13567,7 @@ impl ProtocolEnum for FloatAttributeOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11121,7 +13633,20 @@ impl ProtocolEnum for FurnaceLayout {
             Self::Default => "Default",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::InventoryOnly => "inventoryonly",
+            Self::Default => "default",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "InventoryOnly" => return Some(Self::InventoryOnly),
+            "Default" => return Some(Self::Default),
+            _ => {}
+        }
         const NAMES: &[(&str, FurnaceLayout)] = &[
             ("None", FurnaceLayout::None),
             ("InventoryOnly", FurnaceLayout::InventoryOnly),
@@ -11129,10 +13654,7 @@ impl ProtocolEnum for FurnaceLayout {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11220,7 +13742,26 @@ impl ProtocolEnum for FurnaceLeftTabIndex {
             Self::Inventory => "Inventory",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::RecipeFood => "recipefood",
+            Self::RecipeItems => "recipeitems",
+            Self::RecipeBlocks => "recipeblocks",
+            Self::RecipeSearch => "recipesearch",
+            Self::Inventory => "inventory",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "RecipeFood" => return Some(Self::RecipeFood),
+            "RecipeItems" => return Some(Self::RecipeItems),
+            "RecipeBlocks" => return Some(Self::RecipeBlocks),
+            "RecipeSearch" => return Some(Self::RecipeSearch),
+            "Inventory" => return Some(Self::Inventory),
+            _ => {}
+        }
         const NAMES: &[(&str, FurnaceLeftTabIndex)] = &[
             ("None", FurnaceLeftTabIndex::None),
             ("RecipeFood", FurnaceLeftTabIndex::RecipeFood),
@@ -11231,10 +13772,7 @@ impl ProtocolEnum for FurnaceLeftTabIndex {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11316,7 +13854,24 @@ impl ProtocolEnum for GamePublishSetting {
             Self::Public => "Public",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoMultiPlay => "nomultiplay",
+            Self::InviteOnly => "inviteonly",
+            Self::FriendsOnly => "friendsonly",
+            Self::FriendsOfFriends => "friendsoffriends",
+            Self::Public => "public",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NoMultiPlay" => return Some(Self::NoMultiPlay),
+            "InviteOnly" => return Some(Self::InviteOnly),
+            "FriendsOnly" => return Some(Self::FriendsOnly),
+            "FriendsOfFriends" => return Some(Self::FriendsOfFriends),
+            "Public" => return Some(Self::Public),
+            _ => {}
+        }
         const NAMES: &[(&str, GamePublishSetting)] = &[
             ("NoMultiPlay", GamePublishSetting::NoMultiPlay),
             ("InviteOnly", GamePublishSetting::InviteOnly),
@@ -11326,10 +13881,7 @@ impl ProtocolEnum for GamePublishSetting {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11419,7 +13971,27 @@ impl ProtocolEnum for GameType {
             Self::Spectator => "Spectator",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Undefined => "undefined",
+            Self::Survival => "survival",
+            Self::Creative => "creative",
+            Self::Adventure => "adventure",
+            Self::Default => "default",
+            Self::Spectator => "spectator",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Undefined" => return Some(Self::Undefined),
+            "Survival" => return Some(Self::Survival),
+            "Creative" => return Some(Self::Creative),
+            "Adventure" => return Some(Self::Adventure),
+            "Default" => return Some(Self::Default),
+            "Spectator" => return Some(Self::Spectator),
+            "WorldDefault" => return Some(Self::Survival),
+            _ => {}
+        }
         const NAMES: &[(&str, GameType)] = &[
             ("Undefined", GameType::Undefined),
             ("Survival", GameType::Survival),
@@ -11431,10 +14003,7 @@ impl ProtocolEnum for GameType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11528,7 +14097,28 @@ impl ProtocolEnum for GeneratorType {
             Self::Undefined => "Undefined",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Legacy => "legacy",
+            Self::Overworld => "overworld",
+            Self::Flat => "flat",
+            Self::Nether => "nether",
+            Self::TheEnd => "theend",
+            Self::Void => "void",
+            Self::Undefined => "undefined",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Legacy" => return Some(Self::Legacy),
+            "Overworld" => return Some(Self::Overworld),
+            "Flat" => return Some(Self::Flat),
+            "Nether" => return Some(Self::Nether),
+            "TheEnd" => return Some(Self::TheEnd),
+            "Void" => return Some(Self::Void),
+            "Undefined" => return Some(Self::Undefined),
+            _ => {}
+        }
         const NAMES: &[(&str, GeneratorType)] = &[
             ("Legacy", GeneratorType::Legacy),
             ("Overworld", GeneratorType::Overworld),
@@ -11540,10 +14130,7 @@ impl ProtocolEnum for GeneratorType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -11619,7 +14206,22 @@ impl ProtocolEnum for GraphicsMode {
             Self::RayTraced => "RayTraced",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Simple => "simple",
+            Self::Fancy => "fancy",
+            Self::Advanced => "advanced",
+            Self::RayTraced => "raytraced",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Simple" => return Some(Self::Simple),
+            "Fancy" => return Some(Self::Fancy),
+            "Advanced" => return Some(Self::Advanced),
+            "RayTraced" => return Some(Self::RayTraced),
+            _ => {}
+        }
         const NAMES: &[(&str, GraphicsMode)] = &[
             ("Simple", GraphicsMode::Simple),
             ("Fancy", GraphicsMode::Fancy),
@@ -11628,10 +14230,7 @@ impl ProtocolEnum for GraphicsMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12099,7 +14698,118 @@ impl ProtocolEnum for GraphicsOverrideParameterType {
             Self::OrbitalOffsetDegrees => "OrbitalOffsetDegrees",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SkyZenithColor => "skyzenithcolor",
+            Self::SkyHorizonColor => "skyhorizoncolor",
+            Self::HorizonBlendMin => "horizonblendmin",
+            Self::HorizonBlendMax => "horizonblendmax",
+            Self::HorizonBlendStart => "horizonblendstart",
+            Self::HorizonBlendMieStart => "horizonblendmiestart",
+            Self::RayleighStrength => "rayleighstrength",
+            Self::SunMieStrength => "sunmiestrength",
+            Self::MoonMieStrength => "moonmiestrength",
+            Self::SunGlareShape => "sunglareshape",
+            Self::Chlorophyll => "chlorophyll",
+            Self::Cdom => "cdom",
+            Self::SuspendedSediment => "suspendedsediment",
+            Self::WavesDepth => "wavesdepth",
+            Self::WavesFrequency => "wavesfrequency",
+            Self::WavesFrequencyScaling => "wavesfrequencyscaling",
+            Self::WavesSpeed => "wavesspeed",
+            Self::WavesSpeedScaling => "wavesspeedscaling",
+            Self::WavesShape => "wavesshape",
+            Self::WavesOctaves => "wavesoctaves",
+            Self::WavesMix => "wavesmix",
+            Self::WavesPull => "wavespull",
+            Self::WavesDirectionIncrement => "wavesdirectionincrement",
+            Self::MidtonesContrast => "midtonescontrast",
+            Self::HighlightsContrast => "highlightscontrast",
+            Self::ShadowsContrast => "shadowscontrast",
+            Self::HighlightsGain => "highlightsgain",
+            Self::HighlightsGamma => "highlightsgamma",
+            Self::HighlightsOffset => "highlightsoffset",
+            Self::HighlightsSaturation => "highlightssaturation",
+            Self::MidtonesGain => "midtonesgain",
+            Self::MidtonesGamma => "midtonesgamma",
+            Self::MidtonesOffset => "midtonesoffset",
+            Self::MidtonesSaturation => "midtonessaturation",
+            Self::ShadowsGain => "shadowsgain",
+            Self::ShadowsGamma => "shadowsgamma",
+            Self::ShadowsOffset => "shadowsoffset",
+            Self::ShadowsSaturation => "shadowssaturation",
+            Self::HighlightsMin => "highlightsmin",
+            Self::ShadowsMax => "shadowsmax",
+            Self::Temperature => "temperature",
+            Self::SunColor => "suncolor",
+            Self::SunIlluminance => "sunilluminance",
+            Self::MoonColor => "mooncolor",
+            Self::MoonIlluminance => "moonilluminance",
+            Self::FlashColor => "flashcolor",
+            Self::FlashIlluminance => "flashilluminance",
+            Self::AmbientColor => "ambientcolor",
+            Self::AmbientIlluminance => "ambientilluminance",
+            Self::EmissiveDesaturation => "emissivedesaturation",
+            Self::SkyIntensity => "skyintensity",
+            Self::OrbitalOffsetDegrees => "orbitaloffsetdegrees",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SkyZenithColor" => return Some(Self::SkyZenithColor),
+            "SkyHorizonColor" => return Some(Self::SkyHorizonColor),
+            "HorizonBlendMin" => return Some(Self::HorizonBlendMin),
+            "HorizonBlendMax" => return Some(Self::HorizonBlendMax),
+            "HorizonBlendStart" => return Some(Self::HorizonBlendStart),
+            "HorizonBlendMieStart" => return Some(Self::HorizonBlendMieStart),
+            "RayleighStrength" => return Some(Self::RayleighStrength),
+            "SunMieStrength" => return Some(Self::SunMieStrength),
+            "MoonMieStrength" => return Some(Self::MoonMieStrength),
+            "SunGlareShape" => return Some(Self::SunGlareShape),
+            "Chlorophyll" => return Some(Self::Chlorophyll),
+            "CDOM" => return Some(Self::Cdom),
+            "SuspendedSediment" => return Some(Self::SuspendedSediment),
+            "WavesDepth" => return Some(Self::WavesDepth),
+            "WavesFrequency" => return Some(Self::WavesFrequency),
+            "WavesFrequencyScaling" => return Some(Self::WavesFrequencyScaling),
+            "WavesSpeed" => return Some(Self::WavesSpeed),
+            "WavesSpeedScaling" => return Some(Self::WavesSpeedScaling),
+            "WavesShape" => return Some(Self::WavesShape),
+            "WavesOctaves" => return Some(Self::WavesOctaves),
+            "WavesMix" => return Some(Self::WavesMix),
+            "WavesPull" => return Some(Self::WavesPull),
+            "WavesDirectionIncrement" => return Some(Self::WavesDirectionIncrement),
+            "MidtonesContrast" => return Some(Self::MidtonesContrast),
+            "HighlightsContrast" => return Some(Self::HighlightsContrast),
+            "ShadowsContrast" => return Some(Self::ShadowsContrast),
+            "HighlightsGain" => return Some(Self::HighlightsGain),
+            "HighlightsGamma" => return Some(Self::HighlightsGamma),
+            "HighlightsOffset" => return Some(Self::HighlightsOffset),
+            "HighlightsSaturation" => return Some(Self::HighlightsSaturation),
+            "MidtonesGain" => return Some(Self::MidtonesGain),
+            "MidtonesGamma" => return Some(Self::MidtonesGamma),
+            "MidtonesOffset" => return Some(Self::MidtonesOffset),
+            "MidtonesSaturation" => return Some(Self::MidtonesSaturation),
+            "ShadowsGain" => return Some(Self::ShadowsGain),
+            "ShadowsGamma" => return Some(Self::ShadowsGamma),
+            "ShadowsOffset" => return Some(Self::ShadowsOffset),
+            "ShadowsSaturation" => return Some(Self::ShadowsSaturation),
+            "HighlightsMin" => return Some(Self::HighlightsMin),
+            "ShadowsMax" => return Some(Self::ShadowsMax),
+            "Temperature" => return Some(Self::Temperature),
+            "SunColor" => return Some(Self::SunColor),
+            "SunIlluminance" => return Some(Self::SunIlluminance),
+            "MoonColor" => return Some(Self::MoonColor),
+            "MoonIlluminance" => return Some(Self::MoonIlluminance),
+            "FlashColor" => return Some(Self::FlashColor),
+            "FlashIlluminance" => return Some(Self::FlashIlluminance),
+            "AmbientColor" => return Some(Self::AmbientColor),
+            "AmbientIlluminance" => return Some(Self::AmbientIlluminance),
+            "EmissiveDesaturation" => return Some(Self::EmissiveDesaturation),
+            "SkyIntensity" => return Some(Self::SkyIntensity),
+            "OrbitalOffsetDegrees" => return Some(Self::OrbitalOffsetDegrees),
+            _ => {}
+        }
         const NAMES: &[(&str, GraphicsOverrideParameterType)] = &[
             ("SkyZenithColor", GraphicsOverrideParameterType::SkyZenithColor),
             ("SkyHorizonColor", GraphicsOverrideParameterType::SkyHorizonColor),
@@ -12171,10 +14881,7 @@ impl ProtocolEnum for GraphicsOverrideParameterType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12235,17 +14942,25 @@ impl ProtocolEnum for HandSlot {
             Self::Offhand => "Offhand",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Mainhand => "mainhand",
+            Self::Offhand => "offhand",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Mainhand" => return Some(Self::Mainhand),
+            "Offhand" => return Some(Self::Offhand),
+            _ => {}
+        }
         const NAMES: &[(&str, HandSlot)] = &[
             ("Mainhand", HandSlot::Mainhand),
             ("Offhand", HandSlot::Offhand),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12303,16 +15018,21 @@ impl ProtocolEnum for HiddenLocationPacketType {
             Self::PlayerLocationHide => "PLAYER_LOCATION_HIDE",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::PlayerLocationHide => "player_location_hide",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "PLAYER_LOCATION_HIDE" {
+            return Some(Self::PlayerLocationHide);
+        }
         const NAMES: &[(&str, HiddenLocationPacketType)] = &[
             ("PLAYER_LOCATION_HIDE", HiddenLocationPacketType::PlayerLocationHide),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12442,7 +15162,40 @@ impl ProtocolEnum for HudElement {
             Self::ItemText => "ItemText",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::PaperDoll => "paperdoll",
+            Self::Armor => "armor",
+            Self::ToolTips => "tooltips",
+            Self::TouchControls => "touchcontrols",
+            Self::Crosshair => "crosshair",
+            Self::HotBar => "hotbar",
+            Self::Health => "health",
+            Self::ProgressBar => "progressbar",
+            Self::Hunger => "hunger",
+            Self::AirBubbles => "airbubbles",
+            Self::HorseHealth => "horsehealth",
+            Self::StatusEffects => "statuseffects",
+            Self::ItemText => "itemtext",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "PaperDoll" => return Some(Self::PaperDoll),
+            "Armor" => return Some(Self::Armor),
+            "ToolTips" => return Some(Self::ToolTips),
+            "TouchControls" => return Some(Self::TouchControls),
+            "Crosshair" => return Some(Self::Crosshair),
+            "HotBar" => return Some(Self::HotBar),
+            "Health" => return Some(Self::Health),
+            "ProgressBar" => return Some(Self::ProgressBar),
+            "Hunger" => return Some(Self::Hunger),
+            "AirBubbles" => return Some(Self::AirBubbles),
+            "HorseHealth" => return Some(Self::HorseHealth),
+            "StatusEffects" => return Some(Self::StatusEffects),
+            "ItemText" => return Some(Self::ItemText),
+            _ => {}
+        }
         const NAMES: &[(&str, HudElement)] = &[
             ("PaperDoll", HudElement::PaperDoll),
             ("Armor", HudElement::Armor),
@@ -12460,10 +15213,7 @@ impl ProtocolEnum for HudElement {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12524,17 +15274,25 @@ impl ProtocolEnum for HudVisibility {
             Self::Reset => "Reset",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Hide => "hide",
+            Self::Reset => "reset",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Hide" => return Some(Self::Hide),
+            "Reset" => return Some(Self::Reset),
+            _ => {}
+        }
         const NAMES: &[(&str, HudVisibility)] = &[
             ("Hide", HudVisibility::Hide),
             ("Reset", HudVisibility::Reset),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12622,7 +15380,26 @@ impl ProtocolEnum for InputMode {
             Self::Count => "Count",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Undefined => "undefined",
+            Self::Mouse => "mouse",
+            Self::Touch => "touch",
+            Self::GamePad => "gamepad",
+            Self::GamePadAndMouse => "gamepadandmouse",
+            Self::Count => "count",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Undefined" => return Some(Self::Undefined),
+            "Mouse" => return Some(Self::Mouse),
+            "Touch" => return Some(Self::Touch),
+            "GamePad" => return Some(Self::GamePad),
+            "GamePadAndMouse" => return Some(Self::GamePadAndMouse),
+            "Count" => return Some(Self::Count),
+            _ => {}
+        }
         const NAMES: &[(&str, InputMode)] = &[
             ("Undefined", InputMode::Undefined),
             ("Mouse", InputMode::Mouse),
@@ -12633,10 +15410,7 @@ impl ProtocolEnum for InputMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12718,7 +15492,24 @@ impl ProtocolEnum for InteractPacketPayloadAction {
             Self::OpenInventory => "OpenInventory",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::StopRiding => "stopriding",
+            Self::InteractUpdate => "interactupdate",
+            Self::NpcOpen => "npcopen",
+            Self::OpenInventory => "openinventory",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "StopRiding" => return Some(Self::StopRiding),
+            "InteractUpdate" => return Some(Self::InteractUpdate),
+            "NpcOpen" => return Some(Self::NpcOpen),
+            "OpenInventory" => return Some(Self::OpenInventory),
+            _ => {}
+        }
         const NAMES: &[(&str, InteractPacketPayloadAction)] = &[
             ("Invalid", InteractPacketPayloadAction::Invalid),
             ("StopRiding", InteractPacketPayloadAction::StopRiding),
@@ -12728,10 +15519,7 @@ impl ProtocolEnum for InteractPacketPayloadAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12807,7 +15595,22 @@ impl ProtocolEnum for InventoryLayout {
             Self::RecipeBookOnly => "RecipeBookOnly",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::InventoryOnly => "inventoryonly",
+            Self::Default => "default",
+            Self::RecipeBookOnly => "recipebookonly",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "InventoryOnly" => return Some(Self::InventoryOnly),
+            "Default" => return Some(Self::Default),
+            "RecipeBookOnly" => return Some(Self::RecipeBookOnly),
+            _ => {}
+        }
         const NAMES: &[(&str, InventoryLayout)] = &[
             ("None", InventoryLayout::None),
             ("InventoryOnly", InventoryLayout::InventoryOnly),
@@ -12816,10 +15619,7 @@ impl ProtocolEnum for InventoryLayout {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -12913,7 +15713,28 @@ impl ProtocolEnum for InventoryLeftTabIndex {
             Self::Survival => "Survival",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::RecipeConstruction => "recipeconstruction",
+            Self::RecipeEquipment => "recipeequipment",
+            Self::RecipeItems => "recipeitems",
+            Self::RecipeNature => "recipenature",
+            Self::RecipeSearch => "recipesearch",
+            Self::Survival => "survival",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "RecipeConstruction" => return Some(Self::RecipeConstruction),
+            "RecipeEquipment" => return Some(Self::RecipeEquipment),
+            "RecipeItems" => return Some(Self::RecipeItems),
+            "RecipeNature" => return Some(Self::RecipeNature),
+            "RecipeSearch" => return Some(Self::RecipeSearch),
+            "Survival" => return Some(Self::Survival),
+            _ => {}
+        }
         const NAMES: &[(&str, InventoryLeftTabIndex)] = &[
             ("None", InventoryLeftTabIndex::None),
             ("RecipeConstruction", InventoryLeftTabIndex::RecipeConstruction),
@@ -12925,10 +15746,7 @@ impl ProtocolEnum for InventoryLeftTabIndex {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13022,7 +15840,28 @@ impl ProtocolEnum for InventoryLeftTabPocketIndex {
             Self::RecipeSearch => "RecipeSearch",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Survival => "survival",
+            Self::RecipeNature => "recipenature",
+            Self::RecipeItems => "recipeitems",
+            Self::RecipeEquipment => "recipeequipment",
+            Self::RecipeConstruction => "recipeconstruction",
+            Self::RecipeSearch => "recipesearch",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Survival" => return Some(Self::Survival),
+            "RecipeNature" => return Some(Self::RecipeNature),
+            "RecipeItems" => return Some(Self::RecipeItems),
+            "RecipeEquipment" => return Some(Self::RecipeEquipment),
+            "RecipeConstruction" => return Some(Self::RecipeConstruction),
+            "RecipeSearch" => return Some(Self::RecipeSearch),
+            _ => {}
+        }
         const NAMES: &[(&str, InventoryLeftTabPocketIndex)] = &[
             ("None", InventoryLeftTabPocketIndex::None),
             ("Survival", InventoryLeftTabPocketIndex::Survival),
@@ -13034,10 +15873,7 @@ impl ProtocolEnum for InventoryLeftTabPocketIndex {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13113,7 +15949,22 @@ impl ProtocolEnum for InventoryRightTabIndex {
             Self::Armor => "Armor",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::FullScreen => "fullscreen",
+            Self::Crafting => "crafting",
+            Self::Armor => "armor",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "FullScreen" => return Some(Self::FullScreen),
+            "Crafting" => return Some(Self::Crafting),
+            "Armor" => return Some(Self::Armor),
+            _ => {}
+        }
         const NAMES: &[(&str, InventoryRightTabIndex)] = &[
             ("None", InventoryRightTabIndex::None),
             ("FullScreen", InventoryRightTabIndex::FullScreen),
@@ -13122,10 +15973,7 @@ impl ProtocolEnum for InventoryRightTabIndex {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13186,17 +16034,25 @@ impl ProtocolEnum for InventorySourceFlags {
             Self::WorldInteractionRandom => "World Interaction Random",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoFlag => "no flag",
+            Self::WorldInteractionRandom => "world interaction random",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "No Flag" => return Some(Self::NoFlag),
+            "World Interaction Random" => return Some(Self::WorldInteractionRandom),
+            _ => {}
+        }
         const NAMES: &[(&str, InventorySourceFlags)] = &[
             ("No Flag", InventorySourceFlags::NoFlag),
             ("World Interaction Random", InventorySourceFlags::WorldInteractionRandom),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13278,7 +16134,26 @@ impl ProtocolEnum for InventorySourceType {
             Self::NonImplementedFeatureTodo => "Non Implemented Feature TODO",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ContainerInventory => "container inventory",
+            Self::GlobalInventory => "global inventory",
+            Self::WorldInteraction => "world interaction",
+            Self::CreativeInventory => "creative inventory",
+            Self::NonImplementedFeatureTodo => "non implemented feature todo",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Container Inventory" => return Some(Self::ContainerInventory),
+            "Global Inventory" => return Some(Self::GlobalInventory),
+            "World Interaction" => return Some(Self::WorldInteraction),
+            "Creative Inventory" => return Some(Self::CreativeInventory),
+            "Non Implemented Feature TODO" => {
+                return Some(Self::NonImplementedFeatureTodo);
+            }
+            _ => {}
+        }
         const NAMES: &[(&str, InventorySourceType)] = &[
             ("Container Inventory", InventorySourceType::ContainerInventory),
             ("Global Inventory", InventorySourceType::GlobalInventory),
@@ -13291,10 +16166,7 @@ impl ProtocolEnum for InventorySourceType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13370,7 +16242,22 @@ impl ProtocolEnum for ItemDescriptorType {
             Self::ItemTag => "ItemTag",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Empty => "empty",
+            Self::ItemName => "itemname",
+            Self::Molang => "molang",
+            Self::ItemTag => "itemtag",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Empty" => return Some(Self::Empty),
+            "ItemName" => return Some(Self::ItemName),
+            "Molang" => return Some(Self::Molang),
+            "ItemTag" => return Some(Self::ItemTag),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemDescriptorType)] = &[
             ("Empty", ItemDescriptorType::Empty),
             ("ItemName", ItemDescriptorType::ItemName),
@@ -13379,10 +16266,7 @@ impl ProtocolEnum for ItemDescriptorType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13443,17 +16327,25 @@ impl ProtocolEnum for ItemReleaseActionType {
             Self::Use => "Use",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Release => "release",
+            Self::Use => "use",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Release" => return Some(Self::Release),
+            "Use" => return Some(Self::Use),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemReleaseActionType)] = &[
             ("Release", ItemReleaseActionType::Release),
             ("Use", ItemReleaseActionType::Use),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -13931,7 +16823,210 @@ impl ProtocolEnum for ItemStackNetResult {
             Self::ScreenStackError => "ScreenStackError",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Success => "success",
+            Self::Error => "error",
+            Self::InvalidRequestActionType => "invalidrequestactiontype",
+            Self::ActionRequestNotAllowed => "actionrequestnotallowed",
+            Self::ScreenHandlerEndRequestFailed => "screenhandlerendrequestfailed",
+            Self::ItemRequestActionHandlerCommitFailed => {
+                "itemrequestactionhandlercommitfailed"
+            }
+            Self::InvalidRequestCraftActionType => "invalidrequestcraftactiontype",
+            Self::InvalidCraftRequest => "invalidcraftrequest",
+            Self::InvalidCraftRequestScreen => "invalidcraftrequestscreen",
+            Self::InvalidCraftResult => "invalidcraftresult",
+            Self::InvalidCraftResultIndex => "invalidcraftresultindex",
+            Self::InvalidCraftResultItem => "invalidcraftresultitem",
+            Self::InvalidItemNetId => "invaliditemnetid",
+            Self::MissingCreatedOutputContainer => "missingcreatedoutputcontainer",
+            Self::FailedToSetCreatedItemOutputSlot => "failedtosetcreateditemoutputslot",
+            Self::RequestAlreadyInProgress => "requestalreadyinprogress",
+            Self::FailedToInitSparseContainer => "failedtoinitsparsecontainer",
+            Self::ResultTransferFailed => "resulttransferfailed",
+            Self::ExpectedItemSlotNotFullyConsumed => "expecteditemslotnotfullyconsumed",
+            Self::ExpectedAnywhereItemNotFullyConsumed => {
+                "expectedanywhereitemnotfullyconsumed"
+            }
+            Self::ItemAlreadyConsumedFromSlot => "itemalreadyconsumedfromslot",
+            Self::ConsumedTooMuchFromSlot => "consumedtoomuchfromslot",
+            Self::MismatchSlotExpectedConsumedItem => "mismatchslotexpectedconsumeditem",
+            Self::MismatchSlotExpectedConsumedItemNetIdVariant => {
+                "mismatchslotexpectedconsumeditemnetidvariant"
+            }
+            Self::FailedToMatchExpectedSlotConsumedItem => {
+                "failedtomatchexpectedslotconsumeditem"
+            }
+            Self::FailedToMatchExpectedAllowedAnywhereConsumedItem => {
+                "failedtomatchexpectedallowedanywhereconsumeditem"
+            }
+            Self::ConsumedItemOutOfAllowedSlotRange => {
+                "consumeditemoutofallowedslotrange"
+            }
+            Self::ConsumedItemNotAllowed => "consumeditemnotallowed",
+            Self::PlayerNotInCreativeMode => "playernotincreativemode",
+            Self::InvalidExperimentalRecipeRequest => "invalidexperimentalreciperequest",
+            Self::FailedToCraftCreative => "failedtocraftcreative",
+            Self::FailedToGetLevelRecipe => "failedtogetlevelrecipe",
+            Self::FailedToFindRecipeByNetId => "failedtofindrecipebynetid",
+            Self::MismatchedCraftingSize => "mismatchedcraftingsize",
+            Self::MissingInputSparseContainer => "missinginputsparsecontainer",
+            Self::MismatchedRecipeForInputGridItems => {
+                "mismatchedrecipeforinputgriditems"
+            }
+            Self::EmptyCraftResults => "emptycraftresults",
+            Self::FailedToEnchant => "failedtoenchant",
+            Self::MissingInputItem => "missinginputitem",
+            Self::InsufficientPlayerLevelToEnchant => "insufficientplayerleveltoenchant",
+            Self::MissingMaterialItem => "missingmaterialitem",
+            Self::MissingActor => "missingactor",
+            Self::UnknownPrimaryEffect => "unknownprimaryeffect",
+            Self::PrimaryEffectOutOfRange => "primaryeffectoutofrange",
+            Self::PrimaryEffectUnavailable => "primaryeffectunavailable",
+            Self::SecondaryEffectOutOfRange => "secondaryeffectoutofrange",
+            Self::SecondaryEffectUnavailable => "secondaryeffectunavailable",
+            Self::DstContainerEqualToCreatedOutputContainer => {
+                "dstcontainerequaltocreatedoutputcontainer"
+            }
+            Self::DstContainerAndSlotEqualToSrcContainerAndSlot => {
+                "dstcontainerandslotequaltosrccontainerandslot"
+            }
+            Self::FailedToValidateSrcSlot => "failedtovalidatesrcslot",
+            Self::FailedToValidateDstSlot => "failedtovalidatedstslot",
+            Self::InvalidAdjustedAmount => "invalidadjustedamount",
+            Self::InvalidItemSetType => "invaliditemsettype",
+            Self::InvalidTransferAmount => "invalidtransferamount",
+            Self::CannotSwapItem => "cannotswapitem",
+            Self::CannotPlaceItem => "cannotplaceitem",
+            Self::UnhandledItemSetType => "unhandleditemsettype",
+            Self::InvalidRemovedAmount => "invalidremovedamount",
+            Self::InvalidRegion => "invalidregion",
+            Self::CannotDropItem => "cannotdropitem",
+            Self::CannotDestroyItem => "cannotdestroyitem",
+            Self::InvalidSourceContainer => "invalidsourcecontainer",
+            Self::ItemNotConsumed => "itemnotconsumed",
+            Self::InvalidNumCrafts => "invalidnumcrafts",
+            Self::InvalidCraftResultStackSize => "invalidcraftresultstacksize",
+            Self::CannotRemoveItem => "cannotremoveitem",
+            Self::CannotConsumeItem => "cannotconsumeitem",
+            Self::ScreenStackError => "screenstackerror",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Success" => return Some(Self::Success),
+            "Error" => return Some(Self::Error),
+            "InvalidRequestActionType" => return Some(Self::InvalidRequestActionType),
+            "ActionRequestNotAllowed" => return Some(Self::ActionRequestNotAllowed),
+            "ScreenHandlerEndRequestFailed" => {
+                return Some(Self::ScreenHandlerEndRequestFailed);
+            }
+            "ItemRequestActionHandlerCommitFailed" => {
+                return Some(Self::ItemRequestActionHandlerCommitFailed);
+            }
+            "InvalidRequestCraftActionType" => {
+                return Some(Self::InvalidRequestCraftActionType);
+            }
+            "InvalidCraftRequest" => return Some(Self::InvalidCraftRequest),
+            "InvalidCraftRequestScreen" => return Some(Self::InvalidCraftRequestScreen),
+            "InvalidCraftResult" => return Some(Self::InvalidCraftResult),
+            "InvalidCraftResultIndex" => return Some(Self::InvalidCraftResultIndex),
+            "InvalidCraftResultItem" => return Some(Self::InvalidCraftResultItem),
+            "InvalidItemNetId" => return Some(Self::InvalidItemNetId),
+            "MissingCreatedOutputContainer" => {
+                return Some(Self::MissingCreatedOutputContainer);
+            }
+            "FailedToSetCreatedItemOutputSlot" => {
+                return Some(Self::FailedToSetCreatedItemOutputSlot);
+            }
+            "RequestAlreadyInProgress" => return Some(Self::RequestAlreadyInProgress),
+            "FailedToInitSparseContainer" => {
+                return Some(Self::FailedToInitSparseContainer);
+            }
+            "ResultTransferFailed" => return Some(Self::ResultTransferFailed),
+            "ExpectedItemSlotNotFullyConsumed" => {
+                return Some(Self::ExpectedItemSlotNotFullyConsumed);
+            }
+            "ExpectedAnywhereItemNotFullyConsumed" => {
+                return Some(Self::ExpectedAnywhereItemNotFullyConsumed);
+            }
+            "ItemAlreadyConsumedFromSlot" => {
+                return Some(Self::ItemAlreadyConsumedFromSlot);
+            }
+            "ConsumedTooMuchFromSlot" => return Some(Self::ConsumedTooMuchFromSlot),
+            "MismatchSlotExpectedConsumedItem" => {
+                return Some(Self::MismatchSlotExpectedConsumedItem);
+            }
+            "MismatchSlotExpectedConsumedItemNetIdVariant" => {
+                return Some(Self::MismatchSlotExpectedConsumedItemNetIdVariant);
+            }
+            "FailedToMatchExpectedSlotConsumedItem" => {
+                return Some(Self::FailedToMatchExpectedSlotConsumedItem);
+            }
+            "FailedToMatchExpectedAllowedAnywhereConsumedItem" => {
+                return Some(Self::FailedToMatchExpectedAllowedAnywhereConsumedItem);
+            }
+            "ConsumedItemOutOfAllowedSlotRange" => {
+                return Some(Self::ConsumedItemOutOfAllowedSlotRange);
+            }
+            "ConsumedItemNotAllowed" => return Some(Self::ConsumedItemNotAllowed),
+            "PlayerNotInCreativeMode" => return Some(Self::PlayerNotInCreativeMode),
+            "InvalidExperimentalRecipeRequest" => {
+                return Some(Self::InvalidExperimentalRecipeRequest);
+            }
+            "FailedToCraftCreative" => return Some(Self::FailedToCraftCreative),
+            "FailedToGetLevelRecipe" => return Some(Self::FailedToGetLevelRecipe),
+            "FailedToFindRecipeByNetId" => return Some(Self::FailedToFindRecipeByNetId),
+            "MismatchedCraftingSize" => return Some(Self::MismatchedCraftingSize),
+            "MissingInputSparseContainer" => {
+                return Some(Self::MissingInputSparseContainer);
+            }
+            "MismatchedRecipeForInputGridItems" => {
+                return Some(Self::MismatchedRecipeForInputGridItems);
+            }
+            "EmptyCraftResults" => return Some(Self::EmptyCraftResults),
+            "FailedToEnchant" => return Some(Self::FailedToEnchant),
+            "MissingInputItem" => return Some(Self::MissingInputItem),
+            "InsufficientPlayerLevelToEnchant" => {
+                return Some(Self::InsufficientPlayerLevelToEnchant);
+            }
+            "MissingMaterialItem" => return Some(Self::MissingMaterialItem),
+            "MissingActor" => return Some(Self::MissingActor),
+            "UnknownPrimaryEffect" => return Some(Self::UnknownPrimaryEffect),
+            "PrimaryEffectOutOfRange" => return Some(Self::PrimaryEffectOutOfRange),
+            "PrimaryEffectUnavailable" => return Some(Self::PrimaryEffectUnavailable),
+            "SecondaryEffectOutOfRange" => return Some(Self::SecondaryEffectOutOfRange),
+            "SecondaryEffectUnavailable" => return Some(Self::SecondaryEffectUnavailable),
+            "DstContainerEqualToCreatedOutputContainer" => {
+                return Some(Self::DstContainerEqualToCreatedOutputContainer);
+            }
+            "DstContainerAndSlotEqualToSrcContainerAndSlot" => {
+                return Some(Self::DstContainerAndSlotEqualToSrcContainerAndSlot);
+            }
+            "FailedToValidateSrcSlot" => return Some(Self::FailedToValidateSrcSlot),
+            "FailedToValidateDstSlot" => return Some(Self::FailedToValidateDstSlot),
+            "InvalidAdjustedAmount" => return Some(Self::InvalidAdjustedAmount),
+            "InvalidItemSetType" => return Some(Self::InvalidItemSetType),
+            "InvalidTransferAmount" => return Some(Self::InvalidTransferAmount),
+            "CannotSwapItem" => return Some(Self::CannotSwapItem),
+            "CannotPlaceItem" => return Some(Self::CannotPlaceItem),
+            "UnhandledItemSetType" => return Some(Self::UnhandledItemSetType),
+            "InvalidRemovedAmount" => return Some(Self::InvalidRemovedAmount),
+            "InvalidRegion" => return Some(Self::InvalidRegion),
+            "CannotDropItem" => return Some(Self::CannotDropItem),
+            "CannotDestroyItem" => return Some(Self::CannotDestroyItem),
+            "InvalidSourceContainer" => return Some(Self::InvalidSourceContainer),
+            "ItemNotConsumed" => return Some(Self::ItemNotConsumed),
+            "InvalidNumCrafts" => return Some(Self::InvalidNumCrafts),
+            "InvalidCraftResultStackSize" => {
+                return Some(Self::InvalidCraftResultStackSize);
+            }
+            "CannotRemoveItem" => return Some(Self::CannotRemoveItem),
+            "CannotConsumeItem" => return Some(Self::CannotConsumeItem),
+            "ScreenStackError" => return Some(Self::ScreenStackError),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemStackNetResult)] = &[
             ("Success", ItemStackNetResult::Success),
             ("Error", ItemStackNetResult::Error),
@@ -14070,10 +17165,7 @@ impl ProtocolEnum for ItemStackNetResult {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -14239,7 +17331,52 @@ impl ProtocolEnum for ItemStackRequestActionType {
             Self::CraftResults => "CraftResults",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Take => "take",
+            Self::Place => "place",
+            Self::Swap => "swap",
+            Self::Drop => "drop",
+            Self::Destroy => "destroy",
+            Self::Consume => "consume",
+            Self::Create => "create",
+            Self::ScreenLabTableCombine => "screenlabtablecombine",
+            Self::ScreenBeaconPayment => "screenbeaconpayment",
+            Self::ScreenHUDMineBlock => "screenhudmineblock",
+            Self::CraftRecipe => "craftrecipe",
+            Self::CraftRecipeAuto => "craftrecipeauto",
+            Self::CraftCreative => "craftcreative",
+            Self::CraftRecipeOptional => "craftrecipeoptional",
+            Self::CraftRepairAndDisenchant => "craftrepairanddisenchant",
+            Self::CraftLoom => "craftloom",
+            Self::CraftDiscPress => "craftdiscpress",
+            Self::CraftNonImplemented => "craftnonimplemented",
+            Self::CraftResults => "craftresults",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Take" => return Some(Self::Take),
+            "Place" => return Some(Self::Place),
+            "Swap" => return Some(Self::Swap),
+            "Drop" => return Some(Self::Drop),
+            "Destroy" => return Some(Self::Destroy),
+            "Consume" => return Some(Self::Consume),
+            "Create" => return Some(Self::Create),
+            "ScreenLabTableCombine" => return Some(Self::ScreenLabTableCombine),
+            "ScreenBeaconPayment" => return Some(Self::ScreenBeaconPayment),
+            "ScreenHUDMineBlock" => return Some(Self::ScreenHUDMineBlock),
+            "CraftRecipe" => return Some(Self::CraftRecipe),
+            "CraftRecipeAuto" => return Some(Self::CraftRecipeAuto),
+            "CraftCreative" => return Some(Self::CraftCreative),
+            "CraftRecipeOptional" => return Some(Self::CraftRecipeOptional),
+            "CraftRepairAndDisenchant" => return Some(Self::CraftRepairAndDisenchant),
+            "CraftLoom" => return Some(Self::CraftLoom),
+            "CraftDiscPress" => return Some(Self::CraftDiscPress),
+            "CraftNonImplemented" => return Some(Self::CraftNonImplemented),
+            "CraftResults" => return Some(Self::CraftResults),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemStackRequestActionType)] = &[
             ("Take", ItemStackRequestActionType::Take),
             ("Place", ItemStackRequestActionType::Place),
@@ -14266,10 +17403,7 @@ impl ProtocolEnum for ItemStackRequestActionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -14749,7 +17883,210 @@ impl ProtocolEnum for ItemStackResponseInfoResult {
             Self::ScreenStackError => "ScreenStackError",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Success => "success",
+            Self::Error => "error",
+            Self::InvalidRequestActionType => "invalidrequestactiontype",
+            Self::ActionRequestNotAllowed => "actionrequestnotallowed",
+            Self::ScreenHandlerEndRequestFailed => "screenhandlerendrequestfailed",
+            Self::ItemRequestActionHandlerCommitFailed => {
+                "itemrequestactionhandlercommitfailed"
+            }
+            Self::InvalidRequestCraftActionType => "invalidrequestcraftactiontype",
+            Self::InvalidCraftRequest => "invalidcraftrequest",
+            Self::InvalidCraftRequestScreen => "invalidcraftrequestscreen",
+            Self::InvalidCraftResult => "invalidcraftresult",
+            Self::InvalidCraftResultIndex => "invalidcraftresultindex",
+            Self::InvalidCraftResultItem => "invalidcraftresultitem",
+            Self::InvalidItemNetId => "invaliditemnetid",
+            Self::MissingCreatedOutputContainer => "missingcreatedoutputcontainer",
+            Self::FailedToSetCreatedItemOutputSlot => "failedtosetcreateditemoutputslot",
+            Self::RequestAlreadyInProgress => "requestalreadyinprogress",
+            Self::FailedToInitSparseContainer => "failedtoinitsparsecontainer",
+            Self::ResultTransferFailed => "resulttransferfailed",
+            Self::ExpectedItemSlotNotFullyConsumed => "expecteditemslotnotfullyconsumed",
+            Self::ExpectedAnywhereItemNotFullyConsumed => {
+                "expectedanywhereitemnotfullyconsumed"
+            }
+            Self::ItemAlreadyConsumedFromSlot => "itemalreadyconsumedfromslot",
+            Self::ConsumedTooMuchFromSlot => "consumedtoomuchfromslot",
+            Self::MismatchSlotExpectedConsumedItem => "mismatchslotexpectedconsumeditem",
+            Self::MismatchSlotExpectedConsumedItemNetIdVariant => {
+                "mismatchslotexpectedconsumeditemnetidvariant"
+            }
+            Self::FailedToMatchExpectedSlotConsumedItem => {
+                "failedtomatchexpectedslotconsumeditem"
+            }
+            Self::FailedToMatchExpectedAllowedAnywhereConsumedItem => {
+                "failedtomatchexpectedallowedanywhereconsumeditem"
+            }
+            Self::ConsumedItemOutOfAllowedSlotRange => {
+                "consumeditemoutofallowedslotrange"
+            }
+            Self::ConsumedItemNotAllowed => "consumeditemnotallowed",
+            Self::PlayerNotInCreativeMode => "playernotincreativemode",
+            Self::InvalidExperimentalRecipeRequest => "invalidexperimentalreciperequest",
+            Self::FailedToCraftCreative => "failedtocraftcreative",
+            Self::FailedToGetLevelRecipe => "failedtogetlevelrecipe",
+            Self::FailedToFindRecipeByNetId => "failedtofindrecipebynetid",
+            Self::MismatchedCraftingSize => "mismatchedcraftingsize",
+            Self::MissingInputSparseContainer => "missinginputsparsecontainer",
+            Self::MismatchedRecipeForInputGridItems => {
+                "mismatchedrecipeforinputgriditems"
+            }
+            Self::EmptyCraftResults => "emptycraftresults",
+            Self::FailedToEnchant => "failedtoenchant",
+            Self::MissingInputItem => "missinginputitem",
+            Self::InsufficientPlayerLevelToEnchant => "insufficientplayerleveltoenchant",
+            Self::MissingMaterialItem => "missingmaterialitem",
+            Self::MissingActor => "missingactor",
+            Self::UnknownPrimaryEffect => "unknownprimaryeffect",
+            Self::PrimaryEffectOutOfRange => "primaryeffectoutofrange",
+            Self::PrimaryEffectUnavailable => "primaryeffectunavailable",
+            Self::SecondaryEffectOutOfRange => "secondaryeffectoutofrange",
+            Self::SecondaryEffectUnavailable => "secondaryeffectunavailable",
+            Self::DstContainerEqualToCreatedOutputContainer => {
+                "dstcontainerequaltocreatedoutputcontainer"
+            }
+            Self::DstContainerAndSlotEqualToSrcContainerAndSlot => {
+                "dstcontainerandslotequaltosrccontainerandslot"
+            }
+            Self::FailedToValidateSrcSlot => "failedtovalidatesrcslot",
+            Self::FailedToValidateDstSlot => "failedtovalidatedstslot",
+            Self::InvalidAdjustedAmount => "invalidadjustedamount",
+            Self::InvalidItemSetType => "invaliditemsettype",
+            Self::InvalidTransferAmount => "invalidtransferamount",
+            Self::CannotSwapItem => "cannotswapitem",
+            Self::CannotPlaceItem => "cannotplaceitem",
+            Self::UnhandledItemSetType => "unhandleditemsettype",
+            Self::InvalidRemovedAmount => "invalidremovedamount",
+            Self::InvalidRegion => "invalidregion",
+            Self::CannotDropItem => "cannotdropitem",
+            Self::CannotDestroyItem => "cannotdestroyitem",
+            Self::InvalidSourceContainer => "invalidsourcecontainer",
+            Self::ItemNotConsumed => "itemnotconsumed",
+            Self::InvalidNumCrafts => "invalidnumcrafts",
+            Self::InvalidCraftResultStackSize => "invalidcraftresultstacksize",
+            Self::CannotRemoveItem => "cannotremoveitem",
+            Self::CannotConsumeItem => "cannotconsumeitem",
+            Self::ScreenStackError => "screenstackerror",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Success" => return Some(Self::Success),
+            "Error" => return Some(Self::Error),
+            "InvalidRequestActionType" => return Some(Self::InvalidRequestActionType),
+            "ActionRequestNotAllowed" => return Some(Self::ActionRequestNotAllowed),
+            "ScreenHandlerEndRequestFailed" => {
+                return Some(Self::ScreenHandlerEndRequestFailed);
+            }
+            "ItemRequestActionHandlerCommitFailed" => {
+                return Some(Self::ItemRequestActionHandlerCommitFailed);
+            }
+            "InvalidRequestCraftActionType" => {
+                return Some(Self::InvalidRequestCraftActionType);
+            }
+            "InvalidCraftRequest" => return Some(Self::InvalidCraftRequest),
+            "InvalidCraftRequestScreen" => return Some(Self::InvalidCraftRequestScreen),
+            "InvalidCraftResult" => return Some(Self::InvalidCraftResult),
+            "InvalidCraftResultIndex" => return Some(Self::InvalidCraftResultIndex),
+            "InvalidCraftResultItem" => return Some(Self::InvalidCraftResultItem),
+            "InvalidItemNetId" => return Some(Self::InvalidItemNetId),
+            "MissingCreatedOutputContainer" => {
+                return Some(Self::MissingCreatedOutputContainer);
+            }
+            "FailedToSetCreatedItemOutputSlot" => {
+                return Some(Self::FailedToSetCreatedItemOutputSlot);
+            }
+            "RequestAlreadyInProgress" => return Some(Self::RequestAlreadyInProgress),
+            "FailedToInitSparseContainer" => {
+                return Some(Self::FailedToInitSparseContainer);
+            }
+            "ResultTransferFailed" => return Some(Self::ResultTransferFailed),
+            "ExpectedItemSlotNotFullyConsumed" => {
+                return Some(Self::ExpectedItemSlotNotFullyConsumed);
+            }
+            "ExpectedAnywhereItemNotFullyConsumed" => {
+                return Some(Self::ExpectedAnywhereItemNotFullyConsumed);
+            }
+            "ItemAlreadyConsumedFromSlot" => {
+                return Some(Self::ItemAlreadyConsumedFromSlot);
+            }
+            "ConsumedTooMuchFromSlot" => return Some(Self::ConsumedTooMuchFromSlot),
+            "MismatchSlotExpectedConsumedItem" => {
+                return Some(Self::MismatchSlotExpectedConsumedItem);
+            }
+            "MismatchSlotExpectedConsumedItemNetIdVariant" => {
+                return Some(Self::MismatchSlotExpectedConsumedItemNetIdVariant);
+            }
+            "FailedToMatchExpectedSlotConsumedItem" => {
+                return Some(Self::FailedToMatchExpectedSlotConsumedItem);
+            }
+            "FailedToMatchExpectedAllowedAnywhereConsumedItem" => {
+                return Some(Self::FailedToMatchExpectedAllowedAnywhereConsumedItem);
+            }
+            "ConsumedItemOutOfAllowedSlotRange" => {
+                return Some(Self::ConsumedItemOutOfAllowedSlotRange);
+            }
+            "ConsumedItemNotAllowed" => return Some(Self::ConsumedItemNotAllowed),
+            "PlayerNotInCreativeMode" => return Some(Self::PlayerNotInCreativeMode),
+            "InvalidExperimentalRecipeRequest" => {
+                return Some(Self::InvalidExperimentalRecipeRequest);
+            }
+            "FailedToCraftCreative" => return Some(Self::FailedToCraftCreative),
+            "FailedToGetLevelRecipe" => return Some(Self::FailedToGetLevelRecipe),
+            "FailedToFindRecipeByNetId" => return Some(Self::FailedToFindRecipeByNetId),
+            "MismatchedCraftingSize" => return Some(Self::MismatchedCraftingSize),
+            "MissingInputSparseContainer" => {
+                return Some(Self::MissingInputSparseContainer);
+            }
+            "MismatchedRecipeForInputGridItems" => {
+                return Some(Self::MismatchedRecipeForInputGridItems);
+            }
+            "EmptyCraftResults" => return Some(Self::EmptyCraftResults),
+            "FailedToEnchant" => return Some(Self::FailedToEnchant),
+            "MissingInputItem" => return Some(Self::MissingInputItem),
+            "InsufficientPlayerLevelToEnchant" => {
+                return Some(Self::InsufficientPlayerLevelToEnchant);
+            }
+            "MissingMaterialItem" => return Some(Self::MissingMaterialItem),
+            "MissingActor" => return Some(Self::MissingActor),
+            "UnknownPrimaryEffect" => return Some(Self::UnknownPrimaryEffect),
+            "PrimaryEffectOutOfRange" => return Some(Self::PrimaryEffectOutOfRange),
+            "PrimaryEffectUnavailable" => return Some(Self::PrimaryEffectUnavailable),
+            "SecondaryEffectOutOfRange" => return Some(Self::SecondaryEffectOutOfRange),
+            "SecondaryEffectUnavailable" => return Some(Self::SecondaryEffectUnavailable),
+            "DstContainerEqualToCreatedOutputContainer" => {
+                return Some(Self::DstContainerEqualToCreatedOutputContainer);
+            }
+            "DstContainerAndSlotEqualToSrcContainerAndSlot" => {
+                return Some(Self::DstContainerAndSlotEqualToSrcContainerAndSlot);
+            }
+            "FailedToValidateSrcSlot" => return Some(Self::FailedToValidateSrcSlot),
+            "FailedToValidateDstSlot" => return Some(Self::FailedToValidateDstSlot),
+            "InvalidAdjustedAmount" => return Some(Self::InvalidAdjustedAmount),
+            "InvalidItemSetType" => return Some(Self::InvalidItemSetType),
+            "InvalidTransferAmount" => return Some(Self::InvalidTransferAmount),
+            "CannotSwapItem" => return Some(Self::CannotSwapItem),
+            "CannotPlaceItem" => return Some(Self::CannotPlaceItem),
+            "UnhandledItemSetType" => return Some(Self::UnhandledItemSetType),
+            "InvalidRemovedAmount" => return Some(Self::InvalidRemovedAmount),
+            "InvalidRegion" => return Some(Self::InvalidRegion),
+            "CannotDropItem" => return Some(Self::CannotDropItem),
+            "CannotDestroyItem" => return Some(Self::CannotDestroyItem),
+            "InvalidSourceContainer" => return Some(Self::InvalidSourceContainer),
+            "ItemNotConsumed" => return Some(Self::ItemNotConsumed),
+            "InvalidNumCrafts" => return Some(Self::InvalidNumCrafts),
+            "InvalidCraftResultStackSize" => {
+                return Some(Self::InvalidCraftResultStackSize);
+            }
+            "CannotRemoveItem" => return Some(Self::CannotRemoveItem),
+            "CannotConsumeItem" => return Some(Self::CannotConsumeItem),
+            "ScreenStackError" => return Some(Self::ScreenStackError),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemStackResponseInfoResult)] = &[
             ("Success", ItemStackResponseInfoResult::Success),
             ("Error", ItemStackResponseInfoResult::Error),
@@ -14951,10 +18288,7 @@ impl ProtocolEnum for ItemStackResponseInfoResult {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15030,7 +18364,22 @@ impl ProtocolEnum for ItemUseActionType {
             Self::UseAsAttack => "Use As Attack",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Place => "place",
+            Self::Use => "use",
+            Self::Destroy => "destroy",
+            Self::UseAsAttack => "use as attack",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Place" => return Some(Self::Place),
+            "Use" => return Some(Self::Use),
+            "Destroy" => return Some(Self::Destroy),
+            "Use As Attack" => return Some(Self::UseAsAttack),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemUseActionType)] = &[
             ("Place", ItemUseActionType::Place),
             ("Use", ItemUseActionType::Use),
@@ -15039,10 +18388,7 @@ impl ProtocolEnum for ItemUseActionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15103,17 +18449,25 @@ impl ProtocolEnum for ItemUseClientCooldownState {
             Self::On => "On",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Off => "off",
+            Self::On => "on",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Off" => return Some(Self::Off),
+            "On" => return Some(Self::On),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemUseClientCooldownState)] = &[
             ("Off", ItemUseClientCooldownState::Off),
             ("On", ItemUseClientCooldownState::On),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15179,7 +18533,20 @@ impl ProtocolEnum for ItemUseOnActorActionType {
             Self::ItemInteract => "Item Interact",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Interact => "interact",
+            Self::Attack => "attack",
+            Self::ItemInteract => "item interact",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Interact" => return Some(Self::Interact),
+            "Attack" => return Some(Self::Attack),
+            "Item Interact" => return Some(Self::ItemInteract),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemUseOnActorActionType)] = &[
             ("Interact", ItemUseOnActorActionType::Interact),
             ("Attack", ItemUseOnActorActionType::Attack),
@@ -15187,10 +18554,7 @@ impl ProtocolEnum for ItemUseOnActorActionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15251,17 +18615,25 @@ impl ProtocolEnum for ItemUsePredictedResult {
             Self::Success => "Success",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Failure => "failure",
+            Self::Success => "success",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Failure" => return Some(Self::Failure),
+            "Success" => return Some(Self::Success),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemUsePredictedResult)] = &[
             ("Failure", ItemUsePredictedResult::Failure),
             ("Success", ItemUsePredictedResult::Success),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15331,7 +18703,20 @@ impl ProtocolEnum for ItemUseTriggerType {
             Self::SimulationTick => "Simulation Tick",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::PlayerInput => "player input",
+            Self::SimulationTick => "simulation tick",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "Player Input" => return Some(Self::PlayerInput),
+            "Simulation Tick" => return Some(Self::SimulationTick),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemUseTriggerType)] = &[
             ("Unknown", ItemUseTriggerType::Unknown),
             ("Player Input", ItemUseTriggerType::PlayerInput),
@@ -15339,10 +18724,7 @@ impl ProtocolEnum for ItemUseTriggerType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15408,7 +18790,20 @@ impl ProtocolEnum for ItemVersion {
             Self::None => "None",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Legacy => "legacy",
+            Self::DataDriven => "datadriven",
+            Self::None => "none",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Legacy" => return Some(Self::Legacy),
+            "DataDriven" => return Some(Self::DataDriven),
+            "None" => return Some(Self::None),
+            _ => {}
+        }
         const NAMES: &[(&str, ItemVersion)] = &[
             ("Legacy", ItemVersion::Legacy),
             ("DataDriven", ItemVersion::DataDriven),
@@ -15416,10 +18811,7 @@ impl ProtocolEnum for ItemVersion {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15489,7 +18881,20 @@ impl ProtocolEnum for LabTablePacketPayloadType {
             Self::Reset => "Reset",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::StartCombine => "startcombine",
+            Self::StartReaction => "startreaction",
+            Self::Reset => "reset",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "StartCombine" => return Some(Self::StartCombine),
+            "StartReaction" => return Some(Self::StartReaction),
+            "Reset" => return Some(Self::Reset),
+            _ => {}
+        }
         const NAMES: &[(&str, LabTablePacketPayloadType)] = &[
             ("StartCombine", LabTablePacketPayloadType::StartCombine),
             ("StartReaction", LabTablePacketPayloadType::StartReaction),
@@ -15497,10 +18902,7 @@ impl ProtocolEnum for LabTablePacketPayloadType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15630,7 +19032,40 @@ impl ProtocolEnum for LabTableReactionType {
             Self::MiscLargeSmoke => "MiscLargeSmoke",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::IceBomb => "icebomb",
+            Self::Bleach => "bleach",
+            Self::ElephantToothpaste => "elephanttoothpaste",
+            Self::Fertilizer => "fertilizer",
+            Self::HeatBlock => "heatblock",
+            Self::MagnesiumSalts => "magnesiumsalts",
+            Self::MiscFire => "miscfire",
+            Self::MiscExplosion => "miscexplosion",
+            Self::MiscLava => "misclava",
+            Self::MiscMystical => "miscmystical",
+            Self::MiscSmoke => "miscsmoke",
+            Self::MiscLargeSmoke => "misclargesmoke",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "IceBomb" => return Some(Self::IceBomb),
+            "Bleach" => return Some(Self::Bleach),
+            "ElephantToothpaste" => return Some(Self::ElephantToothpaste),
+            "Fertilizer" => return Some(Self::Fertilizer),
+            "HeatBlock" => return Some(Self::HeatBlock),
+            "MagnesiumSalts" => return Some(Self::MagnesiumSalts),
+            "MiscFire" => return Some(Self::MiscFire),
+            "MiscExplosion" => return Some(Self::MiscExplosion),
+            "MiscLava" => return Some(Self::MiscLava),
+            "MiscMystical" => return Some(Self::MiscMystical),
+            "MiscSmoke" => return Some(Self::MiscSmoke),
+            "MiscLargeSmoke" => return Some(Self::MiscLargeSmoke),
+            _ => {}
+        }
         const NAMES: &[(&str, LabTableReactionType)] = &[
             ("None", LabTableReactionType::None),
             ("IceBomb", LabTableReactionType::IceBomb),
@@ -15648,10 +19083,7 @@ impl ProtocolEnum for LabTableReactionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -15895,7 +19327,84 @@ impl ProtocolEnum for LegacyTelemetryEventPacketPayloadType {
             Self::ItemUsed => "ItemUsed",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Achievement => "achievement",
+            Self::Interaction => "interaction",
+            Self::PortalCreated => "portalcreated",
+            Self::PortalUsed => "portalused",
+            Self::MobKilled => "mobkilled",
+            Self::CauldronUsed => "cauldronused",
+            Self::PlayerDied => "playerdied",
+            Self::BossKilled => "bosskilled",
+            Self::AgentCommandObsolete => "agentcommand_obsolete",
+            Self::AgentCreated => "agentcreated",
+            Self::PatternRemovedObsolete => "patternremoved_obsolete",
+            Self::SlashCommand => "slashcommand",
+            Self::FishBucketedObsolete => "fishbucketed_obsolete",
+            Self::MobBorn => "mobborn",
+            Self::PetDiedObsolete => "petdied_obsolete",
+            Self::POICauldronUsed => "poicauldronused",
+            Self::ComposterUsed => "composterused",
+            Self::BellUsed => "bellused",
+            Self::ActorDefinition => "actordefinition",
+            Self::RaidUpdate => "raidupdate",
+            Self::PlayerMovementAnomalyObsolete => "playermovementanomaly_obsolete",
+            Self::PlayerMovementCorrectedObsolete => "playermovementcorrected_obsolete",
+            Self::HoneyHarvested => "honeyharvested",
+            Self::TargetBlockHit => "targetblockhit",
+            Self::PiglinBarter => "piglinbarter",
+            Self::PlayerWaxedOrUnwaxedCopper => "playerwaxedorunwaxedcopper",
+            Self::CodeBuilderRuntimeAction => "codebuilderruntimeaction",
+            Self::CodeBuilderScoreboard => "codebuilderscoreboard",
+            Self::StriderRiddenInLavaInOverworld => "striderriddeninlavainoverworld",
+            Self::SneakCloseToSculkSensor => "sneakclosetosculksensor",
+            Self::CarefulRestoration => "carefulrestoration",
+            Self::ItemUsed => "itemused",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Achievement" => return Some(Self::Achievement),
+            "Interaction" => return Some(Self::Interaction),
+            "PortalCreated" => return Some(Self::PortalCreated),
+            "PortalUsed" => return Some(Self::PortalUsed),
+            "MobKilled" => return Some(Self::MobKilled),
+            "CauldronUsed" => return Some(Self::CauldronUsed),
+            "PlayerDied" => return Some(Self::PlayerDied),
+            "BossKilled" => return Some(Self::BossKilled),
+            "AgentCommand_OBSOLETE" => return Some(Self::AgentCommandObsolete),
+            "AgentCreated" => return Some(Self::AgentCreated),
+            "PatternRemoved_OBSOLETE" => return Some(Self::PatternRemovedObsolete),
+            "SlashCommand" => return Some(Self::SlashCommand),
+            "FishBucketed_OBSOLETE" => return Some(Self::FishBucketedObsolete),
+            "MobBorn" => return Some(Self::MobBorn),
+            "PetDied_OBSOLETE" => return Some(Self::PetDiedObsolete),
+            "POICauldronUsed" => return Some(Self::POICauldronUsed),
+            "ComposterUsed" => return Some(Self::ComposterUsed),
+            "BellUsed" => return Some(Self::BellUsed),
+            "ActorDefinition" => return Some(Self::ActorDefinition),
+            "RaidUpdate" => return Some(Self::RaidUpdate),
+            "PlayerMovementAnomaly_OBSOLETE" => {
+                return Some(Self::PlayerMovementAnomalyObsolete);
+            }
+            "PlayerMovementCorrected_OBSOLETE" => {
+                return Some(Self::PlayerMovementCorrectedObsolete);
+            }
+            "HoneyHarvested" => return Some(Self::HoneyHarvested),
+            "TargetBlockHit" => return Some(Self::TargetBlockHit),
+            "PiglinBarter" => return Some(Self::PiglinBarter),
+            "PlayerWaxedOrUnwaxedCopper" => return Some(Self::PlayerWaxedOrUnwaxedCopper),
+            "CodeBuilderRuntimeAction" => return Some(Self::CodeBuilderRuntimeAction),
+            "CodeBuilderScoreboard" => return Some(Self::CodeBuilderScoreboard),
+            "StriderRiddenInLavaInOverworld" => {
+                return Some(Self::StriderRiddenInLavaInOverworld);
+            }
+            "SneakCloseToSculkSensor" => return Some(Self::SneakCloseToSculkSensor),
+            "CarefulRestoration" => return Some(Self::CarefulRestoration),
+            "ItemUsed" => return Some(Self::ItemUsed),
+            _ => {}
+        }
         const NAMES: &[(&str, LegacyTelemetryEventPacketPayloadType)] = &[
             ("Achievement", LegacyTelemetryEventPacketPayloadType::Achievement),
             ("Interaction", LegacyTelemetryEventPacketPayloadType::Interaction),
@@ -15965,10 +19474,7 @@ impl ProtocolEnum for LegacyTelemetryEventPacketPayloadType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -16034,7 +19540,20 @@ impl ProtocolEnum for LessonAction {
             Self::Restart => "Restart",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Start => "start",
+            Self::Complete => "complete",
+            Self::Restart => "restart",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Start" => return Some(Self::Start),
+            "Complete" => return Some(Self::Complete),
+            "Restart" => return Some(Self::Restart),
+            _ => {}
+        }
         const NAMES: &[(&str, LessonAction)] = &[
             ("Start", LessonAction::Start),
             ("Complete", LessonAction::Complete),
@@ -16042,10 +19561,7 @@ impl ProtocolEnum for LessonAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -19563,7 +23079,1244 @@ impl ProtocolEnum for LevelSoundEvent {
             Self::Undefined => "undefined",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ItemUseOn => "item.use.on",
+            Self::Hit => "hit",
+            Self::Step => "step",
+            Self::StepBaby => "step.baby",
+            Self::Fly => "fly",
+            Self::Jump => "jump",
+            Self::JumpPrevent => "jump.prevent",
+            Self::Break => "break",
+            Self::Place => "place",
+            Self::HeavyStep => "heavy.step",
+            Self::Gallop => "gallop",
+            Self::Fall => "fall",
+            Self::Hurt => "hurt",
+            Self::HurtBaby => "hurt.baby",
+            Self::HurtInWater => "hurt.in.water",
+            Self::Death => "death",
+            Self::DeathBaby => "death.baby",
+            Self::DeathInWater => "death.in.water",
+            Self::DeathToZombie => "death.to.zombie",
+            Self::Ambient => "ambient",
+            Self::AmbientBaby => "ambient.baby",
+            Self::AmbientInWater => "ambient.in.water",
+            Self::AmbientInAir => "ambient.in.air",
+            Self::AmbientTame => "ambient.tame",
+            Self::AmbientPollinate => "ambient.pollinate",
+            Self::Breathe => "breathe",
+            Self::Mad => "mad",
+            Self::Boost => "boost",
+            Self::Bow => "bow",
+            Self::SquishBig => "squish.big",
+            Self::SquishSmall => "squish.small",
+            Self::FallBig => "fall.big",
+            Self::FallSmall => "fall.small",
+            Self::Splash => "splash",
+            Self::Fizz => "fizz",
+            Self::Flap => "flap",
+            Self::Swim => "swim",
+            Self::Drink => "drink",
+            Self::DrinkHoney => "drink.honey",
+            Self::DrinkMilk => "drink.milk",
+            Self::Eat => "eat",
+            Self::Takeoff => "takeoff",
+            Self::Shake => "shake",
+            Self::Plop => "plop",
+            Self::Land => "land",
+            Self::Saddle => "saddle",
+            Self::Armor => "armor",
+            Self::MobArmorStandPlace => "mob.armor_stand.place",
+            Self::AddChest => "add.chest",
+            Self::Throw => "throw",
+            Self::Attack => "attack",
+            Self::AttackNodamage => "attack.nodamage",
+            Self::AttackStrong => "attack.strong",
+            Self::Warn => "warn",
+            Self::Shear => "shear",
+            Self::Milk => "milk",
+            Self::Thunder => "thunder",
+            Self::Explode => "explode",
+            Self::Fire => "fire",
+            Self::Ignite => "ignite",
+            Self::Fuse => "fuse",
+            Self::Stare => "stare",
+            Self::Spawn => "spawn",
+            Self::Born => "born",
+            Self::Shoot => "shoot",
+            Self::BreakBlock => "break.block",
+            Self::Launch => "launch",
+            Self::Blast => "blast",
+            Self::LargeBlast => "large.blast",
+            Self::Twinkle => "twinkle",
+            Self::Remedy => "remedy",
+            Self::Unfect => "unfect",
+            Self::ConvertToDrowned => "convert_to_drowned",
+            Self::Levelup => "levelup",
+            Self::BowHit => "bow.hit",
+            Self::BulletHit => "bullet.hit",
+            Self::ExtinguishFire => "extinguish.fire",
+            Self::ItemFizz => "item.fizz",
+            Self::ChestOpen => "chest.open",
+            Self::ChestClosed => "chest.closed",
+            Self::ShulkerboxOpen => "shulkerbox.open",
+            Self::ShulkerboxClosed => "shulkerbox.closed",
+            Self::EnderchestOpen => "enderchest.open",
+            Self::EnderchestClosed => "enderchest.closed",
+            Self::PowerOn => "power.on",
+            Self::PowerOff => "power.off",
+            Self::Attach => "attach",
+            Self::Detach => "detach",
+            Self::Deny => "deny",
+            Self::Tripod => "tripod",
+            Self::Pop => "pop",
+            Self::DropSlot => "drop.slot",
+            Self::Note => "note",
+            Self::Thorns => "thorns",
+            Self::PistonIn => "piston.in",
+            Self::PistonOut => "piston.out",
+            Self::Portal => "portal",
+            Self::Water => "water",
+            Self::LavaPop => "lava.pop",
+            Self::Lava => "lava",
+            Self::BeaconActivate => "beacon.activate",
+            Self::BeaconAmbient => "beacon.ambient",
+            Self::BeaconDeactivate => "beacon.deactivate",
+            Self::BeaconPower => "beacon.power",
+            Self::ConduitActivate => "conduit.activate",
+            Self::ConduitAmbient => "conduit.ambient",
+            Self::ConduitAttack => "conduit.attack",
+            Self::ConduitDeactivate => "conduit.deactivate",
+            Self::ConduitShort => "conduit.short",
+            Self::BubblePop => "bubble.pop",
+            Self::BubbleUp => "bubble.up",
+            Self::BubbleUpinside => "bubble.upinside",
+            Self::BubbleDown => "bubble.down",
+            Self::BubbleDowninside => "bubble.downinside",
+            Self::Burp => "burp",
+            Self::BucketFillWater => "bucket.fill.water",
+            Self::BucketEmptyWater => "bucket.empty.water",
+            Self::BucketFillLava => "bucket.fill.lava",
+            Self::BucketEmptyLava => "bucket.empty.lava",
+            Self::BucketFillFish => "bucket.fill.fish",
+            Self::BucketEmptyFish => "bucket.empty.fish",
+            Self::ArmorEquipChain => "armor.equip_chain",
+            Self::ArmorEquipDiamond => "armor.equip_diamond",
+            Self::ArmorEquipElytra => "armor.equip_elytra",
+            Self::ArmorEquipGeneric => "armor.equip_generic",
+            Self::ArmorEquipGold => "armor.equip_gold",
+            Self::ArmorEquipIron => "armor.equip_iron",
+            Self::ArmorEquipLeather => "armor.equip_leather",
+            Self::ArmorEquipNetherite => "armor.equip_netherite",
+            Self::Record13 => "record.13",
+            Self::RecordCat => "record.cat",
+            Self::RecordBlocks => "record.blocks",
+            Self::RecordChirp => "record.chirp",
+            Self::RecordCreator => "record.creator",
+            Self::RecordCreatorMusicBox => "record.creator_music_box",
+            Self::RecordFar => "record.far",
+            Self::RecordMall => "record.mall",
+            Self::RecordMellohi => "record.mellohi",
+            Self::RecordStal => "record.stal",
+            Self::RecordStrad => "record.strad",
+            Self::RecordWard => "record.ward",
+            Self::Record11 => "record.11",
+            Self::RecordWait => "record.wait",
+            Self::RecordNull => "record.null",
+            Self::RecordPigstep => "record.pigstep",
+            Self::RecordPrecipice => "record.precipice",
+            Self::RecordRelic => "record.relic",
+            Self::RecordOtherside => "record.otherside",
+            Self::Record5 => "record.5",
+            Self::RecordTears => "record.tears",
+            Self::RecordLavaChicken => "record.lava_chicken",
+            Self::Flop => "flop",
+            Self::ElderguardianCurse => "elderguardian.curse",
+            Self::Teleport => "teleport",
+            Self::ShulkerOpen => "shulker.open",
+            Self::ShulkerClose => "shulker.close",
+            Self::MobWarning => "mob.warning",
+            Self::MobWarningBaby => "mob.warning.baby",
+            Self::Haggle => "haggle",
+            Self::HaggleYes => "haggle.yes",
+            Self::HaggleNo => "haggle.no",
+            Self::HaggleIdle => "haggle.idle",
+            Self::Disappeared => "disappeared",
+            Self::Reappeared => "reappeared",
+            Self::Chorusgrow => "chorusgrow",
+            Self::Chorusdeath => "chorusdeath",
+            Self::Glass => "glass",
+            Self::PotionBrewed => "potion.brewed",
+            Self::CastSpell => "cast.spell",
+            Self::PrepareAttack => "prepare.attack",
+            Self::PrepareSummon => "prepare.summon",
+            Self::PrepareWololo => "prepare.wololo",
+            Self::Fang => "fang",
+            Self::Charge => "charge",
+            Self::CameraTakePicture => "camera.take_picture",
+            Self::LeashknotBreak => "leashknot.break",
+            Self::LeashknotPlace => "leashknot.place",
+            Self::Growl => "growl",
+            Self::Whine => "whine",
+            Self::Pant => "pant",
+            Self::Purr => "purr",
+            Self::Purreow => "purreow",
+            Self::DeathMinVolume => "death.min.volume",
+            Self::DeathMidVolume => "death.mid.volume",
+            Self::ImitateBlaze => "imitate.blaze",
+            Self::ImitateCaveSpider => "imitate.cave_spider",
+            Self::ImitateCreeper => "imitate.creeper",
+            Self::ImitateElderGuardian => "imitate.elder_guardian",
+            Self::ImitateEnderDragon => "imitate.ender_dragon",
+            Self::ImitateEnderman => "imitate.enderman",
+            Self::ImitateEndermite => "imitate.endermite",
+            Self::ImitateEvocationIllager => "imitate.evocation_illager",
+            Self::ImitateGhast => "imitate.ghast",
+            Self::ImitateHusk => "imitate.husk",
+            Self::ImitateMagmaCube => "imitate.magma_cube",
+            Self::ImitatePolarBear => "imitate.polar_bear",
+            Self::ImitateShulker => "imitate.shulker",
+            Self::ImitateSilverfish => "imitate.silverfish",
+            Self::ImitateSkeleton => "imitate.skeleton",
+            Self::ImitateSlime => "imitate.slime",
+            Self::ImitateSpider => "imitate.spider",
+            Self::ImitateStray => "imitate.stray",
+            Self::ImitateVex => "imitate.vex",
+            Self::ImitateVindicationIllager => "imitate.vindication_illager",
+            Self::ImitateWitch => "imitate.witch",
+            Self::ImitateWither => "imitate.wither",
+            Self::ImitateWitherSkeleton => "imitate.wither_skeleton",
+            Self::ImitateWolf => "imitate.wolf",
+            Self::ImitateZombie => "imitate.zombie",
+            Self::ImitateZombiePigman => "imitate.zombie_pigman",
+            Self::ImitateZombieVillager => "imitate.zombie_villager",
+            Self::BlockEndPortalFrameFill => "block.end_portal_frame.fill",
+            Self::BlockEndPortalSpawn => "block.end_portal.spawn",
+            Self::RandomAnvilUse => "random.anvil_use",
+            Self::BottleDragonbreath => "bottle.dragonbreath",
+            Self::Balloonpop => "balloonpop",
+            Self::SparklerActive => "sparkler.active",
+            Self::ItemTridentHit => "item.trident.hit",
+            Self::ItemTridentHitGround => "item.trident.hit_ground",
+            Self::ItemTridentReturn => "item.trident.return",
+            Self::ItemTridentRiptide1 => "item.trident.riptide_1",
+            Self::ItemTridentRiptide2 => "item.trident.riptide_2",
+            Self::ItemTridentRiptide3 => "item.trident.riptide_3",
+            Self::ItemTridentThrow => "item.trident.throw",
+            Self::ItemTridentThunder => "item.trident.thunder",
+            Self::BlockFletchingTableUse => "block.fletching_table.use",
+            Self::ElemconstructOpen => "elemconstruct.open",
+            Self::IcebombHit => "icebomb.hit",
+            Self::LtReactionIcebomb => "lt.reaction.icebomb",
+            Self::LtReactionBleach => "lt.reaction.bleach",
+            Self::LtReactionEpaste => "lt.reaction.epaste",
+            Self::LtReactionEpaste2 => "lt.reaction.epaste2",
+            Self::LtReactionFertilizer => "lt.reaction.fertilizer",
+            Self::LtReactionFireball => "lt.reaction.fireball",
+            Self::LtReactionMgsalt => "lt.reaction.mgsalt",
+            Self::LtReactionMiscfire => "lt.reaction.miscfire",
+            Self::LtReactionFire => "lt.reaction.fire",
+            Self::LtReactionMiscexplosion => "lt.reaction.miscexplosion",
+            Self::LtReactionMiscmystical => "lt.reaction.miscmystical",
+            Self::LtReactionMiscmystical2 => "lt.reaction.miscmystical2",
+            Self::LtReactionProduct => "lt.reaction.product",
+            Self::SparklerUse => "sparkler.use",
+            Self::GlowstickUse => "glowstick.use",
+            Self::BlockTurtleEggBreak => "block.turtle_egg.break",
+            Self::BlockTurtleEggCrack => "block.turtle_egg.crack",
+            Self::BlockTurtleEggHatch => "block.turtle_egg.hatch",
+            Self::BlockTurtleEggAttack => "block.turtle_egg.attack",
+            Self::BlockSnifferEggCrack => "block.sniffer_egg.crack",
+            Self::BlockSnifferEggHatch => "block.sniffer_egg.hatch",
+            Self::BlockFrogSpawnHatch => "block.frog_spawn.hatch",
+            Self::BlockFrogSpawnBreak => "block.frog_spawn.break",
+            Self::Swoop => "swoop",
+            Self::Presneeze => "presneeze",
+            Self::Sneeze => "sneeze",
+            Self::Scared => "scared",
+            Self::AmbientAggressive => "ambient.aggressive",
+            Self::AmbientWorried => "ambient.worried",
+            Self::CantBreed => "cant_breed",
+            Self::BlockScaffoldingClimb => "block.scaffolding.climb",
+            Self::BlockBambooSaplingPlace => "block.bamboo_sapling.place",
+            Self::CrossbowLoadingStart => "crossbow.loading.start",
+            Self::CrossbowLoadingMiddle => "crossbow.loading.middle",
+            Self::CrossbowLoadingEnd => "crossbow.loading.end",
+            Self::CrossbowShoot => "crossbow.shoot",
+            Self::CrossbowQuickChargeStart => "crossbow.quick_charge.start",
+            Self::CrossbowQuickChargeMiddle => "crossbow.quick_charge.middle",
+            Self::CrossbowQuickChargeEnd => "crossbow.quick_charge.end",
+            Self::ItemShieldBlock => "item.shield.block",
+            Self::PortalTravel => "portal.travel",
+            Self::ItemBookPut => "item.book.put",
+            Self::BlockGrindstoneUse => "block.grindstone.use",
+            Self::BlockBellHit => "block.bell.hit",
+            Self::BlockCampfireCrackle => "block.campfire.crackle",
+            Self::BlockSweetBerryBushHurt => "block.sweet_berry_bush.hurt",
+            Self::BlockSweetBerryBushPick => "block.sweet_berry_bush.pick",
+            Self::BlockStonecutterUse => "block.stonecutter.use",
+            Self::BlockCartographyTableUse => "block.cartography_table.use",
+            Self::BlockComposterEmpty => "block.composter.empty",
+            Self::BlockComposterFill => "block.composter.fill",
+            Self::BlockComposterFillSuccess => "block.composter.fill_success",
+            Self::BlockComposterReady => "block.composter.ready",
+            Self::Roar => "roar",
+            Self::Stun => "stun",
+            Self::BlockBarrelOpen => "block.barrel.open",
+            Self::BlockBarrelClose => "block.barrel.close",
+            Self::RaidHorn => "raid.horn",
+            Self::UiStonecutterTakeResult => "ui.stonecutter.take_result",
+            Self::UiCartographyTableTakeResult => "ui.cartography_table.take_result",
+            Self::UiLoomTakeResult => "ui.loom.take_result",
+            Self::BlockSmokerSmoke => "block.smoker.smoke",
+            Self::BlockBlastfurnaceFireCrackle => "block.blastfurnace.fire_crackle",
+            Self::BlockSmithingTableUse => "block.smithing_table.use",
+            Self::BlockLoomUse => "block.loom.use",
+            Self::AmbientInRaid => "ambient.in.raid",
+            Self::Screech => "screech",
+            Self::Sleep => "sleep",
+            Self::BlockFurnaceLit => "block.furnace.lit",
+            Self::ConvertMooshroom => "convert_mooshroom",
+            Self::MilkSuspiciously => "milk_suspiciously",
+            Self::Celebrate => "celebrate",
+            Self::BlockBeehiveEnter => "block.beehive.enter",
+            Self::BlockBeehiveExit => "block.beehive.exit",
+            Self::BlockBeehiveShear => "block.beehive.shear",
+            Self::BlockBeehiveWork => "block.beehive.work",
+            Self::BlockBeehiveDrip => "block.beehive.drip",
+            Self::AmbientCave => "ambient.cave",
+            Self::Angry => "angry",
+            Self::Retreat => "retreat",
+            Self::ConvertedToZombified => "converted_to_zombified",
+            Self::StepLava => "step_lava",
+            Self::Tempt => "tempt",
+            Self::Panic => "panic",
+            Self::Admire => "admire",
+            Self::ParticleSoulEscapeQuiet => "particle.soul_escape.quiet",
+            Self::ParticleSoulEscapeLoud => "particle.soul_escape.loud",
+            Self::RespawnAnchorCharge => "respawn_anchor.charge",
+            Self::RespawnAnchorDeplete => "respawn_anchor.deplete",
+            Self::RespawnAnchorSetSpawn => "respawn_anchor.set_spawn",
+            Self::RespawnAnchorAmbient => "respawn_anchor.ambient",
+            Self::AmbientCrimsonForestMood => "ambient.crimson_forest.mood",
+            Self::AmbientWarpedForestMood => "ambient.warped_forest.mood",
+            Self::AmbientSoulsandValleyMood => "ambient.soulsand_valley.mood",
+            Self::AmbientNetherWastesMood => "ambient.nether_wastes.mood",
+            Self::AmbientCrimsonForestAdditions => "ambient.crimson_forest.additions",
+            Self::AmbientWarpedForestAdditions => "ambient.warped_forest.additions",
+            Self::AmbientSoulsandValleyAdditions => "ambient.soulsand_valley.additions",
+            Self::AmbientNetherWastesAdditions => "ambient.nether_wastes.additions",
+            Self::AmbientBasaltDeltasAdditions => "ambient.basalt_deltas.additions",
+            Self::AmbientCrimsonForestLoop => "ambient.crimson_forest.loop",
+            Self::AmbientWarpedForestLoop => "ambient.warped_forest.loop",
+            Self::AmbientSoulsandValleyLoop => "ambient.soulsand_valley.loop",
+            Self::AmbientNetherWastesLoop => "ambient.nether_wastes.loop",
+            Self::AmbientBasaltDeltasLoop => "ambient.basalt_deltas.loop",
+            Self::LodestoneCompassLinkCompassToLodestone => {
+                "lodestone_compass.link_compass_to_lodestone"
+            }
+            Self::AmbientBasaltDeltasMood => "ambient.basalt_deltas.mood",
+            Self::PowerOnSculkSensor => "power.on.sculk_sensor",
+            Self::PowerOffSculkSensor => "power.off.sculk_sensor",
+            Self::SmithingTableUse => "smithing_table.use",
+            Self::Default => "default",
+            Self::LayEgg => "lay_egg",
+            Self::LaySpawn => "lay_spawn",
+            Self::BucketFillPowderSnow => "bucket.fill.powder_snow",
+            Self::BucketEmptyPowderSnow => "bucket.empty.powder_snow",
+            Self::CauldronDripWaterPointedDripstone => {
+                "cauldron_drip.water.pointed_dripstone"
+            }
+            Self::CauldronDripLavaPointedDripstone => {
+                "cauldron_drip.lava.pointed_dripstone"
+            }
+            Self::TiltDownBigDripleaf => "tilt_down.big_dripleaf",
+            Self::TiltUpBigDripleaf => "tilt_up.big_dripleaf",
+            Self::DripWaterPointedDripstone => "drip.water.pointed_dripstone",
+            Self::PickBerriesCaveVines => "pick_berries.cave_vines",
+            Self::DripLavaPointedDripstone => "drip.lava.pointed_dripstone",
+            Self::CopperWaxOn => "copper.wax.on",
+            Self::CopperWaxOff => "copper.wax.off",
+            Self::Scrape => "scrape",
+            Self::ItemSpyglassUse => "item.spyglass.use",
+            Self::ItemSpyglassStopUsing => "item.spyglass.stop_using",
+            Self::ChimeAmethystBlock => "chime.amethyst_block",
+            Self::MobPlayerHurtDrown => "mob.player.hurt_drown",
+            Self::MobPlayerHurtOnFire => "mob.player.hurt_on_fire",
+            Self::MobPlayerHurtFreeze => "mob.player.hurt_freeze",
+            Self::AmbientScreamer => "ambient.screamer",
+            Self::HurtScreamer => "hurt.screamer",
+            Self::DeathScreamer => "death.screamer",
+            Self::MilkScreamer => "milk.screamer",
+            Self::JumpToBlock => "jump_to_block",
+            Self::PreRam => "pre_ram",
+            Self::PreRamScreamer => "pre_ram.screamer",
+            Self::RamImpact => "ram_impact",
+            Self::RamImpactScreamer => "ram_impact.screamer",
+            Self::SquidInkSquirt => "squid.ink_squirt",
+            Self::GlowSquidInkSquirt => "glow_squid.ink_squirt",
+            Self::ConvertToStray => "convert_to_stray",
+            Self::CakeAddCandle => "cake.add_candle",
+            Self::ExtinguishCandle => "extinguish.candle",
+            Self::AmbientCandle => "ambient.candle",
+            Self::BlockClick => "block.click",
+            Self::BlockClickFail => "block.click.fail",
+            Self::BlockSculkCatalystBloom => "block.sculk_catalyst.bloom",
+            Self::BlockSculkShriekerShriek => "block.sculk_shrieker.shriek",
+            Self::NearbyClose => "nearby_close",
+            Self::NearbyCloser => "nearby_closer",
+            Self::NearbyClosest => "nearby_closest",
+            Self::Agitated => "agitated",
+            Self::Listening => "listening",
+            Self::Heartbeat => "heartbeat",
+            Self::Tongue => "tongue",
+            Self::ItemGiven => "item_given",
+            Self::ItemTaken => "item_taken",
+            Self::ItemThrown => "item_thrown",
+            Self::IrongolemCrack => "irongolem.crack",
+            Self::IrongolemRepair => "irongolem.repair",
+            Self::HornBreak => "horn_break",
+            Self::HornCall0 => "horn_call0",
+            Self::HornCall1 => "horn_call1",
+            Self::HornCall2 => "horn_call2",
+            Self::HornCall3 => "horn_call3",
+            Self::HornCall4 => "horn_call4",
+            Self::HornCall5 => "horn_call5",
+            Self::HornCall6 => "horn_call6",
+            Self::HornCall7 => "horn_call7",
+            Self::ImitateWarden => "imitate.warden",
+            Self::ListeningAngry => "listening_angry",
+            Self::SonicBoom => "sonic_boom",
+            Self::SonicCharge => "sonic_charge",
+            Self::ConvertToFrog => "convert_to_frog",
+            Self::BlockSculkSpread => "block.sculk.spread",
+            Self::ChargeSculk => "charge.sculk",
+            Self::BlockSculkSensorPlace => "block.sculk_sensor.place",
+            Self::BlockSculkShriekerPlace => "block.sculk_shrieker.place",
+            Self::BlockEnchantingTableUse => "block.enchanting_table.use",
+            Self::BundleDropContents => "bundle.drop_contents",
+            Self::BundleInsert => "bundle.insert",
+            Self::BundleInsertFail => "bundle.insert_fail",
+            Self::BundleRemoveOne => "bundle.remove_one",
+            Self::StepSand => "step_sand",
+            Self::DashReady => "dash_ready",
+            Self::PressurePlateClickOff => "pressure_plate.click_off",
+            Self::PressurePlateClickOn => "pressure_plate.click_on",
+            Self::ButtonClickOff => "button.click_off",
+            Self::ButtonClickOn => "button.click_on",
+            Self::DoorOpen => "door.open",
+            Self::DoorClose => "door.close",
+            Self::TrapdoorOpen => "trapdoor.open",
+            Self::TrapdoorClose => "trapdoor.close",
+            Self::FenceGateOpen => "fence_gate.open",
+            Self::FenceGateClose => "fence_gate.close",
+            Self::Insert => "insert",
+            Self::Pickup => "pickup",
+            Self::InsertEnchanted => "insert_enchanted",
+            Self::PickupEnchanted => "pickup_enchanted",
+            Self::ShatterPot => "shatter_pot",
+            Self::BreakPot => "break_pot",
+            Self::Brush => "brush",
+            Self::BrushCompleted => "brush_completed",
+            Self::BlockSignWaxedInteractFail => "block.sign.waxed_interact_fail",
+            Self::NoteBass => "note.bass",
+            Self::PumpkinCarve => "pumpkin.carve",
+            Self::MobHuskConvertToZombie => "mob.husk.convert_to_zombie",
+            Self::MobPigDeath => "mob.pig.death",
+            Self::MobHoglinConvertedToZombified => "mob.hoglin.converted_to_zombified",
+            Self::AmbientUnderwaterEnter => "ambient.underwater.enter",
+            Self::AmbientUnderwaterExit => "ambient.underwater.exit",
+            Self::BottleFill => "bottle.fill",
+            Self::BottleEmpty => "bottle.empty",
+            Self::BlockDecoratedPotInsert => "block.decorated_pot.insert",
+            Self::BlockDecoratedPotInsertFail => "block.decorated_pot.insert_fail",
+            Self::CrafterCraft => "crafter.craft",
+            Self::CrafterFail => "crafter.fail",
+            Self::CrafterDisableSlot => "crafter.disable_slot",
+            Self::BlockCopperBulbTurnOn => "block.copper_bulb.turn_on",
+            Self::BlockCopperBulbTurnOff => "block.copper_bulb.turn_off",
+            Self::BreezeWindChargeBurst => "breeze_wind_charge.burst",
+            Self::ImitateBreeze => "imitate.breeze",
+            Self::TrialSpawnerOpenShutter => "trial_spawner.open_shutter",
+            Self::TrialSpawnerDetectPlayer => "trial_spawner.detect_player",
+            Self::TrialSpawnerCloseShutter => "trial_spawner.close_shutter",
+            Self::TrialSpawnerSpawnMob => "trial_spawner.spawn_mob",
+            Self::TrialSpawnerEjectItem => "trial_spawner.eject_item",
+            Self::TrialSpawnerAmbient => "trial_spawner.ambient",
+            Self::MobArmadilloBrush => "mob.armadillo.brush",
+            Self::MobArmadilloScuteDrop => "mob.armadillo.scute_drop",
+            Self::ArmorEquipWolf => "armor.equip_wolf",
+            Self::ArmorUnequipWolf => "armor.unequip_wolf",
+            Self::Reflect => "reflect",
+            Self::VaultOpenShutter => "vault.open_shutter",
+            Self::VaultCloseShutter => "vault.close_shutter",
+            Self::VaultEjectItem => "vault.eject_item",
+            Self::VaultInsertItem => "vault.insert_item",
+            Self::VaultInsertItemFail => "vault.insert_item_fail",
+            Self::VaultAmbient => "vault.ambient",
+            Self::VaultActivate => "vault.activate",
+            Self::VaultDeactivate => "vault.deactivate",
+            Self::HurtReduced => "hurt.reduced",
+            Self::WindChargeBurst => "wind_charge.burst",
+            Self::ArmorBreakWolf => "armor.break_wolf",
+            Self::ArmorCrackWolf => "armor.crack_wolf",
+            Self::ArmorRepairWolf => "armor.repair_wolf",
+            Self::MaceSmashAir => "mace.smash_air",
+            Self::MaceSmashGround => "mace.smash_ground",
+            Self::MaceHeavySmashGround => "mace.heavy_smash_ground",
+            Self::TrialSpawnerChargeActivate => "trial_spawner.charge_activate",
+            Self::TrialSpawnerAmbientOminous => "trial_spawner.ambient_ominous",
+            Self::ApplyEffectBadOmen => "apply_effect.bad_omen",
+            Self::ApplyEffectRaidOmen => "apply_effect.raid_omen",
+            Self::ApplyEffectTrialOmen => "apply_effect.trial_omen",
+            Self::OminousItemSpawnerSpawnItem => "ominous_item_spawner.spawn_item",
+            Self::OminousBottleEndUse => "ominous_bottle.end_use",
+            Self::OminousItemSpawnerSpawnItemBegin => {
+                "ominous_item_spawner.spawn_item_begin"
+            }
+            Self::OminousItemSpawnerAboutToSpawnItem => {
+                "ominous_item_spawner.about_to_spawn_item"
+            }
+            Self::ImitateBogged => "imitate.bogged",
+            Self::VaultRejectRewardedPlayer => "vault.reject_rewarded_player",
+            Self::ImitateDrowned => "imitate.drowned",
+            Self::SpongeAbsorb => "sponge.absorb",
+            Self::ImitateCreaking => "imitate.creaking",
+            Self::BlockCreakingHeartTrail => "block.creaking_heart.trail",
+            Self::CreakingHeartSpawn => "creaking_heart_spawn",
+            Self::Activate => "activate",
+            Self::Deactivate => "deactivate",
+            Self::Freeze => "freeze",
+            Self::Unfreeze => "unfreeze",
+            Self::Open => "open",
+            Self::OpenLong => "open_long",
+            Self::Close => "close",
+            Self::CloseLong => "close_long",
+            Self::ImitatePhantom => "imitate.phantom",
+            Self::ImitateZoglin => "imitate.zoglin",
+            Self::ImitateGuardian => "imitate.guardian",
+            Self::ImitateRavager => "imitate.ravager",
+            Self::ImitatePillager => "imitate.pillager",
+            Self::PlaceInWater => "place_in_water",
+            Self::StateChange => "state_change",
+            Self::ImitateHappyGhast => "imitate.happy_ghast",
+            Self::ArmorUnequipGeneric => "armor.unequip_generic",
+            Self::AmbientWeatherTheEndLightFlash => "ambient.weather.the_end_light_flash",
+            Self::LeadLeash => "lead.leash",
+            Self::LeadUnleash => "lead.unleash",
+            Self::LeadBreak => "lead.break",
+            Self::Unsaddle => "unsaddle",
+            Self::ArmorEquipCopper => "armor.equip_copper",
+            Self::PlaceItem => "place_item",
+            Self::SingleSwap => "single_swap",
+            Self::MultiSwap => "multi_swap",
+            Self::ItemEnchantLunge1 => "item.enchant.lunge1",
+            Self::ItemEnchantLunge2 => "item.enchant.lunge2",
+            Self::ItemEnchantLunge3 => "item.enchant.lunge3",
+            Self::AttackCritical => "attack.critical",
+            Self::ItemSpearAttackHit => "item.spear.attack_hit",
+            Self::ItemSpearAttackMiss => "item.spear.attack_miss",
+            Self::ItemWoodenSpearAttackHit => "item.wooden_spear.attack_hit",
+            Self::ItemWoodenSpearAttackMiss => "item.wooden_spear.attack_miss",
+            Self::ImitateParched => "imitate.parched",
+            Self::ImitateCamelHusk => "imitate.camel_husk",
+            Self::ItemSpearUse => "item.spear.use",
+            Self::ItemWoodenSpearUse => "item.wooden_spear.use",
+            Self::SaddleInWater => "saddle_in_water",
+            Self::ItemStoneSpearAttackHit => "item.stone_spear.attack_hit",
+            Self::ItemIronSpearAttackHit => "item.iron_spear.attack_hit",
+            Self::ItemCopperSpearAttackHit => "item.copper_spear.attack_hit",
+            Self::ItemGoldenSpearAttackHit => "item.golden_spear.attack_hit",
+            Self::ItemDiamondSpearAttackHit => "item.diamond_spear.attack_hit",
+            Self::ItemNetheriteSpearAttackHit => "item.netherite_spear.attack_hit",
+            Self::ItemStoneSpearAttackMiss => "item.stone_spear.attack_miss",
+            Self::ItemIronSpearAttackMiss => "item.iron_spear.attack_miss",
+            Self::ItemCopperSpearAttackMiss => "item.copper_spear.attack_miss",
+            Self::ItemGoldenSpearAttackMiss => "item.golden_spear.attack_miss",
+            Self::ItemDiamondSpearAttackMiss => "item.diamond_spear.attack_miss",
+            Self::ItemNetheriteSpearAttackMiss => "item.netherite_spear.attack_miss",
+            Self::ItemStoneSpearUse => "item.stone_spear.use",
+            Self::ItemIronSpearUse => "item.iron_spear.use",
+            Self::ItemCopperSpearUse => "item.copper_spear.use",
+            Self::ItemGoldenSpearUse => "item.golden_spear.use",
+            Self::ItemDiamondSpearUse => "item.diamond_spear.use",
+            Self::ItemNetheriteSpearUse => "item.netherite_spear.use",
+            Self::PauseGrowth => "pause_growth",
+            Self::ResetGrowth => "reset_growth",
+            Self::PushedByPlayer => "pushed_by_player",
+            Self::Bounce => "bounce",
+            Self::SlimeLanding => "slime_landing",
+            Self::AbsorbBlock => "absorb_block",
+            Self::EjectBlock => "eject_block",
+            Self::GeyserEruptionStart => "geyser_eruption_start",
+            Self::GeyserEruptionActive => "geyser_eruption_active",
+            Self::RecordBounce => "record.bounce",
+            Self::BucketFillLandAnimal => "bucket.fill.land_animal",
+            Self::BucketEmptyLandAnimal => "bucket.empty.land_animal",
+            Self::GeyserContinuousEruptionStart => "geyser_continuous_eruption_start",
+            Self::GeyserContinuousEruptionActive => "geyser_continuous_eruption_active",
+            Self::Mount => "mount",
+            Self::Dismount => "dismount",
+            Self::StrawBedBreakLeave => "straw_bed.break_leave",
+            Self::ConvertToFrostbite => "convert_to_frostbite",
+            Self::ConvertToZombie => "convert_to_zombie",
+            Self::Crack => "crack",
+            Self::IceBallThrow => "ice_ball.throw",
+            Self::RecordFlurry => "record.flurry",
+            Self::ImitateFrostbite => "imitate.frostbite",
+            Self::Undefined => "undefined",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "item.use.on" => return Some(Self::ItemUseOn),
+            "hit" => return Some(Self::Hit),
+            "step" => return Some(Self::Step),
+            "step.baby" => return Some(Self::StepBaby),
+            "fly" => return Some(Self::Fly),
+            "jump" => return Some(Self::Jump),
+            "jump.prevent" => return Some(Self::JumpPrevent),
+            "break" => return Some(Self::Break),
+            "place" => return Some(Self::Place),
+            "heavy.step" => return Some(Self::HeavyStep),
+            "gallop" => return Some(Self::Gallop),
+            "fall" => return Some(Self::Fall),
+            "hurt" => return Some(Self::Hurt),
+            "hurt.baby" => return Some(Self::HurtBaby),
+            "hurt.in.water" => return Some(Self::HurtInWater),
+            "death" => return Some(Self::Death),
+            "death.baby" => return Some(Self::DeathBaby),
+            "death.in.water" => return Some(Self::DeathInWater),
+            "death.to.zombie" => return Some(Self::DeathToZombie),
+            "ambient" => return Some(Self::Ambient),
+            "ambient.baby" => return Some(Self::AmbientBaby),
+            "ambient.in.water" => return Some(Self::AmbientInWater),
+            "ambient.in.air" => return Some(Self::AmbientInAir),
+            "ambient.tame" => return Some(Self::AmbientTame),
+            "ambient.pollinate" => return Some(Self::AmbientPollinate),
+            "breathe" => return Some(Self::Breathe),
+            "mad" => return Some(Self::Mad),
+            "boost" => return Some(Self::Boost),
+            "bow" => return Some(Self::Bow),
+            "squish.big" => return Some(Self::SquishBig),
+            "squish.small" => return Some(Self::SquishSmall),
+            "fall.big" => return Some(Self::FallBig),
+            "fall.small" => return Some(Self::FallSmall),
+            "splash" => return Some(Self::Splash),
+            "fizz" => return Some(Self::Fizz),
+            "flap" => return Some(Self::Flap),
+            "swim" => return Some(Self::Swim),
+            "drink" => return Some(Self::Drink),
+            "drink.honey" => return Some(Self::DrinkHoney),
+            "drink.milk" => return Some(Self::DrinkMilk),
+            "eat" => return Some(Self::Eat),
+            "takeoff" => return Some(Self::Takeoff),
+            "shake" => return Some(Self::Shake),
+            "plop" => return Some(Self::Plop),
+            "land" => return Some(Self::Land),
+            "saddle" => return Some(Self::Saddle),
+            "armor" => return Some(Self::Armor),
+            "mob.armor_stand.place" => return Some(Self::MobArmorStandPlace),
+            "add.chest" => return Some(Self::AddChest),
+            "throw" => return Some(Self::Throw),
+            "attack" => return Some(Self::Attack),
+            "attack.nodamage" => return Some(Self::AttackNodamage),
+            "attack.strong" => return Some(Self::AttackStrong),
+            "warn" => return Some(Self::Warn),
+            "shear" => return Some(Self::Shear),
+            "milk" => return Some(Self::Milk),
+            "thunder" => return Some(Self::Thunder),
+            "explode" => return Some(Self::Explode),
+            "fire" => return Some(Self::Fire),
+            "ignite" => return Some(Self::Ignite),
+            "fuse" => return Some(Self::Fuse),
+            "stare" => return Some(Self::Stare),
+            "spawn" => return Some(Self::Spawn),
+            "born" => return Some(Self::Born),
+            "shoot" => return Some(Self::Shoot),
+            "break.block" => return Some(Self::BreakBlock),
+            "launch" => return Some(Self::Launch),
+            "blast" => return Some(Self::Blast),
+            "large.blast" => return Some(Self::LargeBlast),
+            "twinkle" => return Some(Self::Twinkle),
+            "remedy" => return Some(Self::Remedy),
+            "unfect" => return Some(Self::Unfect),
+            "convert_to_drowned" => return Some(Self::ConvertToDrowned),
+            "levelup" => return Some(Self::Levelup),
+            "bow.hit" => return Some(Self::BowHit),
+            "bullet.hit" => return Some(Self::BulletHit),
+            "extinguish.fire" => return Some(Self::ExtinguishFire),
+            "item.fizz" => return Some(Self::ItemFizz),
+            "chest.open" => return Some(Self::ChestOpen),
+            "chest.closed" => return Some(Self::ChestClosed),
+            "shulkerbox.open" => return Some(Self::ShulkerboxOpen),
+            "shulkerbox.closed" => return Some(Self::ShulkerboxClosed),
+            "enderchest.open" => return Some(Self::EnderchestOpen),
+            "enderchest.closed" => return Some(Self::EnderchestClosed),
+            "power.on" => return Some(Self::PowerOn),
+            "power.off" => return Some(Self::PowerOff),
+            "attach" => return Some(Self::Attach),
+            "detach" => return Some(Self::Detach),
+            "deny" => return Some(Self::Deny),
+            "tripod" => return Some(Self::Tripod),
+            "pop" => return Some(Self::Pop),
+            "drop.slot" => return Some(Self::DropSlot),
+            "note" => return Some(Self::Note),
+            "thorns" => return Some(Self::Thorns),
+            "piston.in" => return Some(Self::PistonIn),
+            "piston.out" => return Some(Self::PistonOut),
+            "portal" => return Some(Self::Portal),
+            "water" => return Some(Self::Water),
+            "lava.pop" => return Some(Self::LavaPop),
+            "lava" => return Some(Self::Lava),
+            "beacon.activate" => return Some(Self::BeaconActivate),
+            "beacon.ambient" => return Some(Self::BeaconAmbient),
+            "beacon.deactivate" => return Some(Self::BeaconDeactivate),
+            "beacon.power" => return Some(Self::BeaconPower),
+            "conduit.activate" => return Some(Self::ConduitActivate),
+            "conduit.ambient" => return Some(Self::ConduitAmbient),
+            "conduit.attack" => return Some(Self::ConduitAttack),
+            "conduit.deactivate" => return Some(Self::ConduitDeactivate),
+            "conduit.short" => return Some(Self::ConduitShort),
+            "bubble.pop" => return Some(Self::BubblePop),
+            "bubble.up" => return Some(Self::BubbleUp),
+            "bubble.upinside" => return Some(Self::BubbleUpinside),
+            "bubble.down" => return Some(Self::BubbleDown),
+            "bubble.downinside" => return Some(Self::BubbleDowninside),
+            "burp" => return Some(Self::Burp),
+            "bucket.fill.water" => return Some(Self::BucketFillWater),
+            "bucket.empty.water" => return Some(Self::BucketEmptyWater),
+            "bucket.fill.lava" => return Some(Self::BucketFillLava),
+            "bucket.empty.lava" => return Some(Self::BucketEmptyLava),
+            "bucket.fill.fish" => return Some(Self::BucketFillFish),
+            "bucket.empty.fish" => return Some(Self::BucketEmptyFish),
+            "armor.equip_chain" => return Some(Self::ArmorEquipChain),
+            "armor.equip_diamond" => return Some(Self::ArmorEquipDiamond),
+            "armor.equip_elytra" => return Some(Self::ArmorEquipElytra),
+            "armor.equip_generic" => return Some(Self::ArmorEquipGeneric),
+            "armor.equip_gold" => return Some(Self::ArmorEquipGold),
+            "armor.equip_iron" => return Some(Self::ArmorEquipIron),
+            "armor.equip_leather" => return Some(Self::ArmorEquipLeather),
+            "armor.equip_netherite" => return Some(Self::ArmorEquipNetherite),
+            "record.13" => return Some(Self::Record13),
+            "record.cat" => return Some(Self::RecordCat),
+            "record.blocks" => return Some(Self::RecordBlocks),
+            "record.chirp" => return Some(Self::RecordChirp),
+            "record.creator" => return Some(Self::RecordCreator),
+            "record.creator_music_box" => return Some(Self::RecordCreatorMusicBox),
+            "record.far" => return Some(Self::RecordFar),
+            "record.mall" => return Some(Self::RecordMall),
+            "record.mellohi" => return Some(Self::RecordMellohi),
+            "record.stal" => return Some(Self::RecordStal),
+            "record.strad" => return Some(Self::RecordStrad),
+            "record.ward" => return Some(Self::RecordWard),
+            "record.11" => return Some(Self::Record11),
+            "record.wait" => return Some(Self::RecordWait),
+            "record.null" => return Some(Self::RecordNull),
+            "record.pigstep" => return Some(Self::RecordPigstep),
+            "record.precipice" => return Some(Self::RecordPrecipice),
+            "record.relic" => return Some(Self::RecordRelic),
+            "record.otherside" => return Some(Self::RecordOtherside),
+            "record.5" => return Some(Self::Record5),
+            "record.tears" => return Some(Self::RecordTears),
+            "record.lava_chicken" => return Some(Self::RecordLavaChicken),
+            "flop" => return Some(Self::Flop),
+            "elderguardian.curse" => return Some(Self::ElderguardianCurse),
+            "teleport" => return Some(Self::Teleport),
+            "shulker.open" => return Some(Self::ShulkerOpen),
+            "shulker.close" => return Some(Self::ShulkerClose),
+            "mob.warning" => return Some(Self::MobWarning),
+            "mob.warning.baby" => return Some(Self::MobWarningBaby),
+            "haggle" => return Some(Self::Haggle),
+            "haggle.yes" => return Some(Self::HaggleYes),
+            "haggle.no" => return Some(Self::HaggleNo),
+            "haggle.idle" => return Some(Self::HaggleIdle),
+            "disappeared" => return Some(Self::Disappeared),
+            "reappeared" => return Some(Self::Reappeared),
+            "chorusgrow" => return Some(Self::Chorusgrow),
+            "chorusdeath" => return Some(Self::Chorusdeath),
+            "glass" => return Some(Self::Glass),
+            "potion.brewed" => return Some(Self::PotionBrewed),
+            "cast.spell" => return Some(Self::CastSpell),
+            "prepare.attack" => return Some(Self::PrepareAttack),
+            "prepare.summon" => return Some(Self::PrepareSummon),
+            "prepare.wololo" => return Some(Self::PrepareWololo),
+            "fang" => return Some(Self::Fang),
+            "charge" => return Some(Self::Charge),
+            "camera.take_picture" => return Some(Self::CameraTakePicture),
+            "leashknot.break" => return Some(Self::LeashknotBreak),
+            "leashknot.place" => return Some(Self::LeashknotPlace),
+            "growl" => return Some(Self::Growl),
+            "whine" => return Some(Self::Whine),
+            "pant" => return Some(Self::Pant),
+            "purr" => return Some(Self::Purr),
+            "purreow" => return Some(Self::Purreow),
+            "death.min.volume" => return Some(Self::DeathMinVolume),
+            "death.mid.volume" => return Some(Self::DeathMidVolume),
+            "imitate.blaze" => return Some(Self::ImitateBlaze),
+            "imitate.cave_spider" => return Some(Self::ImitateCaveSpider),
+            "imitate.creeper" => return Some(Self::ImitateCreeper),
+            "imitate.elder_guardian" => return Some(Self::ImitateElderGuardian),
+            "imitate.ender_dragon" => return Some(Self::ImitateEnderDragon),
+            "imitate.enderman" => return Some(Self::ImitateEnderman),
+            "imitate.endermite" => return Some(Self::ImitateEndermite),
+            "imitate.evocation_illager" => return Some(Self::ImitateEvocationIllager),
+            "imitate.ghast" => return Some(Self::ImitateGhast),
+            "imitate.husk" => return Some(Self::ImitateHusk),
+            "imitate.magma_cube" => return Some(Self::ImitateMagmaCube),
+            "imitate.polar_bear" => return Some(Self::ImitatePolarBear),
+            "imitate.shulker" => return Some(Self::ImitateShulker),
+            "imitate.silverfish" => return Some(Self::ImitateSilverfish),
+            "imitate.skeleton" => return Some(Self::ImitateSkeleton),
+            "imitate.slime" => return Some(Self::ImitateSlime),
+            "imitate.spider" => return Some(Self::ImitateSpider),
+            "imitate.stray" => return Some(Self::ImitateStray),
+            "imitate.vex" => return Some(Self::ImitateVex),
+            "imitate.vindication_illager" => return Some(Self::ImitateVindicationIllager),
+            "imitate.witch" => return Some(Self::ImitateWitch),
+            "imitate.wither" => return Some(Self::ImitateWither),
+            "imitate.wither_skeleton" => return Some(Self::ImitateWitherSkeleton),
+            "imitate.wolf" => return Some(Self::ImitateWolf),
+            "imitate.zombie" => return Some(Self::ImitateZombie),
+            "imitate.zombie_pigman" => return Some(Self::ImitateZombiePigman),
+            "imitate.zombie_villager" => return Some(Self::ImitateZombieVillager),
+            "block.end_portal_frame.fill" => return Some(Self::BlockEndPortalFrameFill),
+            "block.end_portal.spawn" => return Some(Self::BlockEndPortalSpawn),
+            "random.anvil_use" => return Some(Self::RandomAnvilUse),
+            "bottle.dragonbreath" => return Some(Self::BottleDragonbreath),
+            "balloonpop" => return Some(Self::Balloonpop),
+            "sparkler.active" => return Some(Self::SparklerActive),
+            "item.trident.hit" => return Some(Self::ItemTridentHit),
+            "item.trident.hit_ground" => return Some(Self::ItemTridentHitGround),
+            "item.trident.return" => return Some(Self::ItemTridentReturn),
+            "item.trident.riptide_1" => return Some(Self::ItemTridentRiptide1),
+            "item.trident.riptide_2" => return Some(Self::ItemTridentRiptide2),
+            "item.trident.riptide_3" => return Some(Self::ItemTridentRiptide3),
+            "item.trident.throw" => return Some(Self::ItemTridentThrow),
+            "item.trident.thunder" => return Some(Self::ItemTridentThunder),
+            "block.fletching_table.use" => return Some(Self::BlockFletchingTableUse),
+            "elemconstruct.open" => return Some(Self::ElemconstructOpen),
+            "icebomb.hit" => return Some(Self::IcebombHit),
+            "lt.reaction.icebomb" => return Some(Self::LtReactionIcebomb),
+            "lt.reaction.bleach" => return Some(Self::LtReactionBleach),
+            "lt.reaction.epaste" => return Some(Self::LtReactionEpaste),
+            "lt.reaction.epaste2" => return Some(Self::LtReactionEpaste2),
+            "lt.reaction.fertilizer" => return Some(Self::LtReactionFertilizer),
+            "lt.reaction.fireball" => return Some(Self::LtReactionFireball),
+            "lt.reaction.mgsalt" => return Some(Self::LtReactionMgsalt),
+            "lt.reaction.miscfire" => return Some(Self::LtReactionMiscfire),
+            "lt.reaction.fire" => return Some(Self::LtReactionFire),
+            "lt.reaction.miscexplosion" => return Some(Self::LtReactionMiscexplosion),
+            "lt.reaction.miscmystical" => return Some(Self::LtReactionMiscmystical),
+            "lt.reaction.miscmystical2" => return Some(Self::LtReactionMiscmystical2),
+            "lt.reaction.product" => return Some(Self::LtReactionProduct),
+            "sparkler.use" => return Some(Self::SparklerUse),
+            "glowstick.use" => return Some(Self::GlowstickUse),
+            "block.turtle_egg.break" => return Some(Self::BlockTurtleEggBreak),
+            "block.turtle_egg.crack" => return Some(Self::BlockTurtleEggCrack),
+            "block.turtle_egg.hatch" => return Some(Self::BlockTurtleEggHatch),
+            "block.turtle_egg.attack" => return Some(Self::BlockTurtleEggAttack),
+            "block.sniffer_egg.crack" => return Some(Self::BlockSnifferEggCrack),
+            "block.sniffer_egg.hatch" => return Some(Self::BlockSnifferEggHatch),
+            "block.frog_spawn.hatch" => return Some(Self::BlockFrogSpawnHatch),
+            "block.frog_spawn.break" => return Some(Self::BlockFrogSpawnBreak),
+            "swoop" => return Some(Self::Swoop),
+            "presneeze" => return Some(Self::Presneeze),
+            "sneeze" => return Some(Self::Sneeze),
+            "scared" => return Some(Self::Scared),
+            "ambient.aggressive" => return Some(Self::AmbientAggressive),
+            "ambient.worried" => return Some(Self::AmbientWorried),
+            "cant_breed" => return Some(Self::CantBreed),
+            "block.scaffolding.climb" => return Some(Self::BlockScaffoldingClimb),
+            "block.bamboo_sapling.place" => return Some(Self::BlockBambooSaplingPlace),
+            "crossbow.loading.start" => return Some(Self::CrossbowLoadingStart),
+            "crossbow.loading.middle" => return Some(Self::CrossbowLoadingMiddle),
+            "crossbow.loading.end" => return Some(Self::CrossbowLoadingEnd),
+            "crossbow.shoot" => return Some(Self::CrossbowShoot),
+            "crossbow.quick_charge.start" => return Some(Self::CrossbowQuickChargeStart),
+            "crossbow.quick_charge.middle" => {
+                return Some(Self::CrossbowQuickChargeMiddle);
+            }
+            "crossbow.quick_charge.end" => return Some(Self::CrossbowQuickChargeEnd),
+            "item.shield.block" => return Some(Self::ItemShieldBlock),
+            "portal.travel" => return Some(Self::PortalTravel),
+            "item.book.put" => return Some(Self::ItemBookPut),
+            "block.grindstone.use" => return Some(Self::BlockGrindstoneUse),
+            "block.bell.hit" => return Some(Self::BlockBellHit),
+            "block.campfire.crackle" => return Some(Self::BlockCampfireCrackle),
+            "block.sweet_berry_bush.hurt" => return Some(Self::BlockSweetBerryBushHurt),
+            "block.sweet_berry_bush.pick" => return Some(Self::BlockSweetBerryBushPick),
+            "block.stonecutter.use" => return Some(Self::BlockStonecutterUse),
+            "block.cartography_table.use" => return Some(Self::BlockCartographyTableUse),
+            "block.composter.empty" => return Some(Self::BlockComposterEmpty),
+            "block.composter.fill" => return Some(Self::BlockComposterFill),
+            "block.composter.fill_success" => {
+                return Some(Self::BlockComposterFillSuccess);
+            }
+            "block.composter.ready" => return Some(Self::BlockComposterReady),
+            "roar" => return Some(Self::Roar),
+            "stun" => return Some(Self::Stun),
+            "block.barrel.open" => return Some(Self::BlockBarrelOpen),
+            "block.barrel.close" => return Some(Self::BlockBarrelClose),
+            "raid.horn" => return Some(Self::RaidHorn),
+            "ui.stonecutter.take_result" => return Some(Self::UiStonecutterTakeResult),
+            "ui.cartography_table.take_result" => {
+                return Some(Self::UiCartographyTableTakeResult);
+            }
+            "ui.loom.take_result" => return Some(Self::UiLoomTakeResult),
+            "block.smoker.smoke" => return Some(Self::BlockSmokerSmoke),
+            "block.blastfurnace.fire_crackle" => {
+                return Some(Self::BlockBlastfurnaceFireCrackle);
+            }
+            "block.smithing_table.use" => return Some(Self::BlockSmithingTableUse),
+            "block.loom.use" => return Some(Self::BlockLoomUse),
+            "ambient.in.raid" => return Some(Self::AmbientInRaid),
+            "screech" => return Some(Self::Screech),
+            "sleep" => return Some(Self::Sleep),
+            "block.furnace.lit" => return Some(Self::BlockFurnaceLit),
+            "convert_mooshroom" => return Some(Self::ConvertMooshroom),
+            "milk_suspiciously" => return Some(Self::MilkSuspiciously),
+            "celebrate" => return Some(Self::Celebrate),
+            "block.beehive.enter" => return Some(Self::BlockBeehiveEnter),
+            "block.beehive.exit" => return Some(Self::BlockBeehiveExit),
+            "block.beehive.shear" => return Some(Self::BlockBeehiveShear),
+            "block.beehive.work" => return Some(Self::BlockBeehiveWork),
+            "block.beehive.drip" => return Some(Self::BlockBeehiveDrip),
+            "ambient.cave" => return Some(Self::AmbientCave),
+            "angry" => return Some(Self::Angry),
+            "retreat" => return Some(Self::Retreat),
+            "converted_to_zombified" => return Some(Self::ConvertedToZombified),
+            "step_lava" => return Some(Self::StepLava),
+            "tempt" => return Some(Self::Tempt),
+            "panic" => return Some(Self::Panic),
+            "admire" => return Some(Self::Admire),
+            "particle.soul_escape.quiet" => return Some(Self::ParticleSoulEscapeQuiet),
+            "particle.soul_escape.loud" => return Some(Self::ParticleSoulEscapeLoud),
+            "respawn_anchor.charge" => return Some(Self::RespawnAnchorCharge),
+            "respawn_anchor.deplete" => return Some(Self::RespawnAnchorDeplete),
+            "respawn_anchor.set_spawn" => return Some(Self::RespawnAnchorSetSpawn),
+            "respawn_anchor.ambient" => return Some(Self::RespawnAnchorAmbient),
+            "ambient.crimson_forest.mood" => return Some(Self::AmbientCrimsonForestMood),
+            "ambient.warped_forest.mood" => return Some(Self::AmbientWarpedForestMood),
+            "ambient.soulsand_valley.mood" => {
+                return Some(Self::AmbientSoulsandValleyMood);
+            }
+            "ambient.nether_wastes.mood" => return Some(Self::AmbientNetherWastesMood),
+            "ambient.crimson_forest.additions" => {
+                return Some(Self::AmbientCrimsonForestAdditions);
+            }
+            "ambient.warped_forest.additions" => {
+                return Some(Self::AmbientWarpedForestAdditions);
+            }
+            "ambient.soulsand_valley.additions" => {
+                return Some(Self::AmbientSoulsandValleyAdditions);
+            }
+            "ambient.nether_wastes.additions" => {
+                return Some(Self::AmbientNetherWastesAdditions);
+            }
+            "ambient.basalt_deltas.additions" => {
+                return Some(Self::AmbientBasaltDeltasAdditions);
+            }
+            "ambient.crimson_forest.loop" => return Some(Self::AmbientCrimsonForestLoop),
+            "ambient.warped_forest.loop" => return Some(Self::AmbientWarpedForestLoop),
+            "ambient.soulsand_valley.loop" => {
+                return Some(Self::AmbientSoulsandValleyLoop);
+            }
+            "ambient.nether_wastes.loop" => return Some(Self::AmbientNetherWastesLoop),
+            "ambient.basalt_deltas.loop" => return Some(Self::AmbientBasaltDeltasLoop),
+            "lodestone_compass.link_compass_to_lodestone" => {
+                return Some(Self::LodestoneCompassLinkCompassToLodestone);
+            }
+            "ambient.basalt_deltas.mood" => return Some(Self::AmbientBasaltDeltasMood),
+            "power.on.sculk_sensor" => return Some(Self::PowerOnSculkSensor),
+            "power.off.sculk_sensor" => return Some(Self::PowerOffSculkSensor),
+            "smithing_table.use" => return Some(Self::SmithingTableUse),
+            "default" => return Some(Self::Default),
+            "lay_egg" => return Some(Self::LayEgg),
+            "lay_spawn" => return Some(Self::LaySpawn),
+            "bucket.fill.powder_snow" => return Some(Self::BucketFillPowderSnow),
+            "bucket.empty.powder_snow" => return Some(Self::BucketEmptyPowderSnow),
+            "cauldron_drip.water.pointed_dripstone" => {
+                return Some(Self::CauldronDripWaterPointedDripstone);
+            }
+            "cauldron_drip.lava.pointed_dripstone" => {
+                return Some(Self::CauldronDripLavaPointedDripstone);
+            }
+            "tilt_down.big_dripleaf" => return Some(Self::TiltDownBigDripleaf),
+            "tilt_up.big_dripleaf" => return Some(Self::TiltUpBigDripleaf),
+            "drip.water.pointed_dripstone" => {
+                return Some(Self::DripWaterPointedDripstone);
+            }
+            "pick_berries.cave_vines" => return Some(Self::PickBerriesCaveVines),
+            "drip.lava.pointed_dripstone" => return Some(Self::DripLavaPointedDripstone),
+            "copper.wax.on" => return Some(Self::CopperWaxOn),
+            "copper.wax.off" => return Some(Self::CopperWaxOff),
+            "scrape" => return Some(Self::Scrape),
+            "item.spyglass.use" => return Some(Self::ItemSpyglassUse),
+            "item.spyglass.stop_using" => return Some(Self::ItemSpyglassStopUsing),
+            "chime.amethyst_block" => return Some(Self::ChimeAmethystBlock),
+            "mob.player.hurt_drown" => return Some(Self::MobPlayerHurtDrown),
+            "mob.player.hurt_on_fire" => return Some(Self::MobPlayerHurtOnFire),
+            "mob.player.hurt_freeze" => return Some(Self::MobPlayerHurtFreeze),
+            "ambient.screamer" => return Some(Self::AmbientScreamer),
+            "hurt.screamer" => return Some(Self::HurtScreamer),
+            "death.screamer" => return Some(Self::DeathScreamer),
+            "milk.screamer" => return Some(Self::MilkScreamer),
+            "jump_to_block" => return Some(Self::JumpToBlock),
+            "pre_ram" => return Some(Self::PreRam),
+            "pre_ram.screamer" => return Some(Self::PreRamScreamer),
+            "ram_impact" => return Some(Self::RamImpact),
+            "ram_impact.screamer" => return Some(Self::RamImpactScreamer),
+            "squid.ink_squirt" => return Some(Self::SquidInkSquirt),
+            "glow_squid.ink_squirt" => return Some(Self::GlowSquidInkSquirt),
+            "convert_to_stray" => return Some(Self::ConvertToStray),
+            "cake.add_candle" => return Some(Self::CakeAddCandle),
+            "extinguish.candle" => return Some(Self::ExtinguishCandle),
+            "ambient.candle" => return Some(Self::AmbientCandle),
+            "block.click" => return Some(Self::BlockClick),
+            "block.click.fail" => return Some(Self::BlockClickFail),
+            "block.sculk_catalyst.bloom" => return Some(Self::BlockSculkCatalystBloom),
+            "block.sculk_shrieker.shriek" => return Some(Self::BlockSculkShriekerShriek),
+            "nearby_close" => return Some(Self::NearbyClose),
+            "nearby_closer" => return Some(Self::NearbyCloser),
+            "nearby_closest" => return Some(Self::NearbyClosest),
+            "agitated" => return Some(Self::Agitated),
+            "listening" => return Some(Self::Listening),
+            "heartbeat" => return Some(Self::Heartbeat),
+            "tongue" => return Some(Self::Tongue),
+            "item_given" => return Some(Self::ItemGiven),
+            "item_taken" => return Some(Self::ItemTaken),
+            "item_thrown" => return Some(Self::ItemThrown),
+            "irongolem.crack" => return Some(Self::IrongolemCrack),
+            "irongolem.repair" => return Some(Self::IrongolemRepair),
+            "horn_break" => return Some(Self::HornBreak),
+            "horn_call0" => return Some(Self::HornCall0),
+            "horn_call1" => return Some(Self::HornCall1),
+            "horn_call2" => return Some(Self::HornCall2),
+            "horn_call3" => return Some(Self::HornCall3),
+            "horn_call4" => return Some(Self::HornCall4),
+            "horn_call5" => return Some(Self::HornCall5),
+            "horn_call6" => return Some(Self::HornCall6),
+            "horn_call7" => return Some(Self::HornCall7),
+            "imitate.warden" => return Some(Self::ImitateWarden),
+            "listening_angry" => return Some(Self::ListeningAngry),
+            "sonic_boom" => return Some(Self::SonicBoom),
+            "sonic_charge" => return Some(Self::SonicCharge),
+            "convert_to_frog" => return Some(Self::ConvertToFrog),
+            "block.sculk.spread" => return Some(Self::BlockSculkSpread),
+            "charge.sculk" => return Some(Self::ChargeSculk),
+            "block.sculk_sensor.place" => return Some(Self::BlockSculkSensorPlace),
+            "block.sculk_shrieker.place" => return Some(Self::BlockSculkShriekerPlace),
+            "block.enchanting_table.use" => return Some(Self::BlockEnchantingTableUse),
+            "bundle.drop_contents" => return Some(Self::BundleDropContents),
+            "bundle.insert" => return Some(Self::BundleInsert),
+            "bundle.insert_fail" => return Some(Self::BundleInsertFail),
+            "bundle.remove_one" => return Some(Self::BundleRemoveOne),
+            "step_sand" => return Some(Self::StepSand),
+            "dash_ready" => return Some(Self::DashReady),
+            "pressure_plate.click_off" => return Some(Self::PressurePlateClickOff),
+            "pressure_plate.click_on" => return Some(Self::PressurePlateClickOn),
+            "button.click_off" => return Some(Self::ButtonClickOff),
+            "button.click_on" => return Some(Self::ButtonClickOn),
+            "door.open" => return Some(Self::DoorOpen),
+            "door.close" => return Some(Self::DoorClose),
+            "trapdoor.open" => return Some(Self::TrapdoorOpen),
+            "trapdoor.close" => return Some(Self::TrapdoorClose),
+            "fence_gate.open" => return Some(Self::FenceGateOpen),
+            "fence_gate.close" => return Some(Self::FenceGateClose),
+            "insert" => return Some(Self::Insert),
+            "pickup" => return Some(Self::Pickup),
+            "insert_enchanted" => return Some(Self::InsertEnchanted),
+            "pickup_enchanted" => return Some(Self::PickupEnchanted),
+            "shatter_pot" => return Some(Self::ShatterPot),
+            "break_pot" => return Some(Self::BreakPot),
+            "brush" => return Some(Self::Brush),
+            "brush_completed" => return Some(Self::BrushCompleted),
+            "block.sign.waxed_interact_fail" => {
+                return Some(Self::BlockSignWaxedInteractFail);
+            }
+            "note.bass" => return Some(Self::NoteBass),
+            "pumpkin.carve" => return Some(Self::PumpkinCarve),
+            "mob.husk.convert_to_zombie" => return Some(Self::MobHuskConvertToZombie),
+            "mob.pig.death" => return Some(Self::MobPigDeath),
+            "mob.hoglin.converted_to_zombified" => {
+                return Some(Self::MobHoglinConvertedToZombified);
+            }
+            "ambient.underwater.enter" => return Some(Self::AmbientUnderwaterEnter),
+            "ambient.underwater.exit" => return Some(Self::AmbientUnderwaterExit),
+            "bottle.fill" => return Some(Self::BottleFill),
+            "bottle.empty" => return Some(Self::BottleEmpty),
+            "block.decorated_pot.insert" => return Some(Self::BlockDecoratedPotInsert),
+            "block.decorated_pot.insert_fail" => {
+                return Some(Self::BlockDecoratedPotInsertFail);
+            }
+            "crafter.craft" => return Some(Self::CrafterCraft),
+            "crafter.fail" => return Some(Self::CrafterFail),
+            "crafter.disable_slot" => return Some(Self::CrafterDisableSlot),
+            "block.copper_bulb.turn_on" => return Some(Self::BlockCopperBulbTurnOn),
+            "block.copper_bulb.turn_off" => return Some(Self::BlockCopperBulbTurnOff),
+            "breeze_wind_charge.burst" => return Some(Self::BreezeWindChargeBurst),
+            "imitate.breeze" => return Some(Self::ImitateBreeze),
+            "trial_spawner.open_shutter" => return Some(Self::TrialSpawnerOpenShutter),
+            "trial_spawner.detect_player" => return Some(Self::TrialSpawnerDetectPlayer),
+            "trial_spawner.close_shutter" => return Some(Self::TrialSpawnerCloseShutter),
+            "trial_spawner.spawn_mob" => return Some(Self::TrialSpawnerSpawnMob),
+            "trial_spawner.eject_item" => return Some(Self::TrialSpawnerEjectItem),
+            "trial_spawner.ambient" => return Some(Self::TrialSpawnerAmbient),
+            "mob.armadillo.brush" => return Some(Self::MobArmadilloBrush),
+            "mob.armadillo.scute_drop" => return Some(Self::MobArmadilloScuteDrop),
+            "armor.equip_wolf" => return Some(Self::ArmorEquipWolf),
+            "armor.unequip_wolf" => return Some(Self::ArmorUnequipWolf),
+            "reflect" => return Some(Self::Reflect),
+            "vault.open_shutter" => return Some(Self::VaultOpenShutter),
+            "vault.close_shutter" => return Some(Self::VaultCloseShutter),
+            "vault.eject_item" => return Some(Self::VaultEjectItem),
+            "vault.insert_item" => return Some(Self::VaultInsertItem),
+            "vault.insert_item_fail" => return Some(Self::VaultInsertItemFail),
+            "vault.ambient" => return Some(Self::VaultAmbient),
+            "vault.activate" => return Some(Self::VaultActivate),
+            "vault.deactivate" => return Some(Self::VaultDeactivate),
+            "hurt.reduced" => return Some(Self::HurtReduced),
+            "wind_charge.burst" => return Some(Self::WindChargeBurst),
+            "armor.break_wolf" => return Some(Self::ArmorBreakWolf),
+            "armor.crack_wolf" => return Some(Self::ArmorCrackWolf),
+            "armor.repair_wolf" => return Some(Self::ArmorRepairWolf),
+            "mace.smash_air" => return Some(Self::MaceSmashAir),
+            "mace.smash_ground" => return Some(Self::MaceSmashGround),
+            "mace.heavy_smash_ground" => return Some(Self::MaceHeavySmashGround),
+            "trial_spawner.charge_activate" => {
+                return Some(Self::TrialSpawnerChargeActivate);
+            }
+            "trial_spawner.ambient_ominous" => {
+                return Some(Self::TrialSpawnerAmbientOminous);
+            }
+            "apply_effect.bad_omen" => return Some(Self::ApplyEffectBadOmen),
+            "apply_effect.raid_omen" => return Some(Self::ApplyEffectRaidOmen),
+            "apply_effect.trial_omen" => return Some(Self::ApplyEffectTrialOmen),
+            "ominous_item_spawner.spawn_item" => {
+                return Some(Self::OminousItemSpawnerSpawnItem);
+            }
+            "ominous_bottle.end_use" => return Some(Self::OminousBottleEndUse),
+            "ominous_item_spawner.spawn_item_begin" => {
+                return Some(Self::OminousItemSpawnerSpawnItemBegin);
+            }
+            "ominous_item_spawner.about_to_spawn_item" => {
+                return Some(Self::OminousItemSpawnerAboutToSpawnItem);
+            }
+            "imitate.bogged" => return Some(Self::ImitateBogged),
+            "vault.reject_rewarded_player" => {
+                return Some(Self::VaultRejectRewardedPlayer);
+            }
+            "imitate.drowned" => return Some(Self::ImitateDrowned),
+            "sponge.absorb" => return Some(Self::SpongeAbsorb),
+            "imitate.creaking" => return Some(Self::ImitateCreaking),
+            "block.creaking_heart.trail" => return Some(Self::BlockCreakingHeartTrail),
+            "creaking_heart_spawn" => return Some(Self::CreakingHeartSpawn),
+            "activate" => return Some(Self::Activate),
+            "deactivate" => return Some(Self::Deactivate),
+            "freeze" => return Some(Self::Freeze),
+            "unfreeze" => return Some(Self::Unfreeze),
+            "open" => return Some(Self::Open),
+            "open_long" => return Some(Self::OpenLong),
+            "close" => return Some(Self::Close),
+            "close_long" => return Some(Self::CloseLong),
+            "imitate.phantom" => return Some(Self::ImitatePhantom),
+            "imitate.zoglin" => return Some(Self::ImitateZoglin),
+            "imitate.guardian" => return Some(Self::ImitateGuardian),
+            "imitate.ravager" => return Some(Self::ImitateRavager),
+            "imitate.pillager" => return Some(Self::ImitatePillager),
+            "place_in_water" => return Some(Self::PlaceInWater),
+            "state_change" => return Some(Self::StateChange),
+            "imitate.happy_ghast" => return Some(Self::ImitateHappyGhast),
+            "armor.unequip_generic" => return Some(Self::ArmorUnequipGeneric),
+            "ambient.weather.the_end_light_flash" => {
+                return Some(Self::AmbientWeatherTheEndLightFlash);
+            }
+            "lead.leash" => return Some(Self::LeadLeash),
+            "lead.unleash" => return Some(Self::LeadUnleash),
+            "lead.break" => return Some(Self::LeadBreak),
+            "unsaddle" => return Some(Self::Unsaddle),
+            "armor.equip_copper" => return Some(Self::ArmorEquipCopper),
+            "place_item" => return Some(Self::PlaceItem),
+            "single_swap" => return Some(Self::SingleSwap),
+            "multi_swap" => return Some(Self::MultiSwap),
+            "item.enchant.lunge1" => return Some(Self::ItemEnchantLunge1),
+            "item.enchant.lunge2" => return Some(Self::ItemEnchantLunge2),
+            "item.enchant.lunge3" => return Some(Self::ItemEnchantLunge3),
+            "attack.critical" => return Some(Self::AttackCritical),
+            "item.spear.attack_hit" => return Some(Self::ItemSpearAttackHit),
+            "item.spear.attack_miss" => return Some(Self::ItemSpearAttackMiss),
+            "item.wooden_spear.attack_hit" => return Some(Self::ItemWoodenSpearAttackHit),
+            "item.wooden_spear.attack_miss" => {
+                return Some(Self::ItemWoodenSpearAttackMiss);
+            }
+            "imitate.parched" => return Some(Self::ImitateParched),
+            "imitate.camel_husk" => return Some(Self::ImitateCamelHusk),
+            "item.spear.use" => return Some(Self::ItemSpearUse),
+            "item.wooden_spear.use" => return Some(Self::ItemWoodenSpearUse),
+            "saddle_in_water" => return Some(Self::SaddleInWater),
+            "item.stone_spear.attack_hit" => return Some(Self::ItemStoneSpearAttackHit),
+            "item.iron_spear.attack_hit" => return Some(Self::ItemIronSpearAttackHit),
+            "item.copper_spear.attack_hit" => return Some(Self::ItemCopperSpearAttackHit),
+            "item.golden_spear.attack_hit" => return Some(Self::ItemGoldenSpearAttackHit),
+            "item.diamond_spear.attack_hit" => {
+                return Some(Self::ItemDiamondSpearAttackHit);
+            }
+            "item.netherite_spear.attack_hit" => {
+                return Some(Self::ItemNetheriteSpearAttackHit);
+            }
+            "item.stone_spear.attack_miss" => return Some(Self::ItemStoneSpearAttackMiss),
+            "item.iron_spear.attack_miss" => return Some(Self::ItemIronSpearAttackMiss),
+            "item.copper_spear.attack_miss" => {
+                return Some(Self::ItemCopperSpearAttackMiss);
+            }
+            "item.golden_spear.attack_miss" => {
+                return Some(Self::ItemGoldenSpearAttackMiss);
+            }
+            "item.diamond_spear.attack_miss" => {
+                return Some(Self::ItemDiamondSpearAttackMiss);
+            }
+            "item.netherite_spear.attack_miss" => {
+                return Some(Self::ItemNetheriteSpearAttackMiss);
+            }
+            "item.stone_spear.use" => return Some(Self::ItemStoneSpearUse),
+            "item.iron_spear.use" => return Some(Self::ItemIronSpearUse),
+            "item.copper_spear.use" => return Some(Self::ItemCopperSpearUse),
+            "item.golden_spear.use" => return Some(Self::ItemGoldenSpearUse),
+            "item.diamond_spear.use" => return Some(Self::ItemDiamondSpearUse),
+            "item.netherite_spear.use" => return Some(Self::ItemNetheriteSpearUse),
+            "pause_growth" => return Some(Self::PauseGrowth),
+            "reset_growth" => return Some(Self::ResetGrowth),
+            "pushed_by_player" => return Some(Self::PushedByPlayer),
+            "bounce" => return Some(Self::Bounce),
+            "slime_landing" => return Some(Self::SlimeLanding),
+            "absorb_block" => return Some(Self::AbsorbBlock),
+            "eject_block" => return Some(Self::EjectBlock),
+            "geyser_eruption_start" => return Some(Self::GeyserEruptionStart),
+            "geyser_eruption_active" => return Some(Self::GeyserEruptionActive),
+            "record.bounce" => return Some(Self::RecordBounce),
+            "bucket.fill.land_animal" => return Some(Self::BucketFillLandAnimal),
+            "bucket.empty.land_animal" => return Some(Self::BucketEmptyLandAnimal),
+            "geyser_continuous_eruption_start" => {
+                return Some(Self::GeyserContinuousEruptionStart);
+            }
+            "geyser_continuous_eruption_active" => {
+                return Some(Self::GeyserContinuousEruptionActive);
+            }
+            "mount" => return Some(Self::Mount),
+            "dismount" => return Some(Self::Dismount),
+            "straw_bed.break_leave" => return Some(Self::StrawBedBreakLeave),
+            "convert_to_frostbite" => return Some(Self::ConvertToFrostbite),
+            "convert_to_zombie" => return Some(Self::ConvertToZombie),
+            "crack" => return Some(Self::Crack),
+            "ice_ball.throw" => return Some(Self::IceBallThrow),
+            "record.flurry" => return Some(Self::RecordFlurry),
+            "imitate.frostbite" => return Some(Self::ImitateFrostbite),
+            "undefined" => return Some(Self::Undefined),
+            _ => {}
+        }
         const NAMES: &[(&str, LevelSoundEvent)] = &[
             ("item.use.on", LevelSoundEvent::ItemUseOn),
             ("hit", LevelSoundEvent::Hit),
@@ -20228,10 +24981,7 @@ impl ProtocolEnum for LevelSoundEvent {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -20469,7 +25219,76 @@ impl ProtocolEnum for MapDecorationType {
             Self::Count => "Count",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::MarkerWhite => "markerwhite",
+            Self::MarkerGreen => "markergreen",
+            Self::MarkerRed => "markerred",
+            Self::MarkerBlue => "markerblue",
+            Self::XWhite => "xwhite",
+            Self::TriangleRed => "trianglered",
+            Self::SquareWhite => "squarewhite",
+            Self::MarkerSign => "markersign",
+            Self::MarkerPink => "markerpink",
+            Self::MarkerOrange => "markerorange",
+            Self::MarkerYellow => "markeryellow",
+            Self::MarkerTeal => "markerteal",
+            Self::TriangleGreen => "trianglegreen",
+            Self::SmallSquareWhite => "smallsquarewhite",
+            Self::Mansion => "mansion",
+            Self::Monument => "monument",
+            Self::NoDraw => "nodraw",
+            Self::VillageDesert => "villagedesert",
+            Self::VillagePlains => "villageplains",
+            Self::VillageSavanna => "villagesavanna",
+            Self::VillageSnowy => "villagesnowy",
+            Self::VillageTaiga => "villagetaiga",
+            Self::JungleTemple => "jungletemple",
+            Self::WitchHut => "witchhut",
+            Self::TrialChambers => "trialchambers",
+            Self::AbandonedCamp => "abandonedcamp",
+            Self::BuriedAncientCity => "buriedancientcity",
+            Self::BuriedMineshaft => "buriedmineshaft",
+            Self::DesertPyramid => "desertpyramid",
+            Self::WarmOceanRuins => "warmoceanruins",
+            Self::Count => "count",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "MarkerWhite" => return Some(Self::MarkerWhite),
+            "MarkerGreen" => return Some(Self::MarkerGreen),
+            "MarkerRed" => return Some(Self::MarkerRed),
+            "MarkerBlue" => return Some(Self::MarkerBlue),
+            "XWhite" => return Some(Self::XWhite),
+            "TriangleRed" => return Some(Self::TriangleRed),
+            "SquareWhite" => return Some(Self::SquareWhite),
+            "MarkerSign" => return Some(Self::MarkerSign),
+            "MarkerPink" => return Some(Self::MarkerPink),
+            "MarkerOrange" => return Some(Self::MarkerOrange),
+            "MarkerYellow" => return Some(Self::MarkerYellow),
+            "MarkerTeal" => return Some(Self::MarkerTeal),
+            "TriangleGreen" => return Some(Self::TriangleGreen),
+            "SmallSquareWhite" => return Some(Self::SmallSquareWhite),
+            "Mansion" => return Some(Self::Mansion),
+            "Monument" => return Some(Self::Monument),
+            "NoDraw" => return Some(Self::NoDraw),
+            "VillageDesert" => return Some(Self::VillageDesert),
+            "VillagePlains" => return Some(Self::VillagePlains),
+            "VillageSavanna" => return Some(Self::VillageSavanna),
+            "VillageSnowy" => return Some(Self::VillageSnowy),
+            "VillageTaiga" => return Some(Self::VillageTaiga),
+            "JungleTemple" => return Some(Self::JungleTemple),
+            "WitchHut" => return Some(Self::WitchHut),
+            "TrialChambers" => return Some(Self::TrialChambers),
+            "AbandonedCamp" => return Some(Self::AbandonedCamp),
+            "BuriedAncientCity" => return Some(Self::BuriedAncientCity),
+            "BuriedMineshaft" => return Some(Self::BuriedMineshaft),
+            "DesertPyramid" => return Some(Self::DesertPyramid),
+            "WarmOceanRuins" => return Some(Self::WarmOceanRuins),
+            "Count" => return Some(Self::Count),
+            _ => {}
+        }
         const NAMES: &[(&str, MapDecorationType)] = &[
             ("MarkerWhite", MapDecorationType::MarkerWhite),
             ("MarkerGreen", MapDecorationType::MarkerGreen),
@@ -20505,10 +25324,7 @@ impl ProtocolEnum for MapDecorationType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -20574,7 +25390,20 @@ impl ProtocolEnum for MapItemTrackedActorType {
             Self::Other => "Other",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Entity => "entity",
+            Self::BlockEntity => "blockentity",
+            Self::Other => "other",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Entity" => return Some(Self::Entity),
+            "BlockEntity" => return Some(Self::BlockEntity),
+            "Other" => return Some(Self::Other),
+            _ => {}
+        }
         const NAMES: &[(&str, MapItemTrackedActorType)] = &[
             ("Entity", MapItemTrackedActorType::Entity),
             ("BlockEntity", MapItemTrackedActorType::BlockEntity),
@@ -20582,10 +25411,7 @@ impl ProtocolEnum for MapItemTrackedActorType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -20691,7 +25517,32 @@ impl ProtocolEnum for MatchmakingState {
             Self::RequeueAsParty => "RequeueAsParty",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Idle => "idle",
+            Self::Matchmaking => "matchmaking",
+            Self::MatchFound => "matchfound",
+            Self::Canceled => "canceled",
+            Self::PlayerLeftParty => "playerleftparty",
+            Self::PlayerLeftServer => "playerleftserver",
+            Self::ServerShutdown => "servershutdown",
+            Self::TimedOut => "timedout",
+            Self::RequeueAsParty => "requeueasparty",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Idle" => return Some(Self::Idle),
+            "Matchmaking" => return Some(Self::Matchmaking),
+            "MatchFound" => return Some(Self::MatchFound),
+            "Canceled" => return Some(Self::Canceled),
+            "PlayerLeftParty" => return Some(Self::PlayerLeftParty),
+            "PlayerLeftServer" => return Some(Self::PlayerLeftServer),
+            "ServerShutdown" => return Some(Self::ServerShutdown),
+            "TimedOut" => return Some(Self::TimedOut),
+            "RequeueAsParty" => return Some(Self::RequeueAsParty),
+            _ => {}
+        }
         const NAMES: &[(&str, MatchmakingState)] = &[
             ("Idle", MatchmakingState::Idle),
             ("Matchmaking", MatchmakingState::Matchmaking),
@@ -20705,10 +25556,7 @@ impl ProtocolEnum for MatchmakingState {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -21430,7 +26278,274 @@ impl ProtocolEnum for MemoryMemoryCategory {
             Self::Executable => "Executable",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::InvalidSizeUnknown => "invalid_sizeunknown",
+            Self::Actor => "actor",
+            Self::ActorAnimation => "actoranimation",
+            Self::ActorRendering => "actorrendering",
+            Self::BlockTickingQueues => "blocktickingqueues",
+            Self::BiomeStorage => "biome_storage",
+            Self::Blobs => "blobs",
+            Self::Cereal => "cereal",
+            Self::CircuitSystem => "circuitsystem",
+            Self::Client => "client",
+            Self::Commands => "commands",
+            Self::DBStorage => "dbstorage",
+            Self::Debug => "debug",
+            Self::Documentation => "documentation",
+            Self::ECSSystems => "ecssystems",
+            Self::Fmod => "fmod",
+            Self::Fonts => "fonts",
+            Self::ImGui => "imgui",
+            Self::Input => "input",
+            Self::JsonUI => "jsonui",
+            Self::JsonUIControlFactoryJson => "jsonui_controlfactory_json",
+            Self::JsonUIControlTree => "jsonui_controltree",
+            Self::JsonUIControlTreeControlElement => "jsonui_controltree_controlelement",
+            Self::JsonUIControlTreePopulateDataBinding => {
+                "jsonui_controltree_populatedatabinding"
+            }
+            Self::JsonUIControlTreePopulateFocus => "jsonui_controltree_populatefocus",
+            Self::JsonUIControlTreePopulateLayout => "jsonui_controltree_populatelayout",
+            Self::JsonUIControlTreePopulateOther => "jsonui_controltree_populateother",
+            Self::JsonUIControlTreePopulateSprite => "jsonui_controltree_populatesprite",
+            Self::JsonUIControlTreePopulateText => "jsonui_controltree_populatetext",
+            Self::JsonUIControlTreePopulateTTS => "jsonui_controltree_populatetts",
+            Self::JsonUIControlTreeVisibility => "jsonui_controltree_visibility",
+            Self::JsonUICreateUI => "jsonui_createui",
+            Self::JsonUIDefs => "jsonui_defs",
+            Self::JsonUILayoutManager => "jsonui_layoutmanager",
+            Self::JsonUILayoutManagerRemoveDependencies => {
+                "jsonui_layoutmanager_removedependencies"
+            }
+            Self::JsonUILayoutManagerInitVariable => "jsonui_layoutmanager_initvariable",
+            Self::Languages => "languages",
+            Self::Level => "level",
+            Self::LevelStructures => "levelstructures",
+            Self::LevelChunk => "levelchunk",
+            Self::LevelChunkGen => "levelchunkgen",
+            Self::LevelChunkGenThreadLocal => "levelchunkgenthreadlocal",
+            Self::LightVolumeManager => "lightvolumemanager",
+            Self::Network => "network",
+            Self::Marketplace => "marketplace",
+            Self::MaterialDragonCompiledDefinition => "material_dragoncompileddefinition",
+            Self::MaterialDragonMaterial => "material_dragonmaterial",
+            Self::MaterialDragonResource => "material_dragonresource",
+            Self::MaterialDragonUniformMap => "material_dragonuniformmap",
+            Self::MaterialRenderMaterial => "material_rendermaterial",
+            Self::MaterialRenderMaterialGroup => "material_rendermaterialgroup",
+            Self::MaterialVariationManager => "material_variationmanager",
+            Self::Molang => "molang",
+            Self::OreUI => "oreui",
+            Self::OreUIClient => "oreui_client",
+            Self::PersonaPieces => "persona_pieces",
+            Self::PersonaAnimations => "persona_animations",
+            Self::PersonaCharacters => "persona_characters",
+            Self::PersonaSkinPacks => "persona_skinpacks",
+            Self::PersonaRepo => "persona_repo",
+            Self::Player => "player",
+            Self::RenderChunk => "renderchunk",
+            Self::RenderChunkIndexBuffer => "renderchunk_indexbuffer",
+            Self::RenderChunkVertexBuffer => "renderchunk_vertexbuffer",
+            Self::Rendering => "rendering",
+            Self::RenderingBgfxInit => "rendering_bgfxinit",
+            Self::RenderingBgfxStartFrame => "rendering_bgfxstartframe",
+            Self::RenderingBlockTessellator => "rendering_blocktessellator",
+            Self::RenderingEndFrame => "rendering_endframe",
+            Self::RenderingGraphicsTasksInit => "rendering_graphicstasksinit",
+            Self::RenderingLibrary => "rendering_library",
+            Self::RenderingPolygonOperatorPool => "rendering_polygonoperatorpool",
+            Self::RenderingPBRTextureData => "rendering_pbrtexturedata",
+            Self::RenderingRenderRegistry => "rendering_renderregistry",
+            Self::RenderingSetup => "rendering_setup",
+            Self::RenderingVertices => "rendering_vertices",
+            Self::RequestLog => "requestlog",
+            Self::ResourcePacks => "resourcepacks",
+            Self::Sound => "sound",
+            Self::SubChunkBiomeData => "subchunk_biomedata",
+            Self::SubChunkBlockData => "subchunk_blockdata",
+            Self::SubChunkLightData => "subchunk_lightdata",
+            Self::Textures => "textures",
+            Self::WeatherRenderer => "weatherrenderer",
+            Self::WorldGenerator => "world_generator",
+            Self::Tasks => "tasks",
+            Self::Test => "test",
+            Self::TestLoadTestTags => "test_loadtesttags",
+            Self::Scripting => "scripting",
+            Self::ScriptingRuntime => "scripting_runtime",
+            Self::ScriptingContext => "scripting_context",
+            Self::ScriptingContextBindingsMc => "scripting_context_bindings_mc",
+            Self::ScriptingContextBindingsGt => "scripting_context_bindings_gt",
+            Self::ScriptingContextRun => "scripting_context_run",
+            Self::DataDrivenUI => "datadrivenui",
+            Self::DataDrivenUIDefs => "datadrivenui_defs",
+            Self::Gameface => "gameface",
+            Self::GamefaceSystem => "gameface_system",
+            Self::GamefaceDom => "gameface_dom",
+            Self::GamefaceCss => "gameface_css",
+            Self::GamefaceDisplay => "gameface_display",
+            Self::GamefaceTempAllocator => "gameface_tempallocator",
+            Self::GamefacePoolAllocator => "gameface_poolallocator",
+            Self::GamefaceDump => "gameface_dump",
+            Self::GamefaceMedia => "gameface_media",
+            Self::GamefaceJson => "gameface_json",
+            Self::GamefaceScriptEngine => "gameface_scriptengine",
+            Self::GamefaceScript => "gameface_script",
+            Self::GamefaceLayout => "gameface_layout",
+            Self::Executable => "executable",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "Invalid_SizeUnknown" => return Some(Self::InvalidSizeUnknown),
+            "Actor" => return Some(Self::Actor),
+            "ActorAnimation" => return Some(Self::ActorAnimation),
+            "ActorRendering" => return Some(Self::ActorRendering),
+            "BlockTickingQueues" => return Some(Self::BlockTickingQueues),
+            "Biome_Storage" => return Some(Self::BiomeStorage),
+            "Blobs" => return Some(Self::Blobs),
+            "Cereal" => return Some(Self::Cereal),
+            "CircuitSystem" => return Some(Self::CircuitSystem),
+            "Client" => return Some(Self::Client),
+            "Commands" => return Some(Self::Commands),
+            "DBStorage" => return Some(Self::DBStorage),
+            "Debug" => return Some(Self::Debug),
+            "Documentation" => return Some(Self::Documentation),
+            "ECSSystems" => return Some(Self::ECSSystems),
+            "FMOD" => return Some(Self::Fmod),
+            "Fonts" => return Some(Self::Fonts),
+            "ImGui" => return Some(Self::ImGui),
+            "Input" => return Some(Self::Input),
+            "JsonUI" => return Some(Self::JsonUI),
+            "JsonUI_ControlFactory_Json" => return Some(Self::JsonUIControlFactoryJson),
+            "JsonUI_ControlTree" => return Some(Self::JsonUIControlTree),
+            "JsonUI_ControlTree_ControlElement" => {
+                return Some(Self::JsonUIControlTreeControlElement);
+            }
+            "JsonUI_ControlTree_PopulateDataBinding" => {
+                return Some(Self::JsonUIControlTreePopulateDataBinding);
+            }
+            "JsonUI_ControlTree_PopulateFocus" => {
+                return Some(Self::JsonUIControlTreePopulateFocus);
+            }
+            "JsonUI_ControlTree_PopulateLayout" => {
+                return Some(Self::JsonUIControlTreePopulateLayout);
+            }
+            "JsonUI_ControlTree_PopulateOther" => {
+                return Some(Self::JsonUIControlTreePopulateOther);
+            }
+            "JsonUI_ControlTree_PopulateSprite" => {
+                return Some(Self::JsonUIControlTreePopulateSprite);
+            }
+            "JsonUI_ControlTree_PopulateText" => {
+                return Some(Self::JsonUIControlTreePopulateText);
+            }
+            "JsonUI_ControlTree_PopulateTTS" => {
+                return Some(Self::JsonUIControlTreePopulateTTS);
+            }
+            "JsonUI_ControlTree_Visibility" => {
+                return Some(Self::JsonUIControlTreeVisibility);
+            }
+            "JsonUI_CreateUI" => return Some(Self::JsonUICreateUI),
+            "JsonUI_Defs" => return Some(Self::JsonUIDefs),
+            "JsonUI_LayoutManager" => return Some(Self::JsonUILayoutManager),
+            "JsonUI_LayoutManager_RemoveDependencies" => {
+                return Some(Self::JsonUILayoutManagerRemoveDependencies);
+            }
+            "JsonUI_LayoutManager_InitVariable" => {
+                return Some(Self::JsonUILayoutManagerInitVariable);
+            }
+            "Languages" => return Some(Self::Languages),
+            "Level" => return Some(Self::Level),
+            "LevelStructures" => return Some(Self::LevelStructures),
+            "LevelChunk" => return Some(Self::LevelChunk),
+            "LevelChunkGen" => return Some(Self::LevelChunkGen),
+            "LevelChunkGenThreadLocal" => return Some(Self::LevelChunkGenThreadLocal),
+            "LightVolumeManager" => return Some(Self::LightVolumeManager),
+            "Network" => return Some(Self::Network),
+            "Marketplace" => return Some(Self::Marketplace),
+            "Material_DragonCompiledDefinition" => {
+                return Some(Self::MaterialDragonCompiledDefinition);
+            }
+            "Material_DragonMaterial" => return Some(Self::MaterialDragonMaterial),
+            "Material_DragonResource" => return Some(Self::MaterialDragonResource),
+            "Material_DragonUniformMap" => return Some(Self::MaterialDragonUniformMap),
+            "Material_RenderMaterial" => return Some(Self::MaterialRenderMaterial),
+            "Material_RenderMaterialGroup" => {
+                return Some(Self::MaterialRenderMaterialGroup);
+            }
+            "Material_VariationManager" => return Some(Self::MaterialVariationManager),
+            "Molang" => return Some(Self::Molang),
+            "OreUI" => return Some(Self::OreUI),
+            "OreUI_Client" => return Some(Self::OreUIClient),
+            "Persona_Pieces" => return Some(Self::PersonaPieces),
+            "Persona_Animations" => return Some(Self::PersonaAnimations),
+            "Persona_Characters" => return Some(Self::PersonaCharacters),
+            "Persona_SkinPacks" => return Some(Self::PersonaSkinPacks),
+            "Persona_Repo" => return Some(Self::PersonaRepo),
+            "Player" => return Some(Self::Player),
+            "RenderChunk" => return Some(Self::RenderChunk),
+            "RenderChunk_IndexBuffer" => return Some(Self::RenderChunkIndexBuffer),
+            "RenderChunk_VertexBuffer" => return Some(Self::RenderChunkVertexBuffer),
+            "Rendering" => return Some(Self::Rendering),
+            "Rendering_BgfxInit" => return Some(Self::RenderingBgfxInit),
+            "Rendering_BgfxStartFrame" => return Some(Self::RenderingBgfxStartFrame),
+            "Rendering_BlockTessellator" => return Some(Self::RenderingBlockTessellator),
+            "Rendering_EndFrame" => return Some(Self::RenderingEndFrame),
+            "Rendering_GraphicsTasksInit" => {
+                return Some(Self::RenderingGraphicsTasksInit);
+            }
+            "Rendering_Library" => return Some(Self::RenderingLibrary),
+            "Rendering_PolygonOperatorPool" => {
+                return Some(Self::RenderingPolygonOperatorPool);
+            }
+            "Rendering_PBRTextureData" => return Some(Self::RenderingPBRTextureData),
+            "Rendering_RenderRegistry" => return Some(Self::RenderingRenderRegistry),
+            "Rendering_Setup" => return Some(Self::RenderingSetup),
+            "Rendering_Vertices" => return Some(Self::RenderingVertices),
+            "RequestLog" => return Some(Self::RequestLog),
+            "ResourcePacks" => return Some(Self::ResourcePacks),
+            "Sound" => return Some(Self::Sound),
+            "SubChunk_BiomeData" => return Some(Self::SubChunkBiomeData),
+            "SubChunk_BlockData" => return Some(Self::SubChunkBlockData),
+            "SubChunk_LightData" => return Some(Self::SubChunkLightData),
+            "Textures" => return Some(Self::Textures),
+            "WeatherRenderer" => return Some(Self::WeatherRenderer),
+            "World_Generator" => return Some(Self::WorldGenerator),
+            "Tasks" => return Some(Self::Tasks),
+            "Test" => return Some(Self::Test),
+            "Test_LoadTestTags" => return Some(Self::TestLoadTestTags),
+            "Scripting" => return Some(Self::Scripting),
+            "Scripting_Runtime" => return Some(Self::ScriptingRuntime),
+            "Scripting_Context" => return Some(Self::ScriptingContext),
+            "Scripting_Context_Bindings_MC" => {
+                return Some(Self::ScriptingContextBindingsMc);
+            }
+            "Scripting_Context_Bindings_GT" => {
+                return Some(Self::ScriptingContextBindingsGt);
+            }
+            "Scripting_Context_Run" => return Some(Self::ScriptingContextRun),
+            "DataDrivenUI" => return Some(Self::DataDrivenUI),
+            "DataDrivenUI_Defs" => return Some(Self::DataDrivenUIDefs),
+            "Gameface" => return Some(Self::Gameface),
+            "Gameface_System" => return Some(Self::GamefaceSystem),
+            "Gameface_DOM" => return Some(Self::GamefaceDom),
+            "Gameface_CSS" => return Some(Self::GamefaceCss),
+            "Gameface_Display" => return Some(Self::GamefaceDisplay),
+            "Gameface_TempAllocator" => return Some(Self::GamefaceTempAllocator),
+            "Gameface_PoolAllocator" => return Some(Self::GamefacePoolAllocator),
+            "Gameface_Dump" => return Some(Self::GamefaceDump),
+            "Gameface_Media" => return Some(Self::GamefaceMedia),
+            "Gameface_JSON" => return Some(Self::GamefaceJson),
+            "Gameface_ScriptEngine" => return Some(Self::GamefaceScriptEngine),
+            "Gameface_Script" => return Some(Self::GamefaceScript),
+            "Gameface_Layout" => return Some(Self::GamefaceLayout),
+            "Executable" => return Some(Self::Executable),
+            _ => {}
+        }
         const NAMES: &[(&str, MemoryMemoryCategory)] = &[
             ("Unknown", MemoryMemoryCategory::Unknown),
             ("Invalid_SizeUnknown", MemoryMemoryCategory::InvalidSizeUnknown),
@@ -21609,10 +26724,7 @@ impl ProtocolEnum for MemoryMemoryCategory {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -21678,7 +26790,20 @@ impl ProtocolEnum for MessageAndParamsMessageType {
             Self::JukeboxPopup => "jukeboxPopup",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Translate => "translate",
+            Self::Popup => "popup",
+            Self::JukeboxPopup => "jukeboxpopup",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "translate" => return Some(Self::Translate),
+            "popup" => return Some(Self::Popup),
+            "jukeboxPopup" => return Some(Self::JukeboxPopup),
+            _ => {}
+        }
         const NAMES: &[(&str, MessageAndParamsMessageType)] = &[
             ("translate", MessageAndParamsMessageType::Translate),
             ("popup", MessageAndParamsMessageType::Popup),
@@ -21686,10 +26811,7 @@ impl ProtocolEnum for MessageAndParamsMessageType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -21777,7 +26899,26 @@ impl ProtocolEnum for MessageOnlyMessageType {
             Self::TextObjectAnnouncement => "textObjectAnnouncement",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Raw => "raw",
+            Self::Tip => "tip",
+            Self::SystemMessage => "systemmessage",
+            Self::TextObjectWhisper => "textobjectwhisper",
+            Self::TextObject => "textobject",
+            Self::TextObjectAnnouncement => "textobjectannouncement",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "raw" => return Some(Self::Raw),
+            "tip" => return Some(Self::Tip),
+            "systemMessage" => return Some(Self::SystemMessage),
+            "textObjectWhisper" => return Some(Self::TextObjectWhisper),
+            "textObject" => return Some(Self::TextObject),
+            "textObjectAnnouncement" => return Some(Self::TextObjectAnnouncement),
+            _ => {}
+        }
         const NAMES: &[(&str, MessageOnlyMessageType)] = &[
             ("raw", MessageOnlyMessageType::Raw),
             ("tip", MessageOnlyMessageType::Tip),
@@ -21788,10 +26929,7 @@ impl ProtocolEnum for MessageOnlyMessageType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -22341,7 +27479,186 @@ impl ProtocolEnum for MinecraftEventingAchievementIds {
             Self::WhatGoesAroundComesAround => "WhatGoesAroundComesAround",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ChestFullOfCobblestone => "chestfullofcobblestone",
+            Self::DiamondForYou => "diamondforyou",
+            Self::IronBelly => "ironbelly",
+            Self::IronMan => "ironman",
+            Self::OnARail => "onarail",
+            Self::Overkill => "overkill",
+            Self::ReturnToSender => "returntosender",
+            Self::SniperDuel => "sniperduel",
+            Self::StayinFrosty => "stayinfrosty",
+            Self::TakeInventory => "takeinventory",
+            Self::MapRoom => "maproom",
+            Self::FreightStation => "freightstation",
+            Self::SmeltEverything => "smelteverything",
+            Self::TasteOfYourOwnMedicine => "tasteofyourownmedicine",
+            Self::WhenPigsFly => "whenpigsfly",
+            Self::Inception => "inception",
+            Self::ArtificialSelection => "artificialselection",
+            Self::FreeDiver => "freediver",
+            Self::SpawnTheWither => "spawnthewither",
+            Self::Beaconator => "beaconator",
+            Self::GreatView => "greatview",
+            Self::SuperSonic => "supersonic",
+            Self::TheEndAgain => "theendagain",
+            Self::TreasureHunter => "treasurehunter",
+            Self::ShootingStar => "shootingstar",
+            Self::FashionShow => "fashionshow",
+            Self::SelfPublishedAuthor => "selfpublishedauthor",
+            Self::AlternativeFuel => "alternativefuel",
+            Self::SleepWithTheFishes => "sleepwiththefishes",
+            Self::Castaway => "castaway",
+            Self::ImAMarineBiologist => "imamarinebiologist",
+            Self::SailThe7Seas => "sailthe7seas",
+            Self::MeGold => "megold",
+            Self::Ahoy => "ahoy",
+            Self::Atlantis => "atlantis",
+            Self::OnePickleTwoPickleSeaPickleFour => "onepickletwopickleseapicklefour",
+            Self::DoaBarrelRoll => "doabarrelroll",
+            Self::Moskstraumen => "moskstraumen",
+            Self::Echolocation => "echolocation",
+            Self::WhereHaveYouBeen => "wherehaveyoubeen",
+            Self::TopOfTheWorld => "topoftheworld",
+            Self::FruitOnTheLoom => "fruitontheloom",
+            Self::SoundTheAlarm => "soundthealarm",
+            Self::BuyLowSellHigh => "buylowsellhigh",
+            Self::Disenchanted => "disenchanted",
+            Self::TimeForStew => "timeforstew",
+            Self::BeeOurGuest => "beeourguest",
+            Self::TotalBeeLocation => "totalbeelocation",
+            Self::StickySituation => "stickysituation",
+            Self::CoverMeInDebris => "covermeindebris",
+            Self::FloatYourGoat => "floatyourgoat",
+            Self::Friend => "friend",
+            Self::WaxOnWaxOff => "waxonwaxoff",
+            Self::StriderRiddenInLavaInOverworld => "striderriddeninlavainoverworld",
+            Self::GoatHornAcquired => "goathornacquired",
+            Self::JukeboxUsedInMeadows => "jukeboxusedinmeadows",
+            Self::TradedAtWorldHeight => "tradedatworldheight",
+            Self::SurvivedFallFromWorldHeight => "survivedfallfromworldheight",
+            Self::SneakCloseToSculkSensor => "sneakclosetosculksensor",
+            Self::ItSpreads => "itspreads",
+            Self::BirthdaySong => "birthdaysong",
+            Self::WithOurPowersCombined => "withourpowerscombined",
+            Self::PlantingThePast => "plantingthepast",
+            Self::CarefulRestoration => "carefulrestoration",
+            Self::Revaulting => "revaulting",
+            Self::CraftersCraftingCrafters => "crafterscraftingcrafters",
+            Self::WhoNeedsRockets => "whoneedsrockets",
+            Self::OverOverkill => "overoverkill",
+            Self::HeartTransplanter => "hearttransplanter",
+            Self::StayHydrated => "stayhydrated",
+            Self::MobKabob => "mobkabob",
+            Self::AdventuringTime => "adventuringtime",
+            Self::UhOh => "uhoh",
+            Self::GettingWood => "gettingwood",
+            Self::BenchMaking => "benchmaking",
+            Self::TimeToMine => "timetomine",
+            Self::HotTopic => "hottopic",
+            Self::AcquireHardware => "acquirehardware",
+            Self::GettingAnUpgrade => "gettinganupgrade",
+            Self::MonsterHunter => "monsterhunter",
+            Self::Diamonds => "diamonds",
+            Self::PlethoraOfCats => "plethoraofcats",
+            Self::WhatGoesAroundComesAround => "whatgoesaroundcomesaround",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "ChestFullOfCobblestone" => return Some(Self::ChestFullOfCobblestone),
+            "DiamondForYou" => return Some(Self::DiamondForYou),
+            "IronBelly" => return Some(Self::IronBelly),
+            "IronMan" => return Some(Self::IronMan),
+            "OnARail" => return Some(Self::OnARail),
+            "Overkill" => return Some(Self::Overkill),
+            "ReturnToSender" => return Some(Self::ReturnToSender),
+            "SniperDuel" => return Some(Self::SniperDuel),
+            "StayinFrosty" => return Some(Self::StayinFrosty),
+            "TakeInventory" => return Some(Self::TakeInventory),
+            "MapRoom" => return Some(Self::MapRoom),
+            "FreightStation" => return Some(Self::FreightStation),
+            "SmeltEverything" => return Some(Self::SmeltEverything),
+            "TasteOfYourOwnMedicine" => return Some(Self::TasteOfYourOwnMedicine),
+            "WhenPigsFly" => return Some(Self::WhenPigsFly),
+            "Inception" => return Some(Self::Inception),
+            "ArtificialSelection" => return Some(Self::ArtificialSelection),
+            "FreeDiver" => return Some(Self::FreeDiver),
+            "SpawnTheWither" => return Some(Self::SpawnTheWither),
+            "Beaconator" => return Some(Self::Beaconator),
+            "GreatView" => return Some(Self::GreatView),
+            "SuperSonic" => return Some(Self::SuperSonic),
+            "TheEndAgain" => return Some(Self::TheEndAgain),
+            "TreasureHunter" => return Some(Self::TreasureHunter),
+            "ShootingStar" => return Some(Self::ShootingStar),
+            "FashionShow" => return Some(Self::FashionShow),
+            "SelfPublishedAuthor" => return Some(Self::SelfPublishedAuthor),
+            "AlternativeFuel" => return Some(Self::AlternativeFuel),
+            "SleepWithTheFishes" => return Some(Self::SleepWithTheFishes),
+            "Castaway" => return Some(Self::Castaway),
+            "ImAMarineBiologist" => return Some(Self::ImAMarineBiologist),
+            "SailThe7Seas" => return Some(Self::SailThe7Seas),
+            "MeGold" => return Some(Self::MeGold),
+            "Ahoy" => return Some(Self::Ahoy),
+            "Atlantis" => return Some(Self::Atlantis),
+            "OnePickleTwoPickleSeaPickleFour" => {
+                return Some(Self::OnePickleTwoPickleSeaPickleFour);
+            }
+            "DoaBarrelRoll" => return Some(Self::DoaBarrelRoll),
+            "Moskstraumen" => return Some(Self::Moskstraumen),
+            "Echolocation" => return Some(Self::Echolocation),
+            "WhereHaveYouBeen" => return Some(Self::WhereHaveYouBeen),
+            "TopOfTheWorld" => return Some(Self::TopOfTheWorld),
+            "FruitOnTheLoom" => return Some(Self::FruitOnTheLoom),
+            "SoundTheAlarm" => return Some(Self::SoundTheAlarm),
+            "BuyLowSellHigh" => return Some(Self::BuyLowSellHigh),
+            "Disenchanted" => return Some(Self::Disenchanted),
+            "TimeForStew" => return Some(Self::TimeForStew),
+            "BeeOurGuest" => return Some(Self::BeeOurGuest),
+            "TotalBeeLocation" => return Some(Self::TotalBeeLocation),
+            "StickySituation" => return Some(Self::StickySituation),
+            "CoverMeInDebris" => return Some(Self::CoverMeInDebris),
+            "FloatYourGoat" => return Some(Self::FloatYourGoat),
+            "Friend" => return Some(Self::Friend),
+            "WaxOnWaxOff" => return Some(Self::WaxOnWaxOff),
+            "StriderRiddenInLavaInOverworld" => {
+                return Some(Self::StriderRiddenInLavaInOverworld);
+            }
+            "GoatHornAcquired" => return Some(Self::GoatHornAcquired),
+            "JukeboxUsedInMeadows" => return Some(Self::JukeboxUsedInMeadows),
+            "TradedAtWorldHeight" => return Some(Self::TradedAtWorldHeight),
+            "SurvivedFallFromWorldHeight" => {
+                return Some(Self::SurvivedFallFromWorldHeight);
+            }
+            "SneakCloseToSculkSensor" => return Some(Self::SneakCloseToSculkSensor),
+            "ItSpreads" => return Some(Self::ItSpreads),
+            "BirthdaySong" => return Some(Self::BirthdaySong),
+            "WithOurPowersCombined" => return Some(Self::WithOurPowersCombined),
+            "PlantingThePast" => return Some(Self::PlantingThePast),
+            "CarefulRestoration" => return Some(Self::CarefulRestoration),
+            "Revaulting" => return Some(Self::Revaulting),
+            "CraftersCraftingCrafters" => return Some(Self::CraftersCraftingCrafters),
+            "WhoNeedsRockets" => return Some(Self::WhoNeedsRockets),
+            "OverOverkill" => return Some(Self::OverOverkill),
+            "HeartTransplanter" => return Some(Self::HeartTransplanter),
+            "StayHydrated" => return Some(Self::StayHydrated),
+            "MobKabob" => return Some(Self::MobKabob),
+            "AdventuringTime" => return Some(Self::AdventuringTime),
+            "UhOh" => return Some(Self::UhOh),
+            "GettingWood" => return Some(Self::GettingWood),
+            "BenchMaking" => return Some(Self::BenchMaking),
+            "TimeToMine" => return Some(Self::TimeToMine),
+            "HotTopic" => return Some(Self::HotTopic),
+            "AcquireHardware" => return Some(Self::AcquireHardware),
+            "GettingAnUpgrade" => return Some(Self::GettingAnUpgrade),
+            "MonsterHunter" => return Some(Self::MonsterHunter),
+            "Diamonds" => return Some(Self::Diamonds),
+            "PlethoraOfCats" => return Some(Self::PlethoraOfCats),
+            "WhatGoesAroundComesAround" => return Some(Self::WhatGoesAroundComesAround),
+            _ => {}
+        }
         const NAMES: &[(&str, MinecraftEventingAchievementIds)] = &[
             (
                 "ChestFullOfCobblestone",
@@ -22468,10 +27785,7 @@ impl ProtocolEnum for MinecraftEventingAchievementIds {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -22625,7 +27939,48 @@ impl ProtocolEnum for MinecraftEventingInteractionType {
             Self::Equipping => "Equipping",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Breeding => "breeding",
+            Self::Taming => "taming",
+            Self::Curing => "curing",
+            Self::Crafted => "crafted",
+            Self::Shearing => "shearing",
+            Self::Milking => "milking",
+            Self::Trading => "trading",
+            Self::Feeding => "feeding",
+            Self::Igniting => "igniting",
+            Self::Coloring => "coloring",
+            Self::Naming => "naming",
+            Self::Leashing => "leashing",
+            Self::Unleashing => "unleashing",
+            Self::PetSleep => "petsleep",
+            Self::Trusting => "trusting",
+            Self::Commanding => "commanding",
+            Self::Equipping => "equipping",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Breeding" => return Some(Self::Breeding),
+            "Taming" => return Some(Self::Taming),
+            "Curing" => return Some(Self::Curing),
+            "Crafted" => return Some(Self::Crafted),
+            "Shearing" => return Some(Self::Shearing),
+            "Milking" => return Some(Self::Milking),
+            "Trading" => return Some(Self::Trading),
+            "Feeding" => return Some(Self::Feeding),
+            "Igniting" => return Some(Self::Igniting),
+            "Coloring" => return Some(Self::Coloring),
+            "Naming" => return Some(Self::Naming),
+            "Leashing" => return Some(Self::Leashing),
+            "Unleashing" => return Some(Self::Unleashing),
+            "PetSleep" => return Some(Self::PetSleep),
+            "Trusting" => return Some(Self::Trusting),
+            "Commanding" => return Some(Self::Commanding),
+            "Equipping" => return Some(Self::Equipping),
+            _ => {}
+        }
         const NAMES: &[(&str, MinecraftEventingInteractionType)] = &[
             ("Breeding", MinecraftEventingInteractionType::Breeding),
             ("Taming", MinecraftEventingInteractionType::Taming),
@@ -22647,10 +28002,7 @@ impl ProtocolEnum for MinecraftEventingInteractionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -22858,7 +28210,66 @@ impl ProtocolEnum for MinecraftEventingPOIBlockInteractionType {
             Self::DisenchantAndRepair => "DisenchantAndRepair",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Extend => "extend",
+            Self::Clone => "clone",
+            Self::Lock => "lock",
+            Self::Create => "create",
+            Self::CreateLocator => "createlocator",
+            Self::Rename => "rename",
+            Self::ItemPlaced => "itemplaced",
+            Self::ItemRemoved => "itemremoved",
+            Self::Cooking => "cooking",
+            Self::Dousing => "dousing",
+            Self::Lighting => "lighting",
+            Self::Haystack => "haystack",
+            Self::Filled => "filled",
+            Self::Emptied => "emptied",
+            Self::AddDye => "adddye",
+            Self::DyeItem => "dyeitem",
+            Self::ClearItem => "clearitem",
+            Self::EnchantArrow => "enchantarrow",
+            Self::CompostItemPlaced => "compostitemplaced",
+            Self::RecoveredBonemeal => "recoveredbonemeal",
+            Self::BookPlaced => "bookplaced",
+            Self::BookOpened => "bookopened",
+            Self::Disenchant => "disenchant",
+            Self::Repair => "repair",
+            Self::DisenchantAndRepair => "disenchantandrepair",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Extend" => return Some(Self::Extend),
+            "Clone" => return Some(Self::Clone),
+            "Lock" => return Some(Self::Lock),
+            "Create" => return Some(Self::Create),
+            "CreateLocator" => return Some(Self::CreateLocator),
+            "Rename" => return Some(Self::Rename),
+            "ItemPlaced" => return Some(Self::ItemPlaced),
+            "ItemRemoved" => return Some(Self::ItemRemoved),
+            "Cooking" => return Some(Self::Cooking),
+            "Dousing" => return Some(Self::Dousing),
+            "Lighting" => return Some(Self::Lighting),
+            "Haystack" => return Some(Self::Haystack),
+            "Filled" => return Some(Self::Filled),
+            "Emptied" => return Some(Self::Emptied),
+            "AddDye" => return Some(Self::AddDye),
+            "DyeItem" => return Some(Self::DyeItem),
+            "ClearItem" => return Some(Self::ClearItem),
+            "EnchantArrow" => return Some(Self::EnchantArrow),
+            "CompostItemPlaced" => return Some(Self::CompostItemPlaced),
+            "RecoveredBonemeal" => return Some(Self::RecoveredBonemeal),
+            "BookPlaced" => return Some(Self::BookPlaced),
+            "BookOpened" => return Some(Self::BookOpened),
+            "Disenchant" => return Some(Self::Disenchant),
+            "Repair" => return Some(Self::Repair),
+            "DisenchantAndRepair" => return Some(Self::DisenchantAndRepair),
+            _ => {}
+        }
         const NAMES: &[(&str, MinecraftEventingPOIBlockInteractionType)] = &[
             ("None", MinecraftEventingPOIBlockInteractionType::None),
             ("Extend", MinecraftEventingPOIBlockInteractionType::Extend),
@@ -22898,10 +28309,7 @@ impl ProtocolEnum for MinecraftEventingPOIBlockInteractionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -24323,7 +29731,540 @@ impl ProtocolEnum for MinecraftPacketIds {
             Self::VirtualContainerClose => "VirtualContainerClose",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::KeepAlive => "keepalive",
+            Self::Login => "login",
+            Self::PlayStatus => "playstatus",
+            Self::ServerToClientHandshake => "servertoclienthandshake",
+            Self::ClientToServerHandshake => "clienttoserverhandshake",
+            Self::Disconnect => "disconnect",
+            Self::ResourcePacksInfo => "resourcepacksinfo",
+            Self::ResourcePackStack => "resourcepackstack",
+            Self::ResourcePackClientResponse => "resourcepackclientresponse",
+            Self::Text => "text",
+            Self::SetTime => "settime",
+            Self::StartGame => "startgame",
+            Self::AddPlayer => "addplayer",
+            Self::AddActor => "addactor",
+            Self::RemoveActor => "removeactor",
+            Self::AddItemActor => "additemactor",
+            Self::ServerPlayerPostMovePosition => "serverplayerpostmoveposition",
+            Self::TakeItemActor => "takeitemactor",
+            Self::MoveAbsoluteActor => "moveabsoluteactor",
+            Self::MovePlayer => "moveplayer",
+            Self::UpdateBlock => "updateblock",
+            Self::AddPainting => "addpainting",
+            Self::LevelEvent => "levelevent",
+            Self::TileEvent => "tileevent",
+            Self::ActorEvent => "actorevent",
+            Self::MobEffect => "mobeffect",
+            Self::UpdateAttributes => "updateattributes",
+            Self::InventoryTransaction => "inventorytransaction",
+            Self::PlayerEquipment => "playerequipment",
+            Self::MobArmorEquipment => "mobarmorequipment",
+            Self::Interact => "interact",
+            Self::BlockPickRequest => "blockpickrequest",
+            Self::ActorPickRequest => "actorpickrequest",
+            Self::PlayerAction => "playeraction",
+            Self::HurtArmor => "hurtarmor",
+            Self::SetActorData => "setactordata",
+            Self::SetActorMotion => "setactormotion",
+            Self::SetActorLink => "setactorlink",
+            Self::SetHealth => "sethealth",
+            Self::SetSpawnPosition => "setspawnposition",
+            Self::Animate => "animate",
+            Self::Respawn => "respawn",
+            Self::ContainerOpen => "containeropen",
+            Self::ContainerClose => "containerclose",
+            Self::PlayerHotbar => "playerhotbar",
+            Self::InventoryContent => "inventorycontent",
+            Self::InventorySlot => "inventoryslot",
+            Self::ContainerSetData => "containersetdata",
+            Self::CraftingData => "craftingdata",
+            Self::GuiDataPickItem => "guidatapickitem",
+            Self::BlockActorData => "blockactordata",
+            Self::FullChunkData => "fullchunkdata",
+            Self::SetCommandsEnabled => "setcommandsenabled",
+            Self::SetDifficulty => "setdifficulty",
+            Self::ChangeDimension => "changedimension",
+            Self::SetPlayerGameType => "setplayergametype",
+            Self::PlayerList => "playerlist",
+            Self::SimpleEvent => "simpleevent",
+            Self::LegacyTelemetryEvent => "legacytelemetryevent",
+            Self::SpawnExperienceOrb => "spawnexperienceorb",
+            Self::MapData => "mapdata",
+            Self::MapInfoRequest => "mapinforequest",
+            Self::RequestChunkRadius => "requestchunkradius",
+            Self::ChunkRadiusUpdated => "chunkradiusupdated",
+            Self::GameRulesChanged => "gameruleschanged",
+            Self::Camera => "camera",
+            Self::BossEvent => "bossevent",
+            Self::ShowCredits => "showcredits",
+            Self::AvailableCommands => "availablecommands",
+            Self::CommandRequest => "commandrequest",
+            Self::CommandBlockUpdate => "commandblockupdate",
+            Self::CommandOutput => "commandoutput",
+            Self::UpdateTrade => "updatetrade",
+            Self::UpdateEquip => "updateequip",
+            Self::ResourcePackDataInfo => "resourcepackdatainfo",
+            Self::ResourcePackChunkData => "resourcepackchunkdata",
+            Self::ResourcePackChunkRequest => "resourcepackchunkrequest",
+            Self::Transfer => "transfer",
+            Self::PlaySound => "playsound",
+            Self::StopSound => "stopsound",
+            Self::SetTitle => "settitle",
+            Self::AddBehaviorTree => "addbehaviortree",
+            Self::StructureBlockUpdate => "structureblockupdate",
+            Self::ShowStoreOffer => "showstoreoffer",
+            Self::PurchaseReceipt => "purchasereceipt",
+            Self::PlayerSkin => "playerskin",
+            Self::SubclientLogin => "subclientlogin",
+            Self::AutomationClientConnect => "automationclientconnect",
+            Self::SetLastHurtBy => "setlasthurtby",
+            Self::BookEdit => "bookedit",
+            Self::NPCRequest => "npcrequest",
+            Self::PhotoTransfer => "phototransfer",
+            Self::ShowModalForm => "showmodalform",
+            Self::ModalFormResponse => "modalformresponse",
+            Self::ServerSettingsRequest => "serversettingsrequest",
+            Self::ServerSettingsResponse => "serversettingsresponse",
+            Self::ShowProfile => "showprofile",
+            Self::SetDefaultGameType => "setdefaultgametype",
+            Self::RemoveObjective => "removeobjective",
+            Self::SetDisplayObjective => "setdisplayobjective",
+            Self::SetScore => "setscore",
+            Self::LabTable => "labtable",
+            Self::UpdateBlockSynced => "updateblocksynced",
+            Self::MoveDeltaActor => "movedeltaactor",
+            Self::SetScoreboardIdentity => "setscoreboardidentity",
+            Self::SetLocalPlayerAsInit => "setlocalplayerasinit",
+            Self::UpdateSoftEnum => "updatesoftenum",
+            Self::Ping => "ping",
+            Self::ScriptCustomEvent => "scriptcustomevent",
+            Self::SpawnParticleEffect => "spawnparticleeffect",
+            Self::AvailableActorIDList => "availableactoridlist",
+            Self::NetworkChunkPublisherUpdate => "networkchunkpublisherupdate",
+            Self::BiomeDefinitionList => "biomedefinitionlist",
+            Self::LevelSoundEvent => "levelsoundevent",
+            Self::LevelEventGeneric => "leveleventgeneric",
+            Self::LecternUpdate => "lecternupdate",
+            Self::ClientCacheStatus => "clientcachestatus",
+            Self::OnScreenTextureAnimation => "onscreentextureanimation",
+            Self::MapCreateLockedCopy => "mapcreatelockedcopy",
+            Self::StructureTemplateDataExportRequest => {
+                "structuretemplatedataexportrequest"
+            }
+            Self::StructureTemplateDataExportResponse => {
+                "structuretemplatedataexportresponse"
+            }
+            Self::ClientCacheBlobStatusPacket => "clientcacheblobstatuspacket",
+            Self::ClientCacheMissResponsePacket => "clientcachemissresponsepacket",
+            Self::EducationSettingsPacket => "educationsettingspacket",
+            Self::Emote => "emote",
+            Self::MultiplayerSettingsPacket => "multiplayersettingspacket",
+            Self::SettingsCommandPacket => "settingscommandpacket",
+            Self::AnvilDamage => "anvildamage",
+            Self::CompletedUsingItem => "completedusingitem",
+            Self::ServerboundCursorItemDrag => "serverboundcursoritemdrag",
+            Self::NetworkSettings => "networksettings",
+            Self::PlayerAuthInputPacket => "playerauthinputpacket",
+            Self::CreativeContent => "creativecontent",
+            Self::PlayerEnchantOptions => "playerenchantoptions",
+            Self::ItemStackRequest => "itemstackrequest",
+            Self::ItemStackResponse => "itemstackresponse",
+            Self::PlayerArmorDamage => "playerarmordamage",
+            Self::CodeBuilderPacket => "codebuilderpacket",
+            Self::UpdatePlayerGameType => "updateplayergametype",
+            Self::EmoteList => "emotelist",
+            Self::PositionTrackingDBServerBroadcast => {
+                "positiontrackingdbserverbroadcast"
+            }
+            Self::PositionTrackingDBClientRequest => "positiontrackingdbclientrequest",
+            Self::DebugInfoPacket => "debuginfopacket",
+            Self::PacketViolationWarning => "packetviolationwarning",
+            Self::MotionPredictionHints => "motionpredictionhints",
+            Self::TriggerAnimation => "triggeranimation",
+            Self::CameraShake => "camerashake",
+            Self::PlayerFogSetting => "playerfogsetting",
+            Self::CorrectPlayerMovePredictionPacket => {
+                "correctplayermovepredictionpacket"
+            }
+            Self::ItemRegistryPacket => "itemregistrypacket",
+            Self::ClientBoundDebugRendererPacket => "clientbounddebugrendererpacket",
+            Self::SyncActorProperty => "syncactorproperty",
+            Self::SimulationTypePacket => "simulationtypepacket",
+            Self::NpcDialoguePacket => "npcdialoguepacket",
+            Self::EduUriResourcePacket => "eduuriresourcepacket",
+            Self::CreatePhotoPacket => "createphotopacket",
+            Self::UpdateSubChunkBlocks => "updatesubchunkblocks",
+            Self::SubChunkPacket => "subchunkpacket",
+            Self::SubChunkRequestPacket => "subchunkrequestpacket",
+            Self::PlayerStartItemCooldown => "playerstartitemcooldown",
+            Self::ScriptMessagePacket => "scriptmessagepacket",
+            Self::CodeBuilderSourcePacket => "codebuildersourcepacket",
+            Self::TickingAreasLoadStatus => "tickingareasloadstatus",
+            Self::DimensionDataPacket => "dimensiondatapacket",
+            Self::AgentAction => "agentaction",
+            Self::ChangeMobProperty => "changemobproperty",
+            Self::LessonProgressPacket => "lessonprogresspacket",
+            Self::RequestAbilityPacket => "requestabilitypacket",
+            Self::RequestPermissionsPacket => "requestpermissionspacket",
+            Self::ToastRequest => "toastrequest",
+            Self::UpdateAbilitiesPacket => "updateabilitiespacket",
+            Self::UpdateAdventureSettingsPacket => "updateadventuresettingspacket",
+            Self::DeathInfo => "deathinfo",
+            Self::EditorNetworkPacket => "editornetworkpacket",
+            Self::FeatureRegistryPacket => "featureregistrypacket",
+            Self::ServerStats => "serverstats",
+            Self::RequestNetworkSettings => "requestnetworksettings",
+            Self::GameTestRequestPacket => "gametestrequestpacket",
+            Self::GameTestResultsPacket => "gametestresultspacket",
+            Self::PlayerClientInputPermissions => "playerclientinputpermissions",
+            Self::CameraPresets => "camerapresets",
+            Self::UnlockedRecipes => "unlockedrecipes",
+            Self::TitleSpecificPacketsStart => "titlespecificpacketsstart",
+            Self::TitleSpecificPacketsEnd => "titlespecificpacketsend",
+            Self::CameraInstruction => "camerainstruction",
+            Self::TrimData => "trimdata",
+            Self::OpenSign => "opensign",
+            Self::AgentAnimation => "agentanimation",
+            Self::RefreshEntitlementsPacket => "refreshentitlementspacket",
+            Self::PlayerToggleCrafterSlotRequestPacket => {
+                "playertogglecrafterslotrequestpacket"
+            }
+            Self::SetPlayerInventoryOptions => "setplayerinventoryoptions",
+            Self::SetHudPacket => "sethudpacket",
+            Self::AwardAchievementPacket => "awardachievementpacket",
+            Self::ClientboundCloseScreen => "clientboundclosescreen",
+            Self::ServerboundLoadingScreenPacket => "serverboundloadingscreenpacket",
+            Self::JigsawStructureDataPacket => "jigsawstructuredatapacket",
+            Self::CurrentStructureFeaturePacket => "currentstructurefeaturepacket",
+            Self::ServerboundDiagnosticsPacket => "serverbounddiagnosticspacket",
+            Self::CameraAimAssist => "cameraaimassist",
+            Self::ContainerRegistryCleanup => "containerregistrycleanup",
+            Self::MovementEffect => "movementeffect",
+            Self::CameraAimAssistActorPriority => "cameraaimassistactorpriority",
+            Self::CameraAimAssistPresets => "cameraaimassistpresets",
+            Self::ClientCameraAimAssist => "clientcameraaimassist",
+            Self::ClientMovementPredictionSyncPacket => {
+                "clientmovementpredictionsyncpacket"
+            }
+            Self::UpdateClientOptions => "updateclientoptions",
+            Self::PlayerVideoCapturePacket => "playervideocapturepacket",
+            Self::PlayerUpdateEntityOverridesPacket => {
+                "playerupdateentityoverridespacket"
+            }
+            Self::PlayerLocation => "playerlocation",
+            Self::SyncWorldClocks => "syncworldclocks",
+            Self::SendPartyDestinationCookie => "sendpartydestinationcookie",
+            Self::PartyDestinationCookieResponse => "partydestinationcookieresponse",
+            Self::SetPlayerFurnaceOptions => "setplayerfurnaceoptions",
+            Self::RecordStarted => "recordstarted",
+            Self::ClientboundMatchmakingState => "clientboundmatchmakingstate",
+            Self::ServerboundMatchmakingCancel => "serverboundmatchmakingcancel",
+            Self::ClientboundPlayAudioContent => "clientboundplayaudiocontent",
+            Self::ServerboundRegisterAudioContent => "serverboundregisteraudiocontent",
+            Self::Chat => "chat",
+            Self::ClientboundOnlineMusicPlaybackResponse => {
+                "clientboundonlinemusicplaybackresponse"
+            }
+            Self::ServerboundRequestOnlineMusicPlayback => {
+                "serverboundrequestonlinemusicplayback"
+            }
+            Self::PlayerToggleArmorVisibilityRequestPacket => {
+                "playertogglearmorvisibilityrequestpacket"
+            }
+            Self::ClientboundMusicPlaybackFailure => "clientboundmusicplaybackfailure",
+            Self::VirtualContainerOpen => "virtualcontaineropen",
+            Self::VirtualContainerClose => "virtualcontainerclose",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "KeepAlive" => return Some(Self::KeepAlive),
+            "Login" => return Some(Self::Login),
+            "PlayStatus" => return Some(Self::PlayStatus),
+            "ServerToClientHandshake" => return Some(Self::ServerToClientHandshake),
+            "ClientToServerHandshake" => return Some(Self::ClientToServerHandshake),
+            "Disconnect" => return Some(Self::Disconnect),
+            "ResourcePacksInfo" => return Some(Self::ResourcePacksInfo),
+            "ResourcePackStack" => return Some(Self::ResourcePackStack),
+            "ResourcePackClientResponse" => return Some(Self::ResourcePackClientResponse),
+            "Text" => return Some(Self::Text),
+            "SetTime" => return Some(Self::SetTime),
+            "StartGame" => return Some(Self::StartGame),
+            "AddPlayer" => return Some(Self::AddPlayer),
+            "AddActor" => return Some(Self::AddActor),
+            "RemoveActor" => return Some(Self::RemoveActor),
+            "AddItemActor" => return Some(Self::AddItemActor),
+            "ServerPlayerPostMovePosition" => {
+                return Some(Self::ServerPlayerPostMovePosition);
+            }
+            "TakeItemActor" => return Some(Self::TakeItemActor),
+            "MoveAbsoluteActor" => return Some(Self::MoveAbsoluteActor),
+            "MovePlayer" => return Some(Self::MovePlayer),
+            "UpdateBlock" => return Some(Self::UpdateBlock),
+            "AddPainting" => return Some(Self::AddPainting),
+            "LevelEvent" => return Some(Self::LevelEvent),
+            "TileEvent" => return Some(Self::TileEvent),
+            "ActorEvent" => return Some(Self::ActorEvent),
+            "MobEffect" => return Some(Self::MobEffect),
+            "UpdateAttributes" => return Some(Self::UpdateAttributes),
+            "InventoryTransaction" => return Some(Self::InventoryTransaction),
+            "PlayerEquipment" => return Some(Self::PlayerEquipment),
+            "MobArmorEquipment" => return Some(Self::MobArmorEquipment),
+            "Interact" => return Some(Self::Interact),
+            "BlockPickRequest" => return Some(Self::BlockPickRequest),
+            "ActorPickRequest" => return Some(Self::ActorPickRequest),
+            "PlayerAction" => return Some(Self::PlayerAction),
+            "HurtArmor" => return Some(Self::HurtArmor),
+            "SetActorData" => return Some(Self::SetActorData),
+            "SetActorMotion" => return Some(Self::SetActorMotion),
+            "SetActorLink" => return Some(Self::SetActorLink),
+            "SetHealth" => return Some(Self::SetHealth),
+            "SetSpawnPosition" => return Some(Self::SetSpawnPosition),
+            "Animate" => return Some(Self::Animate),
+            "Respawn" => return Some(Self::Respawn),
+            "ContainerOpen" => return Some(Self::ContainerOpen),
+            "ContainerClose" => return Some(Self::ContainerClose),
+            "PlayerHotbar" => return Some(Self::PlayerHotbar),
+            "InventoryContent" => return Some(Self::InventoryContent),
+            "InventorySlot" => return Some(Self::InventorySlot),
+            "ContainerSetData" => return Some(Self::ContainerSetData),
+            "CraftingData" => return Some(Self::CraftingData),
+            "GuiDataPickItem" => return Some(Self::GuiDataPickItem),
+            "BlockActorData" => return Some(Self::BlockActorData),
+            "FullChunkData" => return Some(Self::FullChunkData),
+            "SetCommandsEnabled" => return Some(Self::SetCommandsEnabled),
+            "SetDifficulty" => return Some(Self::SetDifficulty),
+            "ChangeDimension" => return Some(Self::ChangeDimension),
+            "SetPlayerGameType" => return Some(Self::SetPlayerGameType),
+            "PlayerList" => return Some(Self::PlayerList),
+            "SimpleEvent" => return Some(Self::SimpleEvent),
+            "LegacyTelemetryEvent" => return Some(Self::LegacyTelemetryEvent),
+            "SpawnExperienceOrb" => return Some(Self::SpawnExperienceOrb),
+            "MapData" => return Some(Self::MapData),
+            "MapInfoRequest" => return Some(Self::MapInfoRequest),
+            "RequestChunkRadius" => return Some(Self::RequestChunkRadius),
+            "ChunkRadiusUpdated" => return Some(Self::ChunkRadiusUpdated),
+            "GameRulesChanged" => return Some(Self::GameRulesChanged),
+            "Camera" => return Some(Self::Camera),
+            "BossEvent" => return Some(Self::BossEvent),
+            "ShowCredits" => return Some(Self::ShowCredits),
+            "AvailableCommands" => return Some(Self::AvailableCommands),
+            "CommandRequest" => return Some(Self::CommandRequest),
+            "CommandBlockUpdate" => return Some(Self::CommandBlockUpdate),
+            "CommandOutput" => return Some(Self::CommandOutput),
+            "UpdateTrade" => return Some(Self::UpdateTrade),
+            "UpdateEquip" => return Some(Self::UpdateEquip),
+            "ResourcePackDataInfo" => return Some(Self::ResourcePackDataInfo),
+            "ResourcePackChunkData" => return Some(Self::ResourcePackChunkData),
+            "ResourcePackChunkRequest" => return Some(Self::ResourcePackChunkRequest),
+            "Transfer" => return Some(Self::Transfer),
+            "PlaySound" => return Some(Self::PlaySound),
+            "StopSound" => return Some(Self::StopSound),
+            "SetTitle" => return Some(Self::SetTitle),
+            "AddBehaviorTree" => return Some(Self::AddBehaviorTree),
+            "StructureBlockUpdate" => return Some(Self::StructureBlockUpdate),
+            "ShowStoreOffer" => return Some(Self::ShowStoreOffer),
+            "PurchaseReceipt" => return Some(Self::PurchaseReceipt),
+            "PlayerSkin" => return Some(Self::PlayerSkin),
+            "SubclientLogin" => return Some(Self::SubclientLogin),
+            "AutomationClientConnect" => return Some(Self::AutomationClientConnect),
+            "SetLastHurtBy" => return Some(Self::SetLastHurtBy),
+            "BookEdit" => return Some(Self::BookEdit),
+            "NPCRequest" => return Some(Self::NPCRequest),
+            "PhotoTransfer" => return Some(Self::PhotoTransfer),
+            "ShowModalForm" => return Some(Self::ShowModalForm),
+            "ModalFormResponse" => return Some(Self::ModalFormResponse),
+            "ServerSettingsRequest" => return Some(Self::ServerSettingsRequest),
+            "ServerSettingsResponse" => return Some(Self::ServerSettingsResponse),
+            "ShowProfile" => return Some(Self::ShowProfile),
+            "SetDefaultGameType" => return Some(Self::SetDefaultGameType),
+            "RemoveObjective" => return Some(Self::RemoveObjective),
+            "SetDisplayObjective" => return Some(Self::SetDisplayObjective),
+            "SetScore" => return Some(Self::SetScore),
+            "LabTable" => return Some(Self::LabTable),
+            "UpdateBlockSynced" => return Some(Self::UpdateBlockSynced),
+            "MoveDeltaActor" => return Some(Self::MoveDeltaActor),
+            "SetScoreboardIdentity" => return Some(Self::SetScoreboardIdentity),
+            "SetLocalPlayerAsInit" => return Some(Self::SetLocalPlayerAsInit),
+            "UpdateSoftEnum" => return Some(Self::UpdateSoftEnum),
+            "Ping" => return Some(Self::Ping),
+            "ScriptCustomEvent" => return Some(Self::ScriptCustomEvent),
+            "SpawnParticleEffect" => return Some(Self::SpawnParticleEffect),
+            "AvailableActorIDList" => return Some(Self::AvailableActorIDList),
+            "NetworkChunkPublisherUpdate" => {
+                return Some(Self::NetworkChunkPublisherUpdate);
+            }
+            "BiomeDefinitionList" => return Some(Self::BiomeDefinitionList),
+            "LevelSoundEvent" => return Some(Self::LevelSoundEvent),
+            "LevelEventGeneric" => return Some(Self::LevelEventGeneric),
+            "LecternUpdate" => return Some(Self::LecternUpdate),
+            "ClientCacheStatus" => return Some(Self::ClientCacheStatus),
+            "OnScreenTextureAnimation" => return Some(Self::OnScreenTextureAnimation),
+            "MapCreateLockedCopy" => return Some(Self::MapCreateLockedCopy),
+            "StructureTemplateDataExportRequest" => {
+                return Some(Self::StructureTemplateDataExportRequest);
+            }
+            "StructureTemplateDataExportResponse" => {
+                return Some(Self::StructureTemplateDataExportResponse);
+            }
+            "ClientCacheBlobStatusPacket" => {
+                return Some(Self::ClientCacheBlobStatusPacket);
+            }
+            "ClientCacheMissResponsePacket" => {
+                return Some(Self::ClientCacheMissResponsePacket);
+            }
+            "EducationSettingsPacket" => return Some(Self::EducationSettingsPacket),
+            "Emote" => return Some(Self::Emote),
+            "MultiplayerSettingsPacket" => return Some(Self::MultiplayerSettingsPacket),
+            "SettingsCommandPacket" => return Some(Self::SettingsCommandPacket),
+            "AnvilDamage" => return Some(Self::AnvilDamage),
+            "CompletedUsingItem" => return Some(Self::CompletedUsingItem),
+            "ServerboundCursorItemDrag" => return Some(Self::ServerboundCursorItemDrag),
+            "NetworkSettings" => return Some(Self::NetworkSettings),
+            "PlayerAuthInputPacket" => return Some(Self::PlayerAuthInputPacket),
+            "CreativeContent" => return Some(Self::CreativeContent),
+            "PlayerEnchantOptions" => return Some(Self::PlayerEnchantOptions),
+            "ItemStackRequest" => return Some(Self::ItemStackRequest),
+            "ItemStackResponse" => return Some(Self::ItemStackResponse),
+            "PlayerArmorDamage" => return Some(Self::PlayerArmorDamage),
+            "CodeBuilderPacket" => return Some(Self::CodeBuilderPacket),
+            "UpdatePlayerGameType" => return Some(Self::UpdatePlayerGameType),
+            "EmoteList" => return Some(Self::EmoteList),
+            "PositionTrackingDBServerBroadcast" => {
+                return Some(Self::PositionTrackingDBServerBroadcast);
+            }
+            "PositionTrackingDBClientRequest" => {
+                return Some(Self::PositionTrackingDBClientRequest);
+            }
+            "DebugInfoPacket" => return Some(Self::DebugInfoPacket),
+            "PacketViolationWarning" => return Some(Self::PacketViolationWarning),
+            "MotionPredictionHints" => return Some(Self::MotionPredictionHints),
+            "TriggerAnimation" => return Some(Self::TriggerAnimation),
+            "CameraShake" => return Some(Self::CameraShake),
+            "PlayerFogSetting" => return Some(Self::PlayerFogSetting),
+            "CorrectPlayerMovePredictionPacket" => {
+                return Some(Self::CorrectPlayerMovePredictionPacket);
+            }
+            "ItemRegistryPacket" => return Some(Self::ItemRegistryPacket),
+            "ClientBoundDebugRendererPacket" => {
+                return Some(Self::ClientBoundDebugRendererPacket);
+            }
+            "SyncActorProperty" => return Some(Self::SyncActorProperty),
+            "SimulationTypePacket" => return Some(Self::SimulationTypePacket),
+            "NpcDialoguePacket" => return Some(Self::NpcDialoguePacket),
+            "EduUriResourcePacket" => return Some(Self::EduUriResourcePacket),
+            "CreatePhotoPacket" => return Some(Self::CreatePhotoPacket),
+            "UpdateSubChunkBlocks" => return Some(Self::UpdateSubChunkBlocks),
+            "SubChunkPacket" => return Some(Self::SubChunkPacket),
+            "SubChunkRequestPacket" => return Some(Self::SubChunkRequestPacket),
+            "PlayerStartItemCooldown" => return Some(Self::PlayerStartItemCooldown),
+            "ScriptMessagePacket" => return Some(Self::ScriptMessagePacket),
+            "CodeBuilderSourcePacket" => return Some(Self::CodeBuilderSourcePacket),
+            "TickingAreasLoadStatus" => return Some(Self::TickingAreasLoadStatus),
+            "DimensionDataPacket" => return Some(Self::DimensionDataPacket),
+            "AgentAction" => return Some(Self::AgentAction),
+            "ChangeMobProperty" => return Some(Self::ChangeMobProperty),
+            "LessonProgressPacket" => return Some(Self::LessonProgressPacket),
+            "RequestAbilityPacket" => return Some(Self::RequestAbilityPacket),
+            "RequestPermissionsPacket" => return Some(Self::RequestPermissionsPacket),
+            "ToastRequest" => return Some(Self::ToastRequest),
+            "UpdateAbilitiesPacket" => return Some(Self::UpdateAbilitiesPacket),
+            "UpdateAdventureSettingsPacket" => {
+                return Some(Self::UpdateAdventureSettingsPacket);
+            }
+            "DeathInfo" => return Some(Self::DeathInfo),
+            "EditorNetworkPacket" => return Some(Self::EditorNetworkPacket),
+            "FeatureRegistryPacket" => return Some(Self::FeatureRegistryPacket),
+            "ServerStats" => return Some(Self::ServerStats),
+            "RequestNetworkSettings" => return Some(Self::RequestNetworkSettings),
+            "GameTestRequestPacket" => return Some(Self::GameTestRequestPacket),
+            "GameTestResultsPacket" => return Some(Self::GameTestResultsPacket),
+            "PlayerClientInputPermissions" => {
+                return Some(Self::PlayerClientInputPermissions);
+            }
+            "CameraPresets" => return Some(Self::CameraPresets),
+            "UnlockedRecipes" => return Some(Self::UnlockedRecipes),
+            "TitleSpecificPacketsStart" => return Some(Self::TitleSpecificPacketsStart),
+            "TitleSpecificPacketsEnd" => return Some(Self::TitleSpecificPacketsEnd),
+            "CameraInstruction" => return Some(Self::CameraInstruction),
+            "TrimData" => return Some(Self::TrimData),
+            "OpenSign" => return Some(Self::OpenSign),
+            "AgentAnimation" => return Some(Self::AgentAnimation),
+            "RefreshEntitlementsPacket" => return Some(Self::RefreshEntitlementsPacket),
+            "PlayerToggleCrafterSlotRequestPacket" => {
+                return Some(Self::PlayerToggleCrafterSlotRequestPacket);
+            }
+            "SetPlayerInventoryOptions" => return Some(Self::SetPlayerInventoryOptions),
+            "SetHudPacket" => return Some(Self::SetHudPacket),
+            "AwardAchievementPacket" => return Some(Self::AwardAchievementPacket),
+            "ClientboundCloseScreen" => return Some(Self::ClientboundCloseScreen),
+            "ServerboundLoadingScreenPacket" => {
+                return Some(Self::ServerboundLoadingScreenPacket);
+            }
+            "JigsawStructureDataPacket" => return Some(Self::JigsawStructureDataPacket),
+            "CurrentStructureFeaturePacket" => {
+                return Some(Self::CurrentStructureFeaturePacket);
+            }
+            "ServerboundDiagnosticsPacket" => {
+                return Some(Self::ServerboundDiagnosticsPacket);
+            }
+            "CameraAimAssist" => return Some(Self::CameraAimAssist),
+            "ContainerRegistryCleanup" => return Some(Self::ContainerRegistryCleanup),
+            "MovementEffect" => return Some(Self::MovementEffect),
+            "CameraAimAssistActorPriority" => {
+                return Some(Self::CameraAimAssistActorPriority);
+            }
+            "CameraAimAssistPresets" => return Some(Self::CameraAimAssistPresets),
+            "ClientCameraAimAssist" => return Some(Self::ClientCameraAimAssist),
+            "ClientMovementPredictionSyncPacket" => {
+                return Some(Self::ClientMovementPredictionSyncPacket);
+            }
+            "UpdateClientOptions" => return Some(Self::UpdateClientOptions),
+            "PlayerVideoCapturePacket" => return Some(Self::PlayerVideoCapturePacket),
+            "PlayerUpdateEntityOverridesPacket" => {
+                return Some(Self::PlayerUpdateEntityOverridesPacket);
+            }
+            "PlayerLocation" => return Some(Self::PlayerLocation),
+            "SyncWorldClocks" => return Some(Self::SyncWorldClocks),
+            "SendPartyDestinationCookie" => return Some(Self::SendPartyDestinationCookie),
+            "PartyDestinationCookieResponse" => {
+                return Some(Self::PartyDestinationCookieResponse);
+            }
+            "SetPlayerFurnaceOptions" => return Some(Self::SetPlayerFurnaceOptions),
+            "RecordStarted" => return Some(Self::RecordStarted),
+            "ClientboundMatchmakingState" => {
+                return Some(Self::ClientboundMatchmakingState);
+            }
+            "ServerboundMatchmakingCancel" => {
+                return Some(Self::ServerboundMatchmakingCancel);
+            }
+            "ClientboundPlayAudioContent" => {
+                return Some(Self::ClientboundPlayAudioContent);
+            }
+            "ServerboundRegisterAudioContent" => {
+                return Some(Self::ServerboundRegisterAudioContent);
+            }
+            "Chat" => return Some(Self::Chat),
+            "ClientboundOnlineMusicPlaybackResponse" => {
+                return Some(Self::ClientboundOnlineMusicPlaybackResponse);
+            }
+            "ServerboundRequestOnlineMusicPlayback" => {
+                return Some(Self::ServerboundRequestOnlineMusicPlayback);
+            }
+            "PlayerToggleArmorVisibilityRequestPacket" => {
+                return Some(Self::PlayerToggleArmorVisibilityRequestPacket);
+            }
+            "ClientboundMusicPlaybackFailure" => {
+                return Some(Self::ClientboundMusicPlaybackFailure);
+            }
+            "VirtualContainerOpen" => return Some(Self::VirtualContainerOpen),
+            "VirtualContainerClose" => return Some(Self::VirtualContainerClose),
+            _ => {}
+        }
         const NAMES: &[(&str, MinecraftPacketIds)] = &[
             ("KeepAlive", MinecraftPacketIds::KeepAlive),
             ("Login", MinecraftPacketIds::Login),
@@ -24643,10 +30584,7 @@ impl ProtocolEnum for MinecraftPacketIds {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -24717,7 +30655,22 @@ impl ProtocolEnum for Mirror {
             Self::Xz => "XZ",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::X => "x",
+            Self::Z => "z",
+            Self::Xz => "xz",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "X" => return Some(Self::X),
+            "Z" => return Some(Self::Z),
+            "XZ" => return Some(Self::Xz),
+            _ => {}
+        }
         const NAMES: &[(&str, Mirror)] = &[
             ("None", Mirror::None),
             ("X", Mirror::X),
@@ -24726,10 +30679,7 @@ impl ProtocolEnum for Mirror {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -24805,7 +30755,22 @@ impl ProtocolEnum for MobEffectPacketPayloadEvent {
             Self::Remove => "Remove",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::Add => "add",
+            Self::Update => "update",
+            Self::Remove => "remove",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "Add" => return Some(Self::Add),
+            "Update" => return Some(Self::Update),
+            "Remove" => return Some(Self::Remove),
+            _ => {}
+        }
         const NAMES: &[(&str, MobEffectPacketPayloadEvent)] = &[
             ("Invalid", MobEffectPacketPayloadEvent::Invalid),
             ("Add", MobEffectPacketPayloadEvent::Add),
@@ -24814,10 +30779,7 @@ impl ProtocolEnum for MobEffectPacketPayloadEvent {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -24878,17 +30840,25 @@ impl ProtocolEnum for ModalFormCancelReason {
             Self::UserBusy => "UserBusy",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::UserClosed => "userclosed",
+            Self::UserBusy => "userbusy",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "UserClosed" => return Some(Self::UserClosed),
+            "UserBusy" => return Some(Self::UserBusy),
+            _ => {}
+        }
         const NAMES: &[(&str, ModalFormCancelReason)] = &[
             ("UserClosed", ModalFormCancelReason::UserClosed),
             ("UserBusy", ModalFormCancelReason::UserBusy),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25044,7 +31014,67 @@ impl ProtocolEnum for MolangVersion {
             Self::Latest => "Latest",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::BeforeVersioning => "beforeversioning",
+            Self::Initial => "initial",
+            Self::FixedItemRemainingUseDurationQuery => {
+                "fixeditemremainingusedurationquery"
+            }
+            Self::ExpressionErrorMessages => "expressionerrormessages",
+            Self::UnexpectedOperatorErrors => "unexpectedoperatorerrors",
+            Self::ConditionalOperatorAssociativity => "conditionaloperatorassociativity",
+            Self::ComparisonAndLogicalOperatorPrecedence => {
+                "comparisonandlogicaloperatorprecedence"
+            }
+            Self::DivideByNegativeValue => "dividebynegativevalue",
+            Self::FixedCapeFlapAmountQuery => "fixedcapeflapamountquery",
+            Self::QueryBlockPropertyRenamedToState => "queryblockpropertyrenamedtostate",
+            Self::DeprecateOldBlockQueryNames => "deprecateoldblockquerynames",
+            Self::DeprecatedSnifferAndCamelQueries => "deprecatedsnifferandcamelqueries",
+            Self::LeafSupportingInFirstSolidBlockBelow => {
+                "leafsupportinginfirstsolidblockbelow"
+            }
+            Self::NumValidVersions => "numvalidversions",
+            Self::Latest => "latest",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "BeforeVersioning" => return Some(Self::BeforeVersioning),
+            "Initial" => return Some(Self::Initial),
+            "FixedItemRemainingUseDurationQuery" => {
+                return Some(Self::FixedItemRemainingUseDurationQuery);
+            }
+            "ExpressionErrorMessages" => return Some(Self::ExpressionErrorMessages),
+            "UnexpectedOperatorErrors" => return Some(Self::UnexpectedOperatorErrors),
+            "ConditionalOperatorAssociativity" => {
+                return Some(Self::ConditionalOperatorAssociativity);
+            }
+            "ComparisonAndLogicalOperatorPrecedence" => {
+                return Some(Self::ComparisonAndLogicalOperatorPrecedence);
+            }
+            "DivideByNegativeValue" => return Some(Self::DivideByNegativeValue),
+            "FixedCapeFlapAmountQuery" => return Some(Self::FixedCapeFlapAmountQuery),
+            "QueryBlockPropertyRenamedToState" => {
+                return Some(Self::QueryBlockPropertyRenamedToState);
+            }
+            "DeprecateOldBlockQueryNames" => {
+                return Some(Self::DeprecateOldBlockQueryNames);
+            }
+            "DeprecatedSnifferAndCamelQueries" => {
+                return Some(Self::DeprecatedSnifferAndCamelQueries);
+            }
+            "LeafSupportingInFirstSolidBlockBelow" => {
+                return Some(Self::LeafSupportingInFirstSolidBlockBelow);
+            }
+            "NumValidVersions" => return Some(Self::NumValidVersions),
+            "Latest" => return Some(Self::Latest),
+            "HardcodedMolang" => return Some(Self::Latest),
+            _ => {}
+        }
         const NAMES: &[(&str, MolangVersion)] = &[
             ("Invalid", MolangVersion::Invalid),
             ("BeforeVersioning", MolangVersion::BeforeVersioning),
@@ -25084,10 +31114,7 @@ impl ProtocolEnum for MolangVersion {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25165,7 +31192,22 @@ impl ProtocolEnum for MovePlayerPacketPayloadPositionMode {
             Self::OnlyHeadRot => "OnlyHeadRot",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Respawn => "respawn",
+            Self::Teleport => "teleport",
+            Self::OnlyHeadRot => "onlyheadrot",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Normal" => return Some(Self::Normal),
+            "Respawn" => return Some(Self::Respawn),
+            "Teleport" => return Some(Self::Teleport),
+            "OnlyHeadRot" => return Some(Self::OnlyHeadRot),
+            _ => {}
+        }
         const NAMES: &[(&str, MovePlayerPacketPayloadPositionMode)] = &[
             ("Normal", MovePlayerPacketPayloadPositionMode::Normal),
             ("Respawn", MovePlayerPacketPayloadPositionMode::Respawn),
@@ -25174,10 +31216,7 @@ impl ProtocolEnum for MovePlayerPacketPayloadPositionMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25247,7 +31286,20 @@ impl ProtocolEnum for MovementEffectType {
             Self::GeyserBoost => "GEYSER_BOOST",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::GlideBoost => "glide_boost",
+            Self::DolphinBoost => "dolphin_boost",
+            Self::GeyserBoost => "geyser_boost",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "GLIDE_BOOST" => return Some(Self::GlideBoost),
+            "DOLPHIN_BOOST" => return Some(Self::DolphinBoost),
+            "GEYSER_BOOST" => return Some(Self::GeyserBoost),
+            _ => {}
+        }
         const NAMES: &[(&str, MovementEffectType)] = &[
             ("GLIDE_BOOST", MovementEffectType::GlideBoost),
             ("DOLPHIN_BOOST", MovementEffectType::DolphinBoost),
@@ -25255,10 +31307,7 @@ impl ProtocolEnum for MovementEffectType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25328,7 +31377,20 @@ impl ProtocolEnum for MultiplayerSettingsPacketType {
             Self::RefreshJoincode => "RefreshJoincode",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::EnableMultiplayer => "enablemultiplayer",
+            Self::DisableMultiplayer => "disablemultiplayer",
+            Self::RefreshJoincode => "refreshjoincode",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "EnableMultiplayer" => return Some(Self::EnableMultiplayer),
+            "DisableMultiplayer" => return Some(Self::DisableMultiplayer),
+            "RefreshJoincode" => return Some(Self::RefreshJoincode),
+            _ => {}
+        }
         const NAMES: &[(&str, MultiplayerSettingsPacketType)] = &[
             ("EnableMultiplayer", MultiplayerSettingsPacketType::EnableMultiplayer),
             ("DisableMultiplayer", MultiplayerSettingsPacketType::DisableMultiplayer),
@@ -25336,10 +31398,7 @@ impl ProtocolEnum for MultiplayerSettingsPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25415,7 +31474,22 @@ impl ProtocolEnum for MusicPlaybackState {
             Self::Pending => "Pending",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Local => "local",
+            Self::Online => "online",
+            Self::NotFound => "notfound",
+            Self::Pending => "pending",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Local" => return Some(Self::Local),
+            "Online" => return Some(Self::Online),
+            "NotFound" => return Some(Self::NotFound),
+            "Pending" => return Some(Self::Pending),
+            _ => {}
+        }
         const NAMES: &[(&str, MusicPlaybackState)] = &[
             ("Local", MusicPlaybackState::Local),
             ("Online", MusicPlaybackState::Online),
@@ -25424,10 +31498,7 @@ impl ProtocolEnum for MusicPlaybackState {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25503,7 +31574,22 @@ impl ProtocolEnum for NewInteractionModel {
             Self::Count => "Count",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Touch => "touch",
+            Self::Crosshair => "crosshair",
+            Self::Classic => "classic",
+            Self::Count => "count",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Touch" => return Some(Self::Touch),
+            "Crosshair" => return Some(Self::Crosshair),
+            "Classic" => return Some(Self::Classic),
+            "Count" => return Some(Self::Count),
+            _ => {}
+        }
         const NAMES: &[(&str, NewInteractionModel)] = &[
             ("Touch", NewInteractionModel::Touch),
             ("Crosshair", NewInteractionModel::Crosshair),
@@ -25512,10 +31598,7 @@ impl ProtocolEnum for NewInteractionModel {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25571,16 +31654,21 @@ impl ProtocolEnum for NoiseAlignmentType {
             Self::MinLocalTransitionEnd => "MinLocalTransitionEnd",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::MinLocalTransitionEnd => "minlocaltransitionend",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "MinLocalTransitionEnd" {
+            return Some(Self::MinLocalTransitionEnd);
+        }
         const NAMES: &[(&str, NoiseAlignmentType)] = &[
             ("MinLocalTransitionEnd", NoiseAlignmentType::MinLocalTransitionEnd),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25641,17 +31729,25 @@ impl ProtocolEnum for NpcDialogueActionType {
             Self::Close => "Close",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Open => "open",
+            Self::Close => "close",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Open" => return Some(Self::Open),
+            "Close" => return Some(Self::Close),
+            _ => {}
+        }
         const NAMES: &[(&str, NpcDialogueActionType)] = &[
             ("Open", NpcDialogueActionType::Open),
             ("Close", NpcDialogueActionType::Close),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25745,7 +31841,28 @@ impl ProtocolEnum for NpcRequestPacketPayloadRequestType {
             Self::ExecuteOpeningCommands => "ExecuteOpeningCommands",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SetActions => "setactions",
+            Self::ExecuteAction => "executeaction",
+            Self::ExecuteClosingCommands => "executeclosingcommands",
+            Self::SetName => "setname",
+            Self::SetSkin => "setskin",
+            Self::SetInteractText => "setinteracttext",
+            Self::ExecuteOpeningCommands => "executeopeningcommands",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SetActions" => return Some(Self::SetActions),
+            "ExecuteAction" => return Some(Self::ExecuteAction),
+            "ExecuteClosingCommands" => return Some(Self::ExecuteClosingCommands),
+            "SetName" => return Some(Self::SetName),
+            "SetSkin" => return Some(Self::SetSkin),
+            "SetInteractText" => return Some(Self::SetInteractText),
+            "ExecuteOpeningCommands" => return Some(Self::ExecuteOpeningCommands),
+            _ => {}
+        }
         const NAMES: &[(&str, NpcRequestPacketPayloadRequestType)] = &[
             ("SetActions", NpcRequestPacketPayloadRequestType::SetActions),
             ("ExecuteAction", NpcRequestPacketPayloadRequestType::ExecuteAction),
@@ -25763,10 +31880,7 @@ impl ProtocolEnum for NpcRequestPacketPayloadRequestType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25827,17 +31941,25 @@ impl ProtocolEnum for ObjectiveSortOrder {
             Self::Descending => "Descending",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Ascending => "ascending",
+            Self::Descending => "descending",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Ascending" => return Some(Self::Ascending),
+            "Descending" => return Some(Self::Descending),
+            _ => {}
+        }
         const NAMES: &[(&str, ObjectiveSortOrder)] = &[
             ("Ascending", ObjectiveSortOrder::Ascending),
             ("Descending", ObjectiveSortOrder::Descending),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -25943,7 +32065,32 @@ impl ProtocolEnum for PackType {
             Self::WorldTemplate => "WorldTemplate",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::Addon => "addon",
+            Self::Cached => "cached",
+            Self::CopyProtected => "copyprotected",
+            Self::Behavior => "behavior",
+            Self::PersonaPiece => "personapiece",
+            Self::Resources => "resources",
+            Self::Skins => "skins",
+            Self::WorldTemplate => "worldtemplate",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "Addon" => return Some(Self::Addon),
+            "Cached" => return Some(Self::Cached),
+            "CopyProtected" => return Some(Self::CopyProtected),
+            "Behavior" => return Some(Self::Behavior),
+            "PersonaPiece" => return Some(Self::PersonaPiece),
+            "Resources" => return Some(Self::Resources),
+            "Skins" => return Some(Self::Skins),
+            "WorldTemplate" => return Some(Self::WorldTemplate),
+            _ => {}
+        }
         const NAMES: &[(&str, PackType)] = &[
             ("Invalid", PackType::Invalid),
             ("Addon", PackType::Addon),
@@ -25957,10 +32104,7 @@ impl ProtocolEnum for PackType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26026,7 +32170,20 @@ impl ProtocolEnum for PacketCompressionAlgorithm {
             Self::None => "None",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ZLib => "zlib",
+            Self::Snappy => "snappy",
+            Self::None => "none",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "ZLib" => return Some(Self::ZLib),
+            "Snappy" => return Some(Self::Snappy),
+            "None" => return Some(Self::None),
+            _ => {}
+        }
         const NAMES: &[(&str, PacketCompressionAlgorithm)] = &[
             ("ZLib", PacketCompressionAlgorithm::ZLib),
             ("Snappy", PacketCompressionAlgorithm::Snappy),
@@ -26034,10 +32191,7 @@ impl ProtocolEnum for PacketCompressionAlgorithm {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26113,7 +32267,22 @@ impl ProtocolEnum for PacketViolationSeverity {
             Self::TerminatingConnection => "TerminatingConnection",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Warning => "warning",
+            Self::FinalWarning => "finalwarning",
+            Self::TerminatingConnection => "terminatingconnection",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "Warning" => return Some(Self::Warning),
+            "FinalWarning" => return Some(Self::FinalWarning),
+            "TerminatingConnection" => return Some(Self::TerminatingConnection),
+            _ => {}
+        }
         const NAMES: &[(&str, PacketViolationSeverity)] = &[
             ("Unknown", PacketViolationSeverity::Unknown),
             ("Warning", PacketViolationSeverity::Warning),
@@ -26122,10 +32291,7 @@ impl ProtocolEnum for PacketViolationSeverity {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26186,17 +32352,25 @@ impl ProtocolEnum for PacketViolationType {
             Self::PacketMalformed => "PacketMalformed",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::PacketMalformed => "packetmalformed",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "PacketMalformed" => return Some(Self::PacketMalformed),
+            _ => {}
+        }
         const NAMES: &[(&str, PacketViolationType)] = &[
             ("Unknown", PacketViolationType::Unknown),
             ("PacketMalformed", PacketViolationType::PacketMalformed),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26262,7 +32436,20 @@ impl ProtocolEnum for PartyDestinationCookieIntent {
             Self::OptOut => "OptOut",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Notify => "notify",
+            Self::OptIn => "optin",
+            Self::OptOut => "optout",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Notify" => return Some(Self::Notify),
+            "OptIn" => return Some(Self::OptIn),
+            "OptOut" => return Some(Self::OptOut),
+            _ => {}
+        }
         const NAMES: &[(&str, PartyDestinationCookieIntent)] = &[
             ("Notify", PartyDestinationCookieIntent::Notify),
             ("OptIn", PartyDestinationCookieIntent::OptIn),
@@ -26270,10 +32457,7 @@ impl ProtocolEnum for PartyDestinationCookieIntent {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26339,7 +32523,20 @@ impl ProtocolEnum for PassengerOfBlockArgumentsEmoteType {
             Self::Laying => "Laying",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Standing => "standing",
+            Self::Riding => "riding",
+            Self::Laying => "laying",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Standing" => return Some(Self::Standing),
+            "Riding" => return Some(Self::Riding),
+            "Laying" => return Some(Self::Laying),
+            _ => {}
+        }
         const NAMES: &[(&str, PassengerOfBlockArgumentsEmoteType)] = &[
             ("Standing", PassengerOfBlockArgumentsEmoteType::Standing),
             ("Riding", PassengerOfBlockArgumentsEmoteType::Riding),
@@ -26347,10 +32544,7 @@ impl ProtocolEnum for PassengerOfBlockArgumentsEmoteType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26420,7 +32614,20 @@ impl ProtocolEnum for PayloadType {
             Self::AddDebugMarkerCube => "AddDebugMarkerCube",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Invalid => "invalid",
+            Self::ClearDebugMarkers => "cleardebugmarkers",
+            Self::AddDebugMarkerCube => "adddebugmarkercube",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Invalid" => return Some(Self::Invalid),
+            "ClearDebugMarkers" => return Some(Self::ClearDebugMarkers),
+            "AddDebugMarkerCube" => return Some(Self::AddDebugMarkerCube),
+            _ => {}
+        }
         const NAMES: &[(&str, PayloadType)] = &[
             ("Invalid", PayloadType::Invalid),
             ("ClearDebugMarkers", PayloadType::ClearDebugMarkers),
@@ -26428,10 +32635,7 @@ impl ProtocolEnum for PayloadType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26507,7 +32711,22 @@ impl ProtocolEnum for PersonaAnimatedTextureType {
             Self::Body128x128 => "Body128x128",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Face => "face",
+            Self::Body32x32 => "body32x32",
+            Self::Body128x128 => "body128x128",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Face" => return Some(Self::Face),
+            "Body32x32" => return Some(Self::Body32x32),
+            "Body128x128" => return Some(Self::Body128x128),
+            _ => {}
+        }
         const NAMES: &[(&str, PersonaAnimatedTextureType)] = &[
             ("None", PersonaAnimatedTextureType::None),
             ("Face", PersonaAnimatedTextureType::Face),
@@ -26516,10 +32735,7 @@ impl ProtocolEnum for PersonaAnimatedTextureType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26580,17 +32796,25 @@ impl ProtocolEnum for PersonaAnimationExpression {
             Self::Blinking => "Blinking",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Linear => "linear",
+            Self::Blinking => "blinking",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Linear" => return Some(Self::Linear),
+            "Blinking" => return Some(Self::Blinking),
+            _ => {}
+        }
         const NAMES: &[(&str, PersonaAnimationExpression)] = &[
             ("Linear", PersonaAnimationExpression::Linear),
             ("Blinking", PersonaAnimationExpression::Blinking),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26651,17 +32875,25 @@ impl ProtocolEnum for PersonaArmSizeType {
             Self::Wide => "Wide",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Slim => "slim",
+            Self::Wide => "wide",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Slim" => return Some(Self::Slim),
+            "Wide" => return Some(Self::Wide),
+            _ => {}
+        }
         const NAMES: &[(&str, PersonaArmSizeType)] = &[
             ("Slim", PersonaArmSizeType::Slim),
             ("Wide", PersonaArmSizeType::Wide),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26893,7 +33125,74 @@ impl ProtocolEnum for PersonaPieceType {
             Self::Unsupported => "Unsupported",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Skeleton => "skeleton",
+            Self::Body => "body",
+            Self::Skin => "skin",
+            Self::Bottom => "bottom",
+            Self::Feet => "feet",
+            Self::Dress => "dress",
+            Self::Top => "top",
+            Self::HighPants => "high_pants",
+            Self::Hands => "hands",
+            Self::Outerwear => "outerwear",
+            Self::FacialHair => "facialhair",
+            Self::Mouth => "mouth",
+            Self::Eyes => "eyes",
+            Self::Hair => "hair",
+            Self::Hood => "hood",
+            Self::Back => "back",
+            Self::FaceAccessory => "faceaccessory",
+            Self::Head => "head",
+            Self::Legs => "legs",
+            Self::LeftLeg => "leftleg",
+            Self::RightLeg => "rightleg",
+            Self::Arms => "arms",
+            Self::LeftArm => "leftarm",
+            Self::RightArm => "rightarm",
+            Self::Capes => "capes",
+            Self::ClassicSkin => "classicskin",
+            Self::Emote => "emote",
+            Self::CoCo => "coco",
+            Self::Unsupported => "unsupported",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "Skeleton" => return Some(Self::Skeleton),
+            "Body" => return Some(Self::Body),
+            "Skin" => return Some(Self::Skin),
+            "Bottom" => return Some(Self::Bottom),
+            "Feet" => return Some(Self::Feet),
+            "Dress" => return Some(Self::Dress),
+            "Top" => return Some(Self::Top),
+            "High_Pants" => return Some(Self::HighPants),
+            "Hands" => return Some(Self::Hands),
+            "Outerwear" => return Some(Self::Outerwear),
+            "FacialHair" => return Some(Self::FacialHair),
+            "Mouth" => return Some(Self::Mouth),
+            "Eyes" => return Some(Self::Eyes),
+            "Hair" => return Some(Self::Hair),
+            "Hood" => return Some(Self::Hood),
+            "Back" => return Some(Self::Back),
+            "FaceAccessory" => return Some(Self::FaceAccessory),
+            "Head" => return Some(Self::Head),
+            "Legs" => return Some(Self::Legs),
+            "LeftLeg" => return Some(Self::LeftLeg),
+            "RightLeg" => return Some(Self::RightLeg),
+            "Arms" => return Some(Self::Arms),
+            "LeftArm" => return Some(Self::LeftArm),
+            "RightArm" => return Some(Self::RightArm),
+            "Capes" => return Some(Self::Capes),
+            "ClassicSkin" => return Some(Self::ClassicSkin),
+            "Emote" => return Some(Self::Emote),
+            "CoCo" => return Some(Self::CoCo),
+            "Unsupported" => return Some(Self::Unsupported),
+            _ => {}
+        }
         const NAMES: &[(&str, PersonaPieceType)] = &[
             ("Unknown", PersonaPieceType::Unknown),
             ("Skeleton", PersonaPieceType::Skeleton),
@@ -26928,10 +33227,7 @@ impl ProtocolEnum for PersonaPieceType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -26997,7 +33293,20 @@ impl ProtocolEnum for PhotoType {
             Self::Book => "Book",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Portfolio => "portfolio",
+            Self::PhotoItem => "photoitem",
+            Self::Book => "book",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Portfolio" => return Some(Self::Portfolio),
+            "PhotoItem" => return Some(Self::PhotoItem),
+            "Book" => return Some(Self::Book),
+            _ => {}
+        }
         const NAMES: &[(&str, PhotoType)] = &[
             ("Portfolio", PhotoType::Portfolio),
             ("PhotoItem", PhotoType::PhotoItem),
@@ -27005,10 +33314,7 @@ impl ProtocolEnum for PhotoType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -27128,7 +33434,52 @@ impl ProtocolEnum for PlayStatus {
             }
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::LoginSuccess => "loginsuccess",
+            Self::LoginFailedClientOld => "loginfailed_clientold",
+            Self::LoginFailedServerOld => "loginfailed_serverold",
+            Self::PlayerSpawn => "playerspawn",
+            Self::LoginFailedInvalidTenant => "loginfailed_invalidtenant",
+            Self::LoginFailedEditionMismatchEduToVanilla => {
+                "loginfailed_editionmismatchedutovanilla"
+            }
+            Self::LoginFailedEditionMismatchVanillaToEdu => {
+                "loginfailed_editionmismatchvanillatoedu"
+            }
+            Self::LoginFailedServerFullSubClient => "loginfailed_serverfullsubclient",
+            Self::LoginFailedEditorMismatchEditorToVanilla => {
+                "loginfailed_editormismatcheditortovanilla"
+            }
+            Self::LoginFailedEditorMismatchVanillaToEditor => {
+                "loginfailed_editormismatchvanillatoeditor"
+            }
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "LoginSuccess" => return Some(Self::LoginSuccess),
+            "LoginFailed_ClientOld" => return Some(Self::LoginFailedClientOld),
+            "LoginFailed_ServerOld" => return Some(Self::LoginFailedServerOld),
+            "PlayerSpawn" => return Some(Self::PlayerSpawn),
+            "LoginFailed_InvalidTenant" => return Some(Self::LoginFailedInvalidTenant),
+            "LoginFailed_EditionMismatchEduToVanilla" => {
+                return Some(Self::LoginFailedEditionMismatchEduToVanilla);
+            }
+            "LoginFailed_EditionMismatchVanillaToEdu" => {
+                return Some(Self::LoginFailedEditionMismatchVanillaToEdu);
+            }
+            "LoginFailed_ServerFullSubClient" => {
+                return Some(Self::LoginFailedServerFullSubClient);
+            }
+            "LoginFailed_EditorMismatchEditorToVanilla" => {
+                return Some(Self::LoginFailedEditorMismatchEditorToVanilla);
+            }
+            "LoginFailed_EditorMismatchVanillaToEditor" => {
+                return Some(Self::LoginFailedEditorMismatchVanillaToEditor);
+            }
+            _ => {}
+        }
         const NAMES: &[(&str, PlayStatus)] = &[
             ("LoginSuccess", PlayStatus::LoginSuccess),
             ("LoginFailed_ClientOld", PlayStatus::LoginFailedClientOld),
@@ -27158,10 +33509,7 @@ impl ProtocolEnum for PlayStatus {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -27541,7 +33889,84 @@ impl ProtocolEnum for PlayerActionType {
             Self::Count => "Count",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::StartDestroyBlock => "startdestroyblock",
+            Self::AbortDestroyBlock => "abortdestroyblock",
+            Self::StopDestroyBlock => "stopdestroyblock",
+            Self::StartSleeping => "startsleeping",
+            Self::StopSleeping => "stopsleeping",
+            Self::Respawn => "respawn",
+            Self::StartJump => "startjump",
+            Self::StartSprinting => "startsprinting",
+            Self::StopSprinting => "stopsprinting",
+            Self::StartSneaking => "startsneaking",
+            Self::StopSneaking => "stopsneaking",
+            Self::CreativeDestroyBlock => "creativedestroyblock",
+            Self::ChangeDimensionAck => "changedimensionack",
+            Self::StartGliding => "startgliding",
+            Self::StopGliding => "stopgliding",
+            Self::DenyDestroyBlock => "denydestroyblock",
+            Self::CrackBlock => "crackblock",
+            Self::StartSwimming => "startswimming",
+            Self::StopSwimming => "stopswimming",
+            Self::StartSpinAttack => "startspinattack",
+            Self::StopSpinAttack => "stopspinattack",
+            Self::PredictDestroyBlock => "predictdestroyblock",
+            Self::ContinueDestroyBlock => "continuedestroyblock",
+            Self::StartItemUseOn => "startitemuseon",
+            Self::StopItemUseOn => "stopitemuseon",
+            Self::HandledTeleport => "handledteleport",
+            Self::MissedSwing => "missedswing",
+            Self::StartCrawling => "startcrawling",
+            Self::StopCrawling => "stopcrawling",
+            Self::StartFlying => "startflying",
+            Self::StopFlying => "stopflying",
+            Self::StartUsingItem => "startusingitem",
+            Self::SwapOffhand => "swapoffhand",
+            Self::Count => "count",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "StartDestroyBlock" => return Some(Self::StartDestroyBlock),
+            "AbortDestroyBlock" => return Some(Self::AbortDestroyBlock),
+            "StopDestroyBlock" => return Some(Self::StopDestroyBlock),
+            "StartSleeping" => return Some(Self::StartSleeping),
+            "StopSleeping" => return Some(Self::StopSleeping),
+            "Respawn" => return Some(Self::Respawn),
+            "StartJump" => return Some(Self::StartJump),
+            "StartSprinting" => return Some(Self::StartSprinting),
+            "StopSprinting" => return Some(Self::StopSprinting),
+            "StartSneaking" => return Some(Self::StartSneaking),
+            "StopSneaking" => return Some(Self::StopSneaking),
+            "CreativeDestroyBlock" => return Some(Self::CreativeDestroyBlock),
+            "ChangeDimensionAck" => return Some(Self::ChangeDimensionAck),
+            "StartGliding" => return Some(Self::StartGliding),
+            "StopGliding" => return Some(Self::StopGliding),
+            "DenyDestroyBlock" => return Some(Self::DenyDestroyBlock),
+            "CrackBlock" => return Some(Self::CrackBlock),
+            "StartSwimming" => return Some(Self::StartSwimming),
+            "StopSwimming" => return Some(Self::StopSwimming),
+            "StartSpinAttack" => return Some(Self::StartSpinAttack),
+            "StopSpinAttack" => return Some(Self::StopSpinAttack),
+            "PredictDestroyBlock" => return Some(Self::PredictDestroyBlock),
+            "ContinueDestroyBlock" => return Some(Self::ContinueDestroyBlock),
+            "StartItemUseOn" => return Some(Self::StartItemUseOn),
+            "StopItemUseOn" => return Some(Self::StopItemUseOn),
+            "HandledTeleport" => return Some(Self::HandledTeleport),
+            "MissedSwing" => return Some(Self::MissedSwing),
+            "StartCrawling" => return Some(Self::StartCrawling),
+            "StopCrawling" => return Some(Self::StopCrawling),
+            "StartFlying" => return Some(Self::StartFlying),
+            "StopFlying" => return Some(Self::StopFlying),
+            "StartUsingItem" => return Some(Self::StartUsingItem),
+            "SwapOffhand" => return Some(Self::SwapOffhand),
+            "Count" => return Some(Self::Count),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerActionType)] = &[
             ("Unknown", PlayerActionType::Unknown),
             ("StartDestroyBlock", PlayerActionType::StartDestroyBlock),
@@ -27581,10 +34006,7 @@ impl ProtocolEnum for PlayerActionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28014,7 +34436,140 @@ impl ProtocolEnum for PlayerAuthInputData {
             Self::SwapOffhand => "SwapOffhand",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Ascend => "ascend",
+            Self::Descend => "descend",
+            Self::JumpDown => "jumpdown",
+            Self::SprintDown => "sprintdown",
+            Self::ChangeHeight => "changeheight",
+            Self::Jumping => "jumping",
+            Self::AutoJumpingInWater => "autojumpinginwater",
+            Self::Sneaking => "sneaking",
+            Self::SneakDown => "sneakdown",
+            Self::Up => "up",
+            Self::Down => "down",
+            Self::Left => "left",
+            Self::Right => "right",
+            Self::UpLeft => "upleft",
+            Self::UpRight => "upright",
+            Self::WantUp => "wantup",
+            Self::WantDown => "wantdown",
+            Self::WantDownSlow => "wantdownslow",
+            Self::WantUpSlow => "wantupslow",
+            Self::Sprinting => "sprinting",
+            Self::AscendBlock => "ascendblock",
+            Self::DescendBlock => "descendblock",
+            Self::SneakToggleDown => "sneaktoggledown",
+            Self::PersistSneak => "persistsneak",
+            Self::StartSprinting => "startsprinting",
+            Self::StopSprinting => "stopsprinting",
+            Self::StartSneaking => "startsneaking",
+            Self::StopSneaking => "stopsneaking",
+            Self::StartSwimming => "startswimming",
+            Self::StopSwimming => "stopswimming",
+            Self::StartJumping => "startjumping",
+            Self::StartGliding => "startgliding",
+            Self::StopGliding => "stopgliding",
+            Self::PerformItemInteraction => "performiteminteraction",
+            Self::PerformBlockActions => "performblockactions",
+            Self::PerformItemStackRequest => "performitemstackrequest",
+            Self::HandledTeleport => "handledteleport",
+            Self::Emoting => "emoting",
+            Self::MissedSwing => "missedswing",
+            Self::StartCrawling => "startcrawling",
+            Self::StopCrawling => "stopcrawling",
+            Self::StartFlying => "startflying",
+            Self::StopFlying => "stopflying",
+            Self::ClientAckServerData => "clientackserverdata",
+            Self::IsInClientPredictedVehicle => "isinclientpredictedvehicle",
+            Self::PaddlingLeft => "paddlingleft",
+            Self::PaddlingRight => "paddlingright",
+            Self::BlockBreakingDelayEnabled => "blockbreakingdelayenabled",
+            Self::HorizontalCollision => "horizontalcollision",
+            Self::VerticalCollision => "verticalcollision",
+            Self::DownLeft => "downleft",
+            Self::DownRight => "downright",
+            Self::StartUsingItem => "startusingitem",
+            Self::StartSpinAttack => "startspinattack",
+            Self::StopSpinAttack => "stopspinattack",
+            Self::IsHotbarOnlyTouch => "ishotbaronlytouch",
+            Self::JumpReleasedRaw => "jumpreleasedraw",
+            Self::JumpPressedRaw => "jumppressedraw",
+            Self::JumpCurrentRaw => "jumpcurrentraw",
+            Self::SneakReleasedRaw => "sneakreleasedraw",
+            Self::SneakPressedRaw => "sneakpressedraw",
+            Self::SneakCurrentRaw => "sneakcurrentraw",
+            Self::SwapOffhand => "swapoffhand",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Ascend" => return Some(Self::Ascend),
+            "Descend" => return Some(Self::Descend),
+            "JumpDown" => return Some(Self::JumpDown),
+            "SprintDown" => return Some(Self::SprintDown),
+            "ChangeHeight" => return Some(Self::ChangeHeight),
+            "Jumping" => return Some(Self::Jumping),
+            "AutoJumpingInWater" => return Some(Self::AutoJumpingInWater),
+            "Sneaking" => return Some(Self::Sneaking),
+            "SneakDown" => return Some(Self::SneakDown),
+            "Up" => return Some(Self::Up),
+            "Down" => return Some(Self::Down),
+            "Left" => return Some(Self::Left),
+            "Right" => return Some(Self::Right),
+            "UpLeft" => return Some(Self::UpLeft),
+            "UpRight" => return Some(Self::UpRight),
+            "WantUp" => return Some(Self::WantUp),
+            "WantDown" => return Some(Self::WantDown),
+            "WantDownSlow" => return Some(Self::WantDownSlow),
+            "WantUpSlow" => return Some(Self::WantUpSlow),
+            "Sprinting" => return Some(Self::Sprinting),
+            "AscendBlock" => return Some(Self::AscendBlock),
+            "DescendBlock" => return Some(Self::DescendBlock),
+            "SneakToggleDown" => return Some(Self::SneakToggleDown),
+            "PersistSneak" => return Some(Self::PersistSneak),
+            "StartSprinting" => return Some(Self::StartSprinting),
+            "StopSprinting" => return Some(Self::StopSprinting),
+            "StartSneaking" => return Some(Self::StartSneaking),
+            "StopSneaking" => return Some(Self::StopSneaking),
+            "StartSwimming" => return Some(Self::StartSwimming),
+            "StopSwimming" => return Some(Self::StopSwimming),
+            "StartJumping" => return Some(Self::StartJumping),
+            "StartGliding" => return Some(Self::StartGliding),
+            "StopGliding" => return Some(Self::StopGliding),
+            "PerformItemInteraction" => return Some(Self::PerformItemInteraction),
+            "PerformBlockActions" => return Some(Self::PerformBlockActions),
+            "PerformItemStackRequest" => return Some(Self::PerformItemStackRequest),
+            "HandledTeleport" => return Some(Self::HandledTeleport),
+            "Emoting" => return Some(Self::Emoting),
+            "MissedSwing" => return Some(Self::MissedSwing),
+            "StartCrawling" => return Some(Self::StartCrawling),
+            "StopCrawling" => return Some(Self::StopCrawling),
+            "StartFlying" => return Some(Self::StartFlying),
+            "StopFlying" => return Some(Self::StopFlying),
+            "ClientAckServerData" => return Some(Self::ClientAckServerData),
+            "IsInClientPredictedVehicle" => return Some(Self::IsInClientPredictedVehicle),
+            "PaddlingLeft" => return Some(Self::PaddlingLeft),
+            "PaddlingRight" => return Some(Self::PaddlingRight),
+            "BlockBreakingDelayEnabled" => return Some(Self::BlockBreakingDelayEnabled),
+            "HorizontalCollision" => return Some(Self::HorizontalCollision),
+            "VerticalCollision" => return Some(Self::VerticalCollision),
+            "DownLeft" => return Some(Self::DownLeft),
+            "DownRight" => return Some(Self::DownRight),
+            "StartUsingItem" => return Some(Self::StartUsingItem),
+            "StartSpinAttack" => return Some(Self::StartSpinAttack),
+            "StopSpinAttack" => return Some(Self::StopSpinAttack),
+            "IsHotbarOnlyTouch" => return Some(Self::IsHotbarOnlyTouch),
+            "JumpReleasedRaw" => return Some(Self::JumpReleasedRaw),
+            "JumpPressedRaw" => return Some(Self::JumpPressedRaw),
+            "JumpCurrentRaw" => return Some(Self::JumpCurrentRaw),
+            "SneakReleasedRaw" => return Some(Self::SneakReleasedRaw),
+            "SneakPressedRaw" => return Some(Self::SneakPressedRaw),
+            "SneakCurrentRaw" => return Some(Self::SneakCurrentRaw),
+            "SwapOffhand" => return Some(Self::SwapOffhand),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerAuthInputData)] = &[
             ("Ascend", PlayerAuthInputData::Ascend),
             ("Descend", PlayerAuthInputData::Descend),
@@ -28088,10 +34643,7 @@ impl ProtocolEnum for PlayerAuthInputData {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28149,16 +34701,21 @@ impl ProtocolEnum for PlayerListAddEntryAction {
             Self::Add => "Add",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Add => "add",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "Add" {
+            return Some(Self::Add);
+        }
         const NAMES: &[(&str, PlayerListAddEntryAction)] = &[
             ("Add", PlayerListAddEntryAction::Add),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28219,17 +34776,25 @@ impl ProtocolEnum for PlayerListPacketType {
             Self::Remove => "Remove",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Add => "add",
+            Self::Remove => "remove",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Add" => return Some(Self::Add),
+            "Remove" => return Some(Self::Remove),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerListPacketType)] = &[
             ("Add", PlayerListPacketType::Add),
             ("Remove", PlayerListPacketType::Remove),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28287,16 +34852,21 @@ impl ProtocolEnum for PlayerListRemoveEntryAction {
             Self::Remove => "Remove",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Remove => "remove",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "Remove" {
+            return Some(Self::Remove);
+        }
         const NAMES: &[(&str, PlayerListRemoveEntryAction)] = &[
             ("Remove", PlayerListRemoveEntryAction::Remove),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28360,7 +34930,18 @@ impl ProtocolEnum for PlayerLocationPacketType {
             Self::PlayerLocationHide => "PLAYER_LOCATION_HIDE",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::PlayerLocationCoordinates => "player_location_coordinates",
+            Self::PlayerLocationHide => "player_location_hide",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "PLAYER_LOCATION_COORDINATES" => return Some(Self::PlayerLocationCoordinates),
+            "PLAYER_LOCATION_HIDE" => return Some(Self::PlayerLocationHide),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerLocationPacketType)] = &[
             (
                 "PLAYER_LOCATION_COORDINATES",
@@ -28370,10 +34951,7 @@ impl ProtocolEnum for PlayerLocationPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28449,7 +35027,22 @@ impl ProtocolEnum for PlayerPermissionLevel {
             Self::Custom => "Custom",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Visitor => "visitor",
+            Self::Member => "member",
+            Self::Operator => "operator",
+            Self::Custom => "custom",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Visitor" => return Some(Self::Visitor),
+            "Member" => return Some(Self::Member),
+            "Operator" => return Some(Self::Operator),
+            "Custom" => return Some(Self::Custom),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerPermissionLevel)] = &[
             ("Visitor", PlayerPermissionLevel::Visitor),
             ("Member", PlayerPermissionLevel::Member),
@@ -28458,10 +35051,7 @@ impl ProtocolEnum for PlayerPermissionLevel {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28531,7 +35121,20 @@ impl ProtocolEnum for PlayerRespawnState {
             Self::ClientReadyToSpawn => "ClientReadyToSpawn",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SearchingForSpawn => "searchingforspawn",
+            Self::ReadyToSpawn => "readytospawn",
+            Self::ClientReadyToSpawn => "clientreadytospawn",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SearchingForSpawn" => return Some(Self::SearchingForSpawn),
+            "ReadyToSpawn" => return Some(Self::ReadyToSpawn),
+            "ClientReadyToSpawn" => return Some(Self::ClientReadyToSpawn),
+            _ => {}
+        }
         const NAMES: &[(&str, PlayerRespawnState)] = &[
             ("SearchingForSpawn", PlayerRespawnState::SearchingForSpawn),
             ("ReadyToSpawn", PlayerRespawnState::ReadyToSpawn),
@@ -28539,10 +35142,7 @@ impl ProtocolEnum for PlayerRespawnState {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28618,7 +35218,22 @@ impl ProtocolEnum for PositionMode {
             Self::OnlyHeadRot => "OnlyHeadRot",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Respawn => "respawn",
+            Self::Teleport => "teleport",
+            Self::OnlyHeadRot => "onlyheadrot",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Normal" => return Some(Self::Normal),
+            "Respawn" => return Some(Self::Respawn),
+            "Teleport" => return Some(Self::Teleport),
+            "OnlyHeadRot" => return Some(Self::OnlyHeadRot),
+            _ => {}
+        }
         const NAMES: &[(&str, PositionMode)] = &[
             ("Normal", PositionMode::Normal),
             ("Respawn", PositionMode::Respawn),
@@ -28627,10 +35242,7 @@ impl ProtocolEnum for PositionMode {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28686,16 +35298,21 @@ impl ProtocolEnum for PositionTrackingDBClientRequestPacketPayloadAction {
             Self::Query => "Query",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Query => "query",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "Query" {
+            return Some(Self::Query);
+        }
         const NAMES: &[(&str, PositionTrackingDBClientRequestPacketPayloadAction)] = &[
             ("Query", PositionTrackingDBClientRequestPacketPayloadAction::Query),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28761,7 +35378,20 @@ impl ProtocolEnum for PositionTrackingDBServerBroadcastPacketPayloadAction {
             Self::NotFound => "NotFound",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Update => "update",
+            Self::Destroy => "destroy",
+            Self::NotFound => "notfound",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Update" => return Some(Self::Update),
+            "Destroy" => return Some(Self::Destroy),
+            "NotFound" => return Some(Self::NotFound),
+            _ => {}
+        }
         const NAMES: &[(&str, PositionTrackingDBServerBroadcastPacketPayloadAction)] = &[
             ("Update", PositionTrackingDBServerBroadcastPacketPayloadAction::Update),
             ("Destroy", PositionTrackingDBServerBroadcastPacketPayloadAction::Destroy),
@@ -28769,10 +35399,7 @@ impl ProtocolEnum for PositionTrackingDBServerBroadcastPacketPayloadAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28866,7 +35493,28 @@ impl ProtocolEnum for RandomDistributionType {
             Self::Triangle => "Triangle",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SingleValued => "singlevalued",
+            Self::Uniform => "uniform",
+            Self::Gaussian => "gaussian",
+            Self::InverseGaussian => "inversegaussian",
+            Self::FixedGrid => "fixedgrid",
+            Self::JitteredGrid => "jitteredgrid",
+            Self::Triangle => "triangle",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SingleValued" => return Some(Self::SingleValued),
+            "Uniform" => return Some(Self::Uniform),
+            "Gaussian" => return Some(Self::Gaussian),
+            "InverseGaussian" => return Some(Self::InverseGaussian),
+            "FixedGrid" => return Some(Self::FixedGrid),
+            "JitteredGrid" => return Some(Self::JitteredGrid),
+            "Triangle" => return Some(Self::Triangle),
+            _ => {}
+        }
         const NAMES: &[(&str, RandomDistributionType)] = &[
             ("SingleValued", RandomDistributionType::SingleValued),
             ("Uniform", RandomDistributionType::Uniform),
@@ -28878,10 +35526,7 @@ impl ProtocolEnum for RandomDistributionType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -28965,7 +35610,22 @@ impl ProtocolEnum for RecipeUnlockingContext {
             Self::PlayerHasManyItems => "PlayerHasManyItems",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::AlwaysUnlocked => "alwaysunlocked",
+            Self::PlayerInWater => "playerinwater",
+            Self::PlayerHasManyItems => "playerhasmanyitems",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "AlwaysUnlocked" => return Some(Self::AlwaysUnlocked),
+            "PlayerInWater" => return Some(Self::PlayerInWater),
+            "PlayerHasManyItems" => return Some(Self::PlayerHasManyItems),
+            _ => {}
+        }
         const NAMES: &[(&str, RecipeUnlockingContext)] = &[
             ("None", RecipeUnlockingContext::None),
             ("AlwaysUnlocked", RecipeUnlockingContext::AlwaysUnlocked),
@@ -28974,10 +35634,7 @@ impl ProtocolEnum for RecipeUnlockingContext {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29043,7 +35700,20 @@ impl ProtocolEnum for RequestAbilityPacketPayloadType {
             Self::Float => "Float",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unset => "unset",
+            Self::Bool => "bool",
+            Self::Float => "float",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unset" => return Some(Self::Unset),
+            "Bool" => return Some(Self::Bool),
+            "Float" => return Some(Self::Float),
+            _ => {}
+        }
         const NAMES: &[(&str, RequestAbilityPacketPayloadType)] = &[
             ("Unset", RequestAbilityPacketPayloadType::Unset),
             ("Bool", RequestAbilityPacketPayloadType::Bool),
@@ -29051,10 +35721,7 @@ impl ProtocolEnum for RequestAbilityPacketPayloadType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29130,7 +35797,22 @@ impl ProtocolEnum for ResourcePackResponse {
             Self::ResourcePackStackFinished => "ResourcePackStackFinished",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Cancel => "cancel",
+            Self::Downloading => "downloading",
+            Self::DownloadingFinished => "downloadingfinished",
+            Self::ResourcePackStackFinished => "resourcepackstackfinished",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Cancel" => return Some(Self::Cancel),
+            "Downloading" => return Some(Self::Downloading),
+            "DownloadingFinished" => return Some(Self::DownloadingFinished),
+            "ResourcePackStackFinished" => return Some(Self::ResourcePackStackFinished),
+            _ => {}
+        }
         const NAMES: &[(&str, ResourcePackResponse)] = &[
             ("Cancel", ResourcePackResponse::Cancel),
             ("Downloading", ResourcePackResponse::Downloading),
@@ -29142,10 +35824,7 @@ impl ProtocolEnum for ResourcePackResponse {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29206,17 +35885,25 @@ impl ProtocolEnum for RewindType {
             Self::Vehicle => "Vehicle",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Player => "player",
+            Self::Vehicle => "vehicle",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Player" => return Some(Self::Player),
+            "Vehicle" => return Some(Self::Vehicle),
+            _ => {}
+        }
         const NAMES: &[(&str, RewindType)] = &[
             ("Player", RewindType::Player),
             ("Vehicle", RewindType::Vehicle),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29298,7 +35985,25 @@ impl ProtocolEnum for Rotation {
             Self::Rotate270 => "Rotate270",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Rotate90 => "rotate90",
+            Self::Rotate180 => "rotate180",
+            Self::Rotate270 => "rotate270",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Rotate90" => return Some(Self::Rotate90),
+            "Rotate180" => return Some(Self::Rotate180),
+            "Rotate270" => return Some(Self::Rotate270),
+            "Clockwise90" => return Some(Self::Rotate90),
+            "Clockwise180" => return Some(Self::Rotate180),
+            "CounterClockwise90" => return Some(Self::Rotate270),
+            _ => {}
+        }
         const NAMES: &[(&str, Rotation)] = &[
             ("None", Rotation::None),
             ("Rotate90", Rotation::Rotate90),
@@ -29310,10 +36015,7 @@ impl ProtocolEnum for Rotation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29389,7 +36091,22 @@ impl ProtocolEnum for ScorePacketEntryAction {
             Self::ChangeFakePlayer => "ChangeFakePlayer",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Remove => "remove",
+            Self::ChangePlayer => "changeplayer",
+            Self::ChangeEntity => "changeentity",
+            Self::ChangeFakePlayer => "changefakeplayer",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Remove" => return Some(Self::Remove),
+            "ChangePlayer" => return Some(Self::ChangePlayer),
+            "ChangeEntity" => return Some(Self::ChangeEntity),
+            "ChangeFakePlayer" => return Some(Self::ChangeFakePlayer),
+            _ => {}
+        }
         const NAMES: &[(&str, ScorePacketEntryAction)] = &[
             ("Remove", ScorePacketEntryAction::Remove),
             ("ChangePlayer", ScorePacketEntryAction::ChangePlayer),
@@ -29398,10 +36115,7 @@ impl ProtocolEnum for ScorePacketEntryAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29462,17 +36176,25 @@ impl ProtocolEnum for ScoreboardIdentityPacketType {
             Self::Remove => "Remove",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Update => "update",
+            Self::Remove => "remove",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Update" => return Some(Self::Update),
+            "Remove" => return Some(Self::Remove),
+            _ => {}
+        }
         const NAMES: &[(&str, ScoreboardIdentityPacketType)] = &[
             ("Update", ScoreboardIdentityPacketType::Update),
             ("Remove", ScoreboardIdentityPacketType::Remove),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29584,7 +36306,34 @@ impl ProtocolEnum for ScriptModuleMinecraftScriptPrimitiveShapeType {
             Self::Cone => "Cone",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Line => "line",
+            Self::Box => "box",
+            Self::Sphere => "sphere",
+            Self::Circle => "circle",
+            Self::Text => "text",
+            Self::Arrow => "arrow",
+            Self::Cylinder => "cylinder",
+            Self::Pyramid => "pyramid",
+            Self::Ellipsoid => "ellipsoid",
+            Self::Cone => "cone",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Line" => return Some(Self::Line),
+            "Box" => return Some(Self::Box),
+            "Sphere" => return Some(Self::Sphere),
+            "Circle" => return Some(Self::Circle),
+            "Text" => return Some(Self::Text),
+            "Arrow" => return Some(Self::Arrow),
+            "Cylinder" => return Some(Self::Cylinder),
+            "Pyramid" => return Some(Self::Pyramid),
+            "Ellipsoid" => return Some(Self::Ellipsoid),
+            "Cone" => return Some(Self::Cone),
+            _ => {}
+        }
         const NAMES: &[(&str, ScriptModuleMinecraftScriptPrimitiveShapeType)] = &[
             ("Line", ScriptModuleMinecraftScriptPrimitiveShapeType::Line),
             ("Box", ScriptModuleMinecraftScriptPrimitiveShapeType::Box),
@@ -29599,10 +36348,7 @@ impl ProtocolEnum for ScriptModuleMinecraftScriptPrimitiveShapeType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29668,7 +36414,20 @@ impl ProtocolEnum for SctpRecoveryProfile {
             Self::Fast => "Fast",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Default => "default",
+            Self::Balanced => "balanced",
+            Self::Fast => "fast",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Default" => return Some(Self::Default),
+            "Balanced" => return Some(Self::Balanced),
+            "Fast" => return Some(Self::Fast),
+            _ => {}
+        }
         const NAMES: &[(&str, SctpRecoveryProfile)] = &[
             ("Default", SctpRecoveryProfile::Default),
             ("Balanced", SctpRecoveryProfile::Balanced),
@@ -29676,10 +36435,7 @@ impl ProtocolEnum for SctpRecoveryProfile {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29755,7 +36511,22 @@ impl ProtocolEnum for ServerEditorConnectionPolicy {
             Self::Mixed => "Mixed",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::MatchWorldType => "matchworldtype",
+            Self::EditorOnly => "editoronly",
+            Self::VanillaOnly => "vanillaonly",
+            Self::Mixed => "mixed",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "MatchWorldType" => return Some(Self::MatchWorldType),
+            "EditorOnly" => return Some(Self::EditorOnly),
+            "VanillaOnly" => return Some(Self::VanillaOnly),
+            "Mixed" => return Some(Self::Mixed),
+            _ => {}
+        }
         const NAMES: &[(&str, ServerEditorConnectionPolicy)] = &[
             ("MatchWorldType", ServerEditorConnectionPolicy::MatchWorldType),
             ("EditorOnly", ServerEditorConnectionPolicy::EditorOnly),
@@ -29764,10 +36535,7 @@ impl ProtocolEnum for ServerEditorConnectionPolicy {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29843,7 +36611,22 @@ impl ProtocolEnum for ServerWaypointGroupAction {
             Self::Update => "Update",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Add => "add",
+            Self::Remove => "remove",
+            Self::Update => "update",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Add" => return Some(Self::Add),
+            "Remove" => return Some(Self::Remove),
+            "Update" => return Some(Self::Update),
+            _ => {}
+        }
         const NAMES: &[(&str, ServerWaypointGroupAction)] = &[
             ("None", ServerWaypointGroupAction::None),
             ("Add", ServerWaypointGroupAction::Add),
@@ -29852,10 +36635,7 @@ impl ProtocolEnum for ServerWaypointGroupAction {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29918,17 +36698,25 @@ impl ProtocolEnum for ServerboundCursorItemDragPacketPayloadState {
             Self::Stop => "Stop",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Start => "start",
+            Self::Stop => "stop",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Start" => return Some(Self::Start),
+            "Stop" => return Some(Self::Stop),
+            _ => {}
+        }
         const NAMES: &[(&str, ServerboundCursorItemDragPacketPayloadState)] = &[
             ("Start", ServerboundCursorItemDragPacketPayloadState::Start),
             ("Stop", ServerboundCursorItemDragPacketPayloadState::Stop),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -29989,7 +36777,18 @@ impl ProtocolEnum for ServerboundLoadingScreenPacketPayloadLoadingScreenPacketTy
             Self::EndLoadingScreen => "EndLoadingScreen",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::StartLoadingScreen => "startloadingscreen",
+            Self::EndLoadingScreen => "endloadingscreen",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "StartLoadingScreen" => return Some(Self::StartLoadingScreen),
+            "EndLoadingScreen" => return Some(Self::EndLoadingScreen),
+            _ => {}
+        }
         const NAMES: &[(
             &str,
             ServerboundLoadingScreenPacketPayloadLoadingScreenPacketType,
@@ -30005,10 +36804,7 @@ impl ProtocolEnum for ServerboundLoadingScreenPacketPayloadLoadingScreenPacketTy
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30080,7 +36876,20 @@ impl ProtocolEnum for ServerboundLoadingScreenPacketType {
             Self::EndLoadingScreen => "EndLoadingScreen",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::StartLoadingScreen => "startloadingscreen",
+            Self::EndLoadingScreen => "endloadingscreen",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "StartLoadingScreen" => return Some(Self::StartLoadingScreen),
+            "EndLoadingScreen" => return Some(Self::EndLoadingScreen),
+            _ => {}
+        }
         const NAMES: &[(&str, ServerboundLoadingScreenPacketType)] = &[
             ("Unknown", ServerboundLoadingScreenPacketType::Unknown),
             (
@@ -30091,10 +36900,7 @@ impl ProtocolEnum for ServerboundLoadingScreenPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30178,7 +36984,25 @@ impl ProtocolEnum for SetDefaultGameTypePacketPayloadDefaultGameType {
             Self::Spectator => "Spectator",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Survival => "survival",
+            Self::Creative => "creative",
+            Self::Adventure => "adventure",
+            Self::Default => "default",
+            Self::Spectator => "spectator",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Survival" => return Some(Self::Survival),
+            "Creative" => return Some(Self::Creative),
+            "Adventure" => return Some(Self::Adventure),
+            "Default" => return Some(Self::Default),
+            "Spectator" => return Some(Self::Spectator),
+            "WorldDefault" => return Some(Self::Survival),
+            _ => {}
+        }
         const NAMES: &[(&str, SetDefaultGameTypePacketPayloadDefaultGameType)] = &[
             ("Survival", SetDefaultGameTypePacketPayloadDefaultGameType::Survival),
             ("Creative", SetDefaultGameTypePacketPayloadDefaultGameType::Creative),
@@ -30189,10 +37013,7 @@ impl ProtocolEnum for SetDefaultGameTypePacketPayloadDefaultGameType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30268,7 +37089,22 @@ impl ProtocolEnum for SetPlayerFurnaceOptionsPacketPayloadFurnaceType {
             Self::Smoker => "Smoker",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Furnace => "furnace",
+            Self::BlastFurnace => "blastfurnace",
+            Self::Smoker => "smoker",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Furnace" => return Some(Self::Furnace),
+            "BlastFurnace" => return Some(Self::BlastFurnace),
+            "Smoker" => return Some(Self::Smoker),
+            _ => {}
+        }
         const NAMES: &[(&str, SetPlayerFurnaceOptionsPacketPayloadFurnaceType)] = &[
             ("None", SetPlayerFurnaceOptionsPacketPayloadFurnaceType::None),
             ("Furnace", SetPlayerFurnaceOptionsPacketPayloadFurnaceType::Furnace),
@@ -30280,10 +37116,7 @@ impl ProtocolEnum for SetPlayerFurnaceOptionsPacketPayloadFurnaceType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30346,7 +37179,18 @@ impl ProtocolEnum for SetScoreboardIdentityPacketPayloadScoreboardIdentityPacket
             Self::Remove => "Remove",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Update => "update",
+            Self::Remove => "remove",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Update" => return Some(Self::Update),
+            "Remove" => return Some(Self::Remove),
+            _ => {}
+        }
         const NAMES: &[(
             &str,
             SetScoreboardIdentityPacketPayloadScoreboardIdentityPacketType,
@@ -30362,10 +37206,7 @@ impl ProtocolEnum for SetScoreboardIdentityPacketPayloadScoreboardIdentityPacket
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30473,7 +37314,32 @@ impl ProtocolEnum for SetTitlePacketTitleType {
             Self::ActionbarTextObject => "ActionbarTextObject",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Clear => "clear",
+            Self::Reset => "reset",
+            Self::Title => "title",
+            Self::Subtitle => "subtitle",
+            Self::Actionbar => "actionbar",
+            Self::Times => "times",
+            Self::TitleTextObject => "titletextobject",
+            Self::SubtitleTextObject => "subtitletextobject",
+            Self::ActionbarTextObject => "actionbartextobject",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Clear" => return Some(Self::Clear),
+            "Reset" => return Some(Self::Reset),
+            "Title" => return Some(Self::Title),
+            "Subtitle" => return Some(Self::Subtitle),
+            "Actionbar" => return Some(Self::Actionbar),
+            "Times" => return Some(Self::Times),
+            "TitleTextObject" => return Some(Self::TitleTextObject),
+            "SubtitleTextObject" => return Some(Self::SubtitleTextObject),
+            "ActionbarTextObject" => return Some(Self::ActionbarTextObject),
+            _ => {}
+        }
         const NAMES: &[(&str, SetTitlePacketTitleType)] = &[
             ("Clear", SetTitlePacketTitleType::Clear),
             ("Reset", SetTitlePacketTitleType::Reset),
@@ -30487,10 +37353,7 @@ impl ProtocolEnum for SetTitlePacketTitleType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30551,17 +37414,25 @@ impl ProtocolEnum for SharedTypesComprehensiveCameraPresetAudioListener {
             Self::Player => "Player",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Camera => "camera",
+            Self::Player => "player",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Camera" => return Some(Self::Camera),
+            "Player" => return Some(Self::Player),
+            _ => {}
+        }
         const NAMES: &[(&str, SharedTypesComprehensiveCameraPresetAudioListener)] = &[
             ("Camera", SharedTypesComprehensiveCameraPresetAudioListener::Camera),
             ("Player", SharedTypesComprehensiveCameraPresetAudioListener::Player),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30823,7 +37694,84 @@ impl ProtocolEnum for SharedTypesLegacyActorDamageCause {
             Self::MaceSmash => "MaceSmash",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Override => "override",
+            Self::Contact => "contact",
+            Self::EntityAttack => "entityattack",
+            Self::Projectile => "projectile",
+            Self::Suffocation => "suffocation",
+            Self::Fall => "fall",
+            Self::Fire => "fire",
+            Self::FireTick => "firetick",
+            Self::Lava => "lava",
+            Self::Drowning => "drowning",
+            Self::BlockExplosion => "blockexplosion",
+            Self::EntityExplosion => "entityexplosion",
+            Self::Void => "void",
+            Self::SelfDestruct => "selfdestruct",
+            Self::Magic => "magic",
+            Self::Wither => "wither",
+            Self::Starve => "starve",
+            Self::Anvil => "anvil",
+            Self::Thorns => "thorns",
+            Self::FallingBlock => "fallingblock",
+            Self::Piston => "piston",
+            Self::FlyIntoWall => "flyintowall",
+            Self::Magma => "magma",
+            Self::Fireworks => "fireworks",
+            Self::Lightning => "lightning",
+            Self::Charging => "charging",
+            Self::Temperature => "temperature",
+            Self::Freezing => "freezing",
+            Self::Stalactite => "stalactite",
+            Self::Stalagmite => "stalagmite",
+            Self::RamAttack => "ramattack",
+            Self::SonicBoom => "sonicboom",
+            Self::Campfire => "campfire",
+            Self::SoulCampfire => "soulcampfire",
+            Self::MaceSmash => "macesmash",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Override" => return Some(Self::Override),
+            "Contact" => return Some(Self::Contact),
+            "EntityAttack" => return Some(Self::EntityAttack),
+            "Projectile" => return Some(Self::Projectile),
+            "Suffocation" => return Some(Self::Suffocation),
+            "Fall" => return Some(Self::Fall),
+            "Fire" => return Some(Self::Fire),
+            "FireTick" => return Some(Self::FireTick),
+            "Lava" => return Some(Self::Lava),
+            "Drowning" => return Some(Self::Drowning),
+            "BlockExplosion" => return Some(Self::BlockExplosion),
+            "EntityExplosion" => return Some(Self::EntityExplosion),
+            "Void" => return Some(Self::Void),
+            "SelfDestruct" => return Some(Self::SelfDestruct),
+            "Magic" => return Some(Self::Magic),
+            "Wither" => return Some(Self::Wither),
+            "Starve" => return Some(Self::Starve),
+            "Anvil" => return Some(Self::Anvil),
+            "Thorns" => return Some(Self::Thorns),
+            "FallingBlock" => return Some(Self::FallingBlock),
+            "Piston" => return Some(Self::Piston),
+            "FlyIntoWall" => return Some(Self::FlyIntoWall),
+            "Magma" => return Some(Self::Magma),
+            "Fireworks" => return Some(Self::Fireworks),
+            "Lightning" => return Some(Self::Lightning),
+            "Charging" => return Some(Self::Charging),
+            "Temperature" => return Some(Self::Temperature),
+            "Freezing" => return Some(Self::Freezing),
+            "Stalactite" => return Some(Self::Stalactite),
+            "Stalagmite" => return Some(Self::Stalagmite),
+            "RamAttack" => return Some(Self::RamAttack),
+            "SonicBoom" => return Some(Self::SonicBoom),
+            "Campfire" => return Some(Self::Campfire),
+            "SoulCampfire" => return Some(Self::SoulCampfire),
+            "MaceSmash" => return Some(Self::MaceSmash),
+            _ => {}
+        }
         const NAMES: &[(&str, SharedTypesLegacyActorDamageCause)] = &[
             ("Override", SharedTypesLegacyActorDamageCause::Override),
             ("Contact", SharedTypesLegacyActorDamageCause::Contact),
@@ -30863,10 +37811,7 @@ impl ProtocolEnum for SharedTypesLegacyActorDamageCause {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -30948,7 +37893,24 @@ impl ProtocolEnum for SharedTypesLegacyArmorSlot {
             Self::Body => "Body",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Head => "head",
+            Self::Torso => "torso",
+            Self::Legs => "legs",
+            Self::Feet => "feet",
+            Self::Body => "body",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Head" => return Some(Self::Head),
+            "Torso" => return Some(Self::Torso),
+            "Legs" => return Some(Self::Legs),
+            "Feet" => return Some(Self::Feet),
+            "Body" => return Some(Self::Body),
+            _ => {}
+        }
         const NAMES: &[(&str, SharedTypesLegacyArmorSlot)] = &[
             ("Head", SharedTypesLegacyArmorSlot::Head),
             ("Torso", SharedTypesLegacyArmorSlot::Torso),
@@ -30958,10 +37920,7 @@ impl ProtocolEnum for SharedTypesLegacyArmorSlot {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31022,17 +37981,25 @@ impl ProtocolEnum for ShowCreditsPacketPayloadCreditsState {
             Self::Finished => "Finished",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Start => "start",
+            Self::Finished => "finished",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Start" => return Some(Self::Start),
+            "Finished" => return Some(Self::Finished),
+            _ => {}
+        }
         const NAMES: &[(&str, ShowCreditsPacketPayloadCreditsState)] = &[
             ("Start", ShowCreditsPacketPayloadCreditsState::Start),
             ("Finished", ShowCreditsPacketPayloadCreditsState::Finished),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31102,7 +38069,20 @@ impl ProtocolEnum for ShowStoreOfferRedirectType {
             Self::ThirdPartyServerPage => "ThirdPartyServerPage",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::MarketplaceOffer => "marketplaceoffer",
+            Self::DressingRoomOffer => "dressingroomoffer",
+            Self::ThirdPartyServerPage => "thirdpartyserverpage",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "MarketplaceOffer" => return Some(Self::MarketplaceOffer),
+            "DressingRoomOffer" => return Some(Self::DressingRoomOffer),
+            "ThirdPartyServerPage" => return Some(Self::ThirdPartyServerPage),
+            _ => {}
+        }
         const NAMES: &[(&str, ShowStoreOfferRedirectType)] = &[
             ("MarketplaceOffer", ShowStoreOfferRedirectType::MarketplaceOffer),
             ("DressingRoomOffer", ShowStoreOfferRedirectType::DressingRoomOffer),
@@ -31110,10 +38090,7 @@ impl ProtocolEnum for ShowStoreOfferRedirectType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31189,7 +38166,22 @@ impl ProtocolEnum for SimulationType {
             Self::Invalid => "INVALID",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Game => "game",
+            Self::Editor => "editor",
+            Self::Test => "test",
+            Self::Invalid => "invalid",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Game" => return Some(Self::Game),
+            "Editor" => return Some(Self::Editor),
+            "Test" => return Some(Self::Test),
+            "INVALID" => return Some(Self::Invalid),
+            _ => {}
+        }
         const NAMES: &[(&str, SimulationType)] = &[
             ("Game", SimulationType::Game),
             ("Editor", SimulationType::Editor),
@@ -31198,10 +38190,7 @@ impl ProtocolEnum for SimulationType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31267,7 +38256,20 @@ impl ProtocolEnum for SoftEnumUpdateType {
             Self::Replace => "Replace",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Add => "add",
+            Self::Remove => "remove",
+            Self::Replace => "replace",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Add" => return Some(Self::Add),
+            "Remove" => return Some(Self::Remove),
+            "Replace" => return Some(Self::Replace),
+            _ => {}
+        }
         const NAMES: &[(&str, SoftEnumUpdateType)] = &[
             ("Add", SoftEnumUpdateType::Add),
             ("Remove", SoftEnumUpdateType::Remove),
@@ -31275,10 +38277,7 @@ impl ProtocolEnum for SoftEnumUpdateType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31372,7 +38371,28 @@ impl ProtocolEnum for SoundDataEventType {
             Self::Resume => "Resume",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Stop => "stop",
+            Self::SetVolume => "setvolume",
+            Self::SetPitch => "setpitch",
+            Self::Fade => "fade",
+            Self::SeekTo => "seekto",
+            Self::Pause => "pause",
+            Self::Resume => "resume",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Stop" => return Some(Self::Stop),
+            "SetVolume" => return Some(Self::SetVolume),
+            "SetPitch" => return Some(Self::SetPitch),
+            "Fade" => return Some(Self::Fade),
+            "SeekTo" => return Some(Self::SeekTo),
+            "Pause" => return Some(Self::Pause),
+            "Resume" => return Some(Self::Resume),
+            _ => {}
+        }
         const NAMES: &[(&str, SoundDataEventType)] = &[
             ("Stop", SoundDataEventType::Stop),
             ("SetVolume", SoundDataEventType::SetVolume),
@@ -31384,10 +38404,7 @@ impl ProtocolEnum for SoundDataEventType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31448,17 +38465,25 @@ impl ProtocolEnum for SpawnBiomeType {
             Self::UserDefined => "UserDefined",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Default => "default",
+            Self::UserDefined => "userdefined",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Default" => return Some(Self::Default),
+            "UserDefined" => return Some(Self::UserDefined),
+            _ => {}
+        }
         const NAMES: &[(&str, SpawnBiomeType)] = &[
             ("Default", SpawnBiomeType::Default),
             ("UserDefined", SpawnBiomeType::UserDefined),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31519,17 +38544,25 @@ impl ProtocolEnum for SpawnPositionType {
             Self::WorldSpawn => "WorldSpawn",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::PlayerRespawn => "playerrespawn",
+            Self::WorldSpawn => "worldspawn",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "PlayerRespawn" => return Some(Self::PlayerRespawn),
+            "WorldSpawn" => return Some(Self::WorldSpawn),
+            _ => {}
+        }
         const NAMES: &[(&str, SpawnPositionType)] = &[
             ("PlayerRespawn", SpawnPositionType::PlayerRespawn),
             ("WorldSpawn", SpawnPositionType::WorldSpawn),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31585,16 +38618,21 @@ impl ProtocolEnum for StringAttributeOperation {
             Self::Override => "OVERRIDE",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Override => "override",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        if name == "OVERRIDE" {
+            return Some(Self::Override);
+        }
         const NAMES: &[(&str, StringAttributeOperation)] = &[
             ("OVERRIDE", StringAttributeOperation::Override),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31682,7 +38720,26 @@ impl ProtocolEnum for StructureBlockType {
             Self::Export => "Export",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Data => "data",
+            Self::Save => "save",
+            Self::Load => "load",
+            Self::Corner => "corner",
+            Self::Invalid => "invalid",
+            Self::Export => "export",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Data" => return Some(Self::Data),
+            "Save" => return Some(Self::Save),
+            "Load" => return Some(Self::Load),
+            "Corner" => return Some(Self::Corner),
+            "Invalid" => return Some(Self::Invalid),
+            "Export" => return Some(Self::Export),
+            _ => {}
+        }
         const NAMES: &[(&str, StructureBlockType)] = &[
             ("Data", StructureBlockType::Data),
             ("Save", StructureBlockType::Save),
@@ -31693,10 +38750,7 @@ impl ProtocolEnum for StructureBlockType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31757,17 +38811,25 @@ impl ProtocolEnum for StructureRedstoneSaveMode {
             Self::SavesToDisk => "SavesToDisk",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::SavesToMemory => "savestomemory",
+            Self::SavesToDisk => "savestodisk",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "SavesToMemory" => return Some(Self::SavesToMemory),
+            "SavesToDisk" => return Some(Self::SavesToDisk),
+            _ => {}
+        }
         const NAMES: &[(&str, StructureRedstoneSaveMode)] = &[
             ("SavesToMemory", StructureRedstoneSaveMode::SavesToMemory),
             ("SavesToDisk", StructureRedstoneSaveMode::SavesToDisk),
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31843,7 +38905,22 @@ impl ProtocolEnum for StructureTemplateRequestOperation {
             Self::QuerySavedStructure => "QuerySavedStructure",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::ExportFromSaveMode => "exportfromsavemode",
+            Self::ExportFromLoadMode => "exportfromloadmode",
+            Self::QuerySavedStructure => "querysavedstructure",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "ExportFromSaveMode" => return Some(Self::ExportFromSaveMode),
+            "ExportFromLoadMode" => return Some(Self::ExportFromLoadMode),
+            "QuerySavedStructure" => return Some(Self::QuerySavedStructure),
+            _ => {}
+        }
         const NAMES: &[(&str, StructureTemplateRequestOperation)] = &[
             ("None", StructureTemplateRequestOperation::None),
             (
@@ -31861,10 +38938,7 @@ impl ProtocolEnum for StructureTemplateRequestOperation {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -31930,7 +39004,20 @@ impl ProtocolEnum for StructureTemplateResponseType {
             Self::Query => "Query",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::Export => "export",
+            Self::Query => "query",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "None" => return Some(Self::None),
+            "Export" => return Some(Self::Export),
+            "Query" => return Some(Self::Query),
+            _ => {}
+        }
         const NAMES: &[(&str, StructureTemplateResponseType)] = &[
             ("None", StructureTemplateResponseType::None),
             ("Export", StructureTemplateResponseType::Export),
@@ -31938,10 +39025,7 @@ impl ProtocolEnum for StructureTemplateResponseType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32019,7 +39103,22 @@ impl ProtocolEnum for SubChunkHeightmapDataHeightMapType {
             Self::AllTooLow => "AllTooLow",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoData => "nodata",
+            Self::HasData => "hasdata",
+            Self::AllTooHigh => "alltoohigh",
+            Self::AllTooLow => "alltoolow",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NoData" => return Some(Self::NoData),
+            "HasData" => return Some(Self::HasData),
+            "AllTooHigh" => return Some(Self::AllTooHigh),
+            "AllTooLow" => return Some(Self::AllTooLow),
+            _ => {}
+        }
         const NAMES: &[(&str, SubChunkHeightmapDataHeightMapType)] = &[
             ("NoData", SubChunkHeightmapDataHeightMapType::NoData),
             ("HasData", SubChunkHeightmapDataHeightMapType::HasData),
@@ -32028,10 +39127,7 @@ impl ProtocolEnum for SubChunkHeightmapDataHeightMapType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32115,7 +39211,24 @@ impl ProtocolEnum for SubChunkHeightmapDataRenderHeightMapType {
             Self::AllCopied => "AllCopied",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoData => "nodata",
+            Self::HasData => "hasdata",
+            Self::AllTooHigh => "alltoohigh",
+            Self::AllTooLow => "alltoolow",
+            Self::AllCopied => "allcopied",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NoData" => return Some(Self::NoData),
+            "HasData" => return Some(Self::HasData),
+            "AllTooHigh" => return Some(Self::AllTooHigh),
+            "AllTooLow" => return Some(Self::AllTooLow),
+            "AllCopied" => return Some(Self::AllCopied),
+            _ => {}
+        }
         const NAMES: &[(&str, SubChunkHeightmapDataRenderHeightMapType)] = &[
             ("NoData", SubChunkHeightmapDataRenderHeightMapType::NoData),
             ("HasData", SubChunkHeightmapDataRenderHeightMapType::HasData),
@@ -32125,10 +39238,7 @@ impl ProtocolEnum for SubChunkHeightmapDataRenderHeightMapType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32218,7 +39328,26 @@ impl ProtocolEnum for SubChunkPacketDataSubChunkRequestResult {
             Self::SuccessAllAir => "SuccessAllAir",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Success => "success",
+            Self::LevelChunkDoesntExist => "levelchunkdoesntexist",
+            Self::WrongDimension => "wrongdimension",
+            Self::PlayerDoesntExist => "playerdoesntexist",
+            Self::IndexOutOfBounds => "indexoutofbounds",
+            Self::SuccessAllAir => "successallair",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Success" => return Some(Self::Success),
+            "LevelChunkDoesntExist" => return Some(Self::LevelChunkDoesntExist),
+            "WrongDimension" => return Some(Self::WrongDimension),
+            "PlayerDoesntExist" => return Some(Self::PlayerDoesntExist),
+            "IndexOutOfBounds" => return Some(Self::IndexOutOfBounds),
+            "SuccessAllAir" => return Some(Self::SuccessAllAir),
+            _ => {}
+        }
         const NAMES: &[(&str, SubChunkPacketDataSubChunkRequestResult)] = &[
             ("Success", SubChunkPacketDataSubChunkRequestResult::Success),
             (
@@ -32238,10 +39367,7 @@ impl ProtocolEnum for SubChunkPacketDataSubChunkRequestResult {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32323,7 +39449,24 @@ impl ProtocolEnum for SubChunkPacketPayloadHeightMapDataType {
             Self::AllCopied => "AllCopied",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::NoData => "nodata",
+            Self::HasData => "hasdata",
+            Self::AllTooHigh => "alltoohigh",
+            Self::AllTooLow => "alltoolow",
+            Self::AllCopied => "allcopied",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "NoData" => return Some(Self::NoData),
+            "HasData" => return Some(Self::HasData),
+            "AllTooHigh" => return Some(Self::AllTooHigh),
+            "AllTooLow" => return Some(Self::AllTooLow),
+            "AllCopied" => return Some(Self::AllCopied),
+            _ => {}
+        }
         const NAMES: &[(&str, SubChunkPacketPayloadHeightMapDataType)] = &[
             ("NoData", SubChunkPacketPayloadHeightMapDataType::NoData),
             ("HasData", SubChunkPacketPayloadHeightMapDataType::HasData),
@@ -32333,10 +39476,7 @@ impl ProtocolEnum for SubChunkPacketPayloadHeightMapDataType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32430,7 +39570,28 @@ impl ProtocolEnum for SubChunkPacketPayloadSubChunkRequestResult {
             Self::SuccessAllAir => "SuccessAllAir",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Undefined => "undefined",
+            Self::Success => "success",
+            Self::LevelChunkDoesntExist => "levelchunkdoesntexist",
+            Self::WrongDimension => "wrongdimension",
+            Self::PlayerDoesntExist => "playerdoesntexist",
+            Self::IndexOutOfBounds => "indexoutofbounds",
+            Self::SuccessAllAir => "successallair",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Undefined" => return Some(Self::Undefined),
+            "Success" => return Some(Self::Success),
+            "LevelChunkDoesntExist" => return Some(Self::LevelChunkDoesntExist),
+            "WrongDimension" => return Some(Self::WrongDimension),
+            "PlayerDoesntExist" => return Some(Self::PlayerDoesntExist),
+            "IndexOutOfBounds" => return Some(Self::IndexOutOfBounds),
+            "SuccessAllAir" => return Some(Self::SuccessAllAir),
+            _ => {}
+        }
         const NAMES: &[(&str, SubChunkPacketPayloadSubChunkRequestResult)] = &[
             ("Undefined", SubChunkPacketPayloadSubChunkRequestResult::Undefined),
             ("Success", SubChunkPacketPayloadSubChunkRequestResult::Success),
@@ -32454,10 +39615,7 @@ impl ProtocolEnum for SubChunkPacketPayloadSubChunkRequestResult {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32533,7 +39691,24 @@ impl ProtocolEnum for Subtype {
             Self::UnlockWorldTemplateSettings => "UnlockWorldTemplateSettings",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::UninitializedSubtype => "uninitializedsubtype",
+            Self::EnableCommands => "enablecommands",
+            Self::DisableCommands => "disablecommands",
+            Self::UnlockWorldTemplateSettings => "unlockworldtemplatesettings",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "UninitializedSubtype" => return Some(Self::UninitializedSubtype),
+            "EnableCommands" => return Some(Self::EnableCommands),
+            "DisableCommands" => return Some(Self::DisableCommands),
+            "UnlockWorldTemplateSettings" => {
+                return Some(Self::UnlockWorldTemplateSettings);
+            }
+            _ => {}
+        }
         const NAMES: &[(&str, Subtype)] = &[
             ("UninitializedSubtype", Subtype::UninitializedSubtype),
             ("EnableCommands", Subtype::EnableCommands),
@@ -32542,10 +39717,7 @@ impl ProtocolEnum for Subtype {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32693,7 +39865,38 @@ impl ProtocolEnum for TextPacketType {
             Self::TextObjectAnnouncement => "textObjectAnnouncement",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Raw => "raw",
+            Self::Chat => "chat",
+            Self::Translate => "translate",
+            Self::Popup => "popup",
+            Self::JukeboxPopup => "jukeboxpopup",
+            Self::Tip => "tip",
+            Self::SystemMessage => "systemmessage",
+            Self::Whisper => "whisper",
+            Self::Announcement => "announcement",
+            Self::TextObjectWhisper => "textobjectwhisper",
+            Self::TextObject => "textobject",
+            Self::TextObjectAnnouncement => "textobjectannouncement",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "raw" => return Some(Self::Raw),
+            "chat" => return Some(Self::Chat),
+            "translate" => return Some(Self::Translate),
+            "popup" => return Some(Self::Popup),
+            "jukeboxPopup" => return Some(Self::JukeboxPopup),
+            "tip" => return Some(Self::Tip),
+            "systemMessage" => return Some(Self::SystemMessage),
+            "whisper" => return Some(Self::Whisper),
+            "announcement" => return Some(Self::Announcement),
+            "textObjectWhisper" => return Some(Self::TextObjectWhisper),
+            "textObject" => return Some(Self::TextObject),
+            "textObjectAnnouncement" => return Some(Self::TextObjectAnnouncement),
+            _ => {}
+        }
         const NAMES: &[(&str, TextPacketType)] = &[
             ("raw", TextPacketType::Raw),
             ("chat", TextPacketType::Chat),
@@ -32710,10 +39913,7 @@ impl ProtocolEnum for TextPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32867,7 +40067,48 @@ impl ProtocolEnum for TextProcessingEventOrigin {
             Self::DataDrivenUI => "DataDrivenUI",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::ServerChatPublic => "serverchatpublic",
+            Self::ServerChatWhisper => "serverchatwhisper",
+            Self::SignText => "signtext",
+            Self::AnvilText => "anviltext",
+            Self::BookAndQuillText => "bookandquilltext",
+            Self::CommandBlockText => "commandblocktext",
+            Self::BlockActorDataText => "blockactordatatext",
+            Self::JoinEventText => "joineventtext",
+            Self::LeaveEventText => "leaveeventtext",
+            Self::SlashCommandChat => "slashcommandchat",
+            Self::CartographyText => "cartographytext",
+            Self::KickCommand => "kickcommand",
+            Self::TitleCommand => "titlecommand",
+            Self::SummonCommand => "summoncommand",
+            Self::ServerForm => "serverform",
+            Self::DataDrivenUI => "datadrivenui",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "unknown" => return Some(Self::Unknown),
+            "ServerChatPublic" => return Some(Self::ServerChatPublic),
+            "ServerChatWhisper" => return Some(Self::ServerChatWhisper),
+            "SignText" => return Some(Self::SignText),
+            "AnvilText" => return Some(Self::AnvilText),
+            "BookAndQuillText" => return Some(Self::BookAndQuillText),
+            "CommandBlockText" => return Some(Self::CommandBlockText),
+            "BlockActorDataText" => return Some(Self::BlockActorDataText),
+            "JoinEventText" => return Some(Self::JoinEventText),
+            "LeaveEventText" => return Some(Self::LeaveEventText),
+            "SlashCommandChat" => return Some(Self::SlashCommandChat),
+            "CartographyText" => return Some(Self::CartographyText),
+            "KickCommand" => return Some(Self::KickCommand),
+            "TitleCommand" => return Some(Self::TitleCommand),
+            "SummonCommand" => return Some(Self::SummonCommand),
+            "ServerForm" => return Some(Self::ServerForm),
+            "DataDrivenUI" => return Some(Self::DataDrivenUI),
+            _ => {}
+        }
         const NAMES: &[(&str, TextProcessingEventOrigin)] = &[
             ("unknown", TextProcessingEventOrigin::Unknown),
             ("ServerChatPublic", TextProcessingEventOrigin::ServerChatPublic),
@@ -32889,10 +40130,7 @@ impl ProtocolEnum for TextProcessingEventOrigin {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -32958,7 +40196,20 @@ impl ProtocolEnum for TrustedSkinFlag {
             Self::True => "True",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unset => "unset",
+            Self::False => "false",
+            Self::True => "true",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unset" => return Some(Self::Unset),
+            "False" => return Some(Self::False),
+            "True" => return Some(Self::True),
+            _ => {}
+        }
         const NAMES: &[(&str, TrustedSkinFlag)] = &[
             ("Unset", TrustedSkinFlag::Unset),
             ("False", TrustedSkinFlag::False),
@@ -32966,10 +40217,7 @@ impl ProtocolEnum for TrustedSkinFlag {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33051,7 +40299,24 @@ impl ProtocolEnum for UnlockedRecipesPacketPayloadPacketType {
             Self::RemoveAllUnlockedRecipes => "RemoveAllUnlockedRecipes",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Empty => "empty",
+            Self::InitiallyUnlockedRecipes => "initiallyunlockedrecipes",
+            Self::NewlyUnlockedRecipes => "newlyunlockedrecipes",
+            Self::RemoveUnlockedRecipes => "removeunlockedrecipes",
+            Self::RemoveAllUnlockedRecipes => "removeallunlockedrecipes",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Empty" => return Some(Self::Empty),
+            "InitiallyUnlockedRecipes" => return Some(Self::InitiallyUnlockedRecipes),
+            "NewlyUnlockedRecipes" => return Some(Self::NewlyUnlockedRecipes),
+            "RemoveUnlockedRecipes" => return Some(Self::RemoveUnlockedRecipes),
+            "RemoveAllUnlockedRecipes" => return Some(Self::RemoveAllUnlockedRecipes),
+            _ => {}
+        }
         const NAMES: &[(&str, UnlockedRecipesPacketPayloadPacketType)] = &[
             ("Empty", UnlockedRecipesPacketPayloadPacketType::Empty),
             (
@@ -33073,10 +40338,7 @@ impl ProtocolEnum for UnlockedRecipesPacketPayloadPacketType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33152,7 +40414,22 @@ impl ProtocolEnum for UpdateType {
             Self::SetFloatOverride => "SetFloatOverride",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::ClearOverrides => "clearoverrides",
+            Self::RemoveOverride => "removeoverride",
+            Self::SetIntOverride => "setintoverride",
+            Self::SetFloatOverride => "setfloatoverride",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "ClearOverrides" => return Some(Self::ClearOverrides),
+            "RemoveOverride" => return Some(Self::RemoveOverride),
+            "SetIntOverride" => return Some(Self::SetIntOverride),
+            "SetFloatOverride" => return Some(Self::SetFloatOverride),
+            _ => {}
+        }
         const NAMES: &[(&str, UpdateType)] = &[
             ("ClearOverrides", UpdateType::ClearOverrides),
             ("RemoveOverride", UpdateType::RemoveOverride),
@@ -33161,10 +40438,7 @@ impl ProtocolEnum for UpdateType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33246,7 +40520,24 @@ impl ProtocolEnum for VillageType {
             Self::Default => "Default",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Desert => "desert",
+            Self::Ice => "ice",
+            Self::Savanna => "savanna",
+            Self::Taiga => "taiga",
+            Self::Default => "default",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Desert" => return Some(Self::Desert),
+            "Ice" => return Some(Self::Ice),
+            "Savanna" => return Some(Self::Savanna),
+            "Taiga" => return Some(Self::Taiga),
+            "Default" => return Some(Self::Default),
+            _ => {}
+        }
         const NAMES: &[(&str, VillageType)] = &[
             ("Desert", VillageType::Desert),
             ("Ice", VillageType::Ice),
@@ -33256,10 +40547,7 @@ impl ProtocolEnum for VillageType {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33359,7 +40647,30 @@ impl ProtocolEnum for VirtualContainerCloseCause {
             Self::UiCancelled => "UiCancelled",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::UserClosed => "userclosed",
+            Self::ServerRequested => "serverrequested",
+            Self::UserBusy => "userbusy",
+            Self::ClientNotReady => "clientnotready",
+            Self::InvalidContents => "invalidcontents",
+            Self::UiCreationFailed => "uicreationfailed",
+            Self::UiCancelled => "uicancelled",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "UserClosed" => return Some(Self::UserClosed),
+            "ServerRequested" => return Some(Self::ServerRequested),
+            "UserBusy" => return Some(Self::UserBusy),
+            "ClientNotReady" => return Some(Self::ClientNotReady),
+            "InvalidContents" => return Some(Self::InvalidContents),
+            "UiCreationFailed" => return Some(Self::UiCreationFailed),
+            "UiCancelled" => return Some(Self::UiCancelled),
+            _ => {}
+        }
         const NAMES: &[(&str, VirtualContainerCloseCause)] = &[
             ("Unknown", VirtualContainerCloseCause::Unknown),
             ("UserClosed", VirtualContainerCloseCause::UserClosed),
@@ -33372,10 +40683,7 @@ impl ProtocolEnum for VirtualContainerCloseCause {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33441,7 +40749,20 @@ impl ProtocolEnum for VirtualContainerCloseKind {
             Self::Confirmed => "Confirmed",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Request => "request",
+            Self::Closed => "closed",
+            Self::Confirmed => "confirmed",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Request" => return Some(Self::Request),
+            "Closed" => return Some(Self::Closed),
+            "Confirmed" => return Some(Self::Confirmed),
+            _ => {}
+        }
         const NAMES: &[(&str, VirtualContainerCloseKind)] = &[
             ("Request", VirtualContainerCloseKind::Request),
             ("Closed", VirtualContainerCloseKind::Closed),
@@ -33449,10 +40770,7 @@ impl ProtocolEnum for VirtualContainerCloseKind {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33554,7 +40872,30 @@ impl ProtocolEnum for VirtualContainerClosePacketPayloadCause {
             Self::UiCancelled => "UiCancelled",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::UserClosed => "userclosed",
+            Self::ServerRequested => "serverrequested",
+            Self::UserBusy => "userbusy",
+            Self::ClientNotReady => "clientnotready",
+            Self::InvalidContents => "invalidcontents",
+            Self::UiCreationFailed => "uicreationfailed",
+            Self::UiCancelled => "uicancelled",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Unknown" => return Some(Self::Unknown),
+            "UserClosed" => return Some(Self::UserClosed),
+            "ServerRequested" => return Some(Self::ServerRequested),
+            "UserBusy" => return Some(Self::UserBusy),
+            "ClientNotReady" => return Some(Self::ClientNotReady),
+            "InvalidContents" => return Some(Self::InvalidContents),
+            "UiCreationFailed" => return Some(Self::UiCreationFailed),
+            "UiCancelled" => return Some(Self::UiCancelled),
+            _ => {}
+        }
         const NAMES: &[(&str, VirtualContainerClosePacketPayloadCause)] = &[
             ("Unknown", VirtualContainerClosePacketPayloadCause::Unknown),
             ("UserClosed", VirtualContainerClosePacketPayloadCause::UserClosed),
@@ -33576,10 +40917,7 @@ impl ProtocolEnum for VirtualContainerClosePacketPayloadCause {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }
@@ -33647,7 +40985,20 @@ impl ProtocolEnum for VirtualContainerClosePacketPayloadKind {
             Self::Confirmed => "Confirmed",
         }
     }
+    fn wire_name(self) -> &'static str {
+        match self {
+            Self::Request => "request",
+            Self::Closed => "closed",
+            Self::Confirmed => "confirmed",
+        }
+    }
     fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Request" => return Some(Self::Request),
+            "Closed" => return Some(Self::Closed),
+            "Confirmed" => return Some(Self::Confirmed),
+            _ => {}
+        }
         const NAMES: &[(&str, VirtualContainerClosePacketPayloadKind)] = &[
             ("Request", VirtualContainerClosePacketPayloadKind::Request),
             ("Closed", VirtualContainerClosePacketPayloadKind::Closed),
@@ -33655,10 +41006,7 @@ impl ProtocolEnum for VirtualContainerClosePacketPayloadKind {
         ];
         NAMES
             .iter()
-            .find(|(candidate, _)| *candidate == name)
-            .or_else(|| {
-                NAMES.iter().find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            })
+            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
             .map(|(_, value)| *value)
     }
 }

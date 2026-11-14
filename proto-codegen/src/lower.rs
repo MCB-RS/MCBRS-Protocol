@@ -173,7 +173,8 @@ impl<'a> Lowerer<'a> {
                     self.model.aliases.push(AliasDef { name, source: doc.title.clone(), doc: doc_text, ty: ty? });
                 }
                 Kind::Packet => {
-                    let meta = doc.packet.as_ref().expect("packet kind implies metadata");
+                    let meta =
+                        doc.packet.as_ref().ok_or_else(|| format!("{location}: packet without $metaProperties"))?;
                     let payload = match &doc.root.reference {
                         Some(target) => self.lower_ref(target, None, Options::default(), &location)?,
                         None => self.lower(&doc.root, &format!("{name} Payload"), Inherit::default(), &location)?,
@@ -242,7 +243,13 @@ impl<'a> Lowerer<'a> {
         let name = self.rust_names[stem].clone();
         match kind_of(doc) {
             Kind::Enum => Ok(self.enum_ty(name, underlying.or(doc.root.underlying), options)),
-            Kind::Struct | Kind::Variant | Kind::Packet => Ok(Ty::Named(name)),
+            Kind::Struct | Kind::Variant => Ok(Ty::Named(name)),
+            // Packet structs live in another module than the types; a type
+            // that embeds a packet embeds its payload.
+            Kind::Packet => match &doc.root.reference {
+                Some(payload) if payload != stem => self.lower_ref(payload, underlying, options, &format!("{stem}.json")),
+                _ => Err(format!("{location}: $ref to packet {stem:?}, which has no payload type of its own")),
+            },
             Kind::Alias => {
                 if self.resolving.contains(&stem) {
                     // The schema defines this type in terms of itself, which
@@ -389,17 +396,37 @@ impl<'a> Lowerer<'a> {
 
     /// Resolves a `const` value to the enum variant it designates.
     fn const_variant(&self, enum_name: &str, constant: &str, location: &str) -> Result<String> {
-        let def = &self.model.enums[self.enum_index[enum_name]];
+        let def = self
+            .enum_index
+            .get(enum_name)
+            .and_then(|&index| self.model.enums.get(index))
+            .ok_or_else(|| format!("{location}: const refers to unknown enum {enum_name}"))?;
+        // `const` values are spelled differently from the enumerators
+        // ("changeentity" for `ChangeEntity`): compare letters and digits only.
         let wanted = normalize(constant);
-        let variant = def
+        let mut matches: Vec<&str> = def
             .variants
             .iter()
-            .find(|variant| normalize(&variant.original) == wanted)
-            .map(|variant| variant.name.clone())
-            .or_else(|| {
-                def.aliases.iter().find(|alias| normalize(&alias.original) == wanted).map(|alias| alias.target.clone())
-            });
-        variant.ok_or_else(|| format!("{location}: const {constant:?} is not an enumerator of {}", def.source))
+            .filter(|variant| normalize(&variant.original) == wanted)
+            .map(|variant| variant.name.as_str())
+            .chain(
+                def.aliases
+                    .iter()
+                    .filter(|alias| normalize(&alias.original) == wanted)
+                    .map(|alias| alias.target.as_str()),
+            )
+            .collect();
+        matches.sort_unstable();
+        matches.dedup();
+        match matches.as_slice() {
+            [variant] => Ok((*variant).to_owned()),
+            [] => Err(format!("{location}: const {constant:?} is not an enumerator of {}", def.source)),
+            several => Err(format!(
+                "{location}: const {constant:?} is ambiguous in {}: it matches {}",
+                def.source,
+                several.join(", ")
+            )),
+        }
     }
 
     fn build_struct(&mut self, name: String, source: &str, node: &'a Node, location: &str) -> Result<StructDef> {
@@ -407,6 +434,18 @@ impl<'a> Lowerer<'a> {
             node.properties.as_ref().map(|properties| properties.iter().collect()).unwrap_or_default();
         // Wire order; properties without an ordinal keep their document order.
         properties.sort_by_key(|(_, property)| property.ordinal.unwrap_or(u64::MAX));
+
+        // Two properties at the same position would make the wire order a guess.
+        for pair in properties.windows(2) {
+            if let (Some(a), Some(b)) = (pair[0].1.ordinal, pair[1].1.ordinal) {
+                if a == b {
+                    return Err(format!(
+                        "{location}: properties {:?} and {:?} share x-ordinal-index {a}",
+                        pair[0].0, pair[1].0
+                    ));
+                }
+            }
+        }
 
         let required = node.required.as_deref().unwrap_or(&[]);
         for entry in required {
@@ -434,10 +473,13 @@ impl<'a> Lowerer<'a> {
                         return Err(format!("{field_location}: const on a non-enum field ({other:?}) is not supported"))
                     }
                 };
-                let Ty::Enum { name: enum_name, .. } = &ty else { unreachable!("checked above") };
-                let variant = self.const_variant(enum_name, constant, &field_location)?;
+                let enum_name = match &ty {
+                    Ty::Enum { name, .. } => name.clone(),
+                    other => return Err(format!("{field_location}: const on a non-enum field ({other:?})")),
+                };
+                let variant = self.const_variant(&enum_name, constant, &field_location)?;
                 let constant = ConstValue {
-                    enum_name: enum_name.clone(),
+                    enum_name,
                     variant,
                     const_name: const_names.unique(&names::screaming_snake_case(original)),
                 };
@@ -475,13 +517,14 @@ impl<'a> Lowerer<'a> {
 
         // Tagged when every branch is a struct led by a constant of one enum,
         // serialized identically everywhere.
-        let tags: Vec<Option<&'a Node>> =
+        let tags: Option<Vec<&'a Node>> =
             branches.iter().map(|b| b.reference.as_deref().and_then(|stem| self.tag_property(stem))).collect();
-        let tagged = tags.iter().all(Option::is_some)
-            && tags.windows(2).all(|pair| {
-                let (a, b) = (pair[0].unwrap(), pair[1].unwrap());
+        let tags = tags.filter(|tags| {
+            tags.windows(2).all(|pair| {
+                let (a, b) = (pair[0], pair[1]);
                 a.reference == b.reference && a.underlying == b.underlying && a.options == b.options
-            });
+            })
+        });
 
         let mut base_names = Vec::new();
         let mut tys = Vec::new();
@@ -516,21 +559,30 @@ impl<'a> Lowerer<'a> {
         let mut branch_names = Namer::with_reserved(&["Self"]);
         let mut out = Vec::new();
         for (index, (ty, short)) in tys.into_iter().zip(short_names).enumerate() {
-            let tag_variant = if tagged {
-                let tag = tags[index].expect("tagged implies a tag on every branch");
-                let enum_stem = tag.reference.as_deref().ok_or_else(|| format!("{location}: const without $ref"))?;
-                let (enum_stem, _) = self.doc(enum_stem, location)?;
-                let enum_name = self.rust_names[enum_stem].clone();
-                let constant = tag.constant.as_deref().expect("tag has a constant");
-                Some(self.const_variant(&enum_name, constant, location)?)
-            } else {
-                None
+            let tag_variant = match tags.as_ref().and_then(|tags| tags.get(index)) {
+                Some(tag) => {
+                    let enum_stem =
+                        tag.reference.as_deref().ok_or_else(|| format!("{location}: const without $ref"))?;
+                    let (enum_stem, _) = self.doc(enum_stem, location)?;
+                    let enum_name = self.rust_names[enum_stem].clone();
+                    let constant = tag.constant.as_deref().ok_or_else(|| format!("{location}: tag without const"))?;
+                    let variant = self.const_variant(&enum_name, constant, location)?;
+                    // Two branches selected by the same value: the second one
+                    // could never be decoded.
+                    if let Some(other) = out.iter().find(|b: &&Branch| b.tag_variant.as_deref() == Some(&variant)) {
+                        return Err(format!(
+                            "{location}: branches {} and {short} are both selected by {enum_name}::{variant}",
+                            other.name
+                        ));
+                    }
+                    Some(variant)
+                }
+                None => None,
             };
             out.push(Branch { name: branch_names.unique(&short), ty, tag_variant });
         }
 
-        let kind = if tagged {
-            let tag = tags[0].expect("tagged implies a tag");
+        let kind = if let Some(tag) = tags.as_ref().and_then(|tags| tags.first()) {
             let tag_location = format!("{location}/<tag>");
             match self.lower(tag, &name, Inherit::default(), &tag_location)? {
                 Ty::Enum { name, wire, .. } => VariantKind::Tagged { tag: Ty::Enum { name, wire, allow_unknown: false } },
@@ -752,5 +804,48 @@ mod tests {
         assert!(Lowerer::new(&clash).run().is_err());
         let dangling = docs(&[("APacket", packet(1))]);
         assert!(Lowerer::new(&dangling).run().is_err());
+    }
+
+    #[test]
+    fn a_type_embedding_a_packet_embeds_its_payload() {
+        let docs = docs(&[
+            ("P", json!({"type": "object"})),
+            ("APacket", json!({"$ref": "./P.json", "$metaProperties": {"[cereal:packet]": 1}})),
+            ("S", json!({"type": "object", "required": ["Inner"], "properties": {
+                "Inner": {"$ref": "./APacket.json", "x-ordinal-index": 0}}})),
+        ]);
+        let model = Lowerer::new(&docs).run().unwrap();
+        let holder = model.structs.iter().find(|s| s.name == "S").unwrap();
+        assert_eq!(holder.fields[0].ty, Ty::Named("P".into()));
+    }
+
+    #[test]
+    fn ambiguous_schemas_are_rejected() {
+        let error = |entries: &[(&str, Value)]| Lowerer::new(&docs(entries)).run().unwrap_err();
+
+        // Two properties claiming the same wire position.
+        let message = error(&[("S", json!({"type": "object", "properties": {
+            "A": {"type": "boolean", "x-ordinal-index": 0},
+            "B": {"type": "boolean", "x-ordinal-index": 0}}}))]);
+        assert!(message.contains("share x-ordinal-index 0"), "{message}");
+
+        let kind = json!({"type": "string", "enum": ["Item_Tag", "ItemTag", "Other"],
+                          "x-underlying-type": "uint8", "x-enum-binary-value": [0, 1, 2]});
+        let tagged = |constant: &str| json!({"type": "object", "required": ["Type"], "properties": {
+            "Type": {"const": constant, "$ref": "./Kind.json", "x-underlying-type": "uint8",
+                     "x-serialization-options": ["Enum-as-Value"], "x-ordinal-index": 0}}});
+
+        // A constant matching two different enumerators.
+        let message = error(&[("Kind", kind.clone()), ("A", tagged("itemtag"))]);
+        assert!(message.contains("ambiguous"), "{message}");
+
+        // Two branches selected by the same discriminator value.
+        let message = error(&[
+            ("Kind", kind),
+            ("A", tagged("other")),
+            ("B", tagged("Other")),
+            ("V", json!({"oneOf": [{"$ref": "./A.json"}, {"$ref": "./B.json"}]})),
+        ]);
+        assert!(message.contains("both selected by"), "{message}");
     }
 }

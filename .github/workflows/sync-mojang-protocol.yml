@@ -5,15 +5,17 @@ name: Sync Mojang protocol
 #
 # Requires "Allow GitHub Actions to create and approve pull requests"
 # (Settings > Actions > General) so the last step can open the PR.
+#
+# Third-party actions are pinned to full commit SHAs: this job holds a token
+# that can push branches, so a moved tag must not be able to change its code.
 
 on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+# Nothing by default; the job below asks for exactly what it needs.
+permissions: {}
 
 concurrency:
   group: sync-mojang-protocol
@@ -27,9 +29,14 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       # Cheap check: one `git ls-remote`, no clone, no toolchain. When Mojang's
       # `main` has not moved every following step is skipped and the run ends
@@ -39,8 +46,10 @@ jobs:
         run: |
           set -euo pipefail
           remote="$(git ls-remote "$MOJANG_REPO" refs/heads/main | cut -f1)"
-          if [ -z "$remote" ]; then
-            echo "::error::could not resolve refs/heads/main of $MOJANG_REPO"
+          # The value comes from a third party and is reused by later steps:
+          # accept nothing but a full SHA-1.
+          if ! [[ "$remote" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::unexpected answer for refs/heads/main of $MOJANG_REPO"
             exit 1
           fi
           local_sha="$(tr -d '[:space:]' < .mojang-protocol-sha 2>/dev/null || true)"
@@ -56,18 +65,20 @@ jobs:
 
       - name: Download Mojang's json/ and update .mojang-protocol-sha
         if: steps.upstream.outputs.changed == 'true'
+        env:
+          UPSTREAM_SHA: ${{ steps.upstream.outputs.remote }}
         run: |
           set -euo pipefail
-          bash scripts/fetch-mojang-protocol.sh "${{ steps.upstream.outputs.remote }}"
-          test "$(cat .mojang-protocol-sha)" = "${{ steps.upstream.outputs.remote }}"
+          bash scripts/fetch-mojang-protocol.sh "$UPSTREAM_SHA"
+          test "$(cat .mojang-protocol-sha)" = "$UPSTREAM_SHA"
 
       - name: Install Rust
         if: steps.upstream.outputs.changed == 'true'
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
 
       - name: Cache cargo
         if: steps.upstream.outputs.changed == 'true'
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
 
       - name: Regenerate the protocol
         if: steps.upstream.outputs.changed == 'true'
@@ -86,15 +97,17 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          protocol="$(sed -n 's/^pub const PROTOCOL_VERSION: i32 = \(.*\);$/\1/p' src/generated/mod.rs)"
-          minecraft="$(sed -n 's/^pub const MINECRAFT_VERSION: &str = "\(.*\)";$/\1/p' src/generated/mod.rs)"
+          protocol="$(sed -n 's/^pub const PROTOCOL_VERSION: i32 = \([0-9-]*\);$/\1/p' src/generated/mod.rs)"
+          # Free text from Mojang's files: keep only what a version can contain.
+          minecraft="$(sed -n 's/^pub const MINECRAFT_VERSION: &str = "\(.*\)";$/\1/p' src/generated/mod.rs | tr -cd 'A-Za-z0-9._-')"
           echo "protocol=$protocol" >> "$GITHUB_OUTPUT"
           echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
 
       - name: Open pull request
         if: steps.upstream.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: chore/sync-mojang-protocol
           delete-branch: true
           add-paths: |
@@ -113,4 +126,7 @@ jobs:
             The JSON schemas were downloaded again, `src/generated/` was rebuilt with
             `cargo run --bin proto-codegen`, and `cargo check` / `cargo test` passed.
             Nothing in `src/generated/` was edited by hand.
+
+            Pull requests opened with the default token do not start other
+            workflows: close and reopen this one to run CI on it.
           labels: protocol-sync

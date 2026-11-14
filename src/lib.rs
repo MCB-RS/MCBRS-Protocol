@@ -20,6 +20,8 @@
 //! assert_eq!(packet, decoded);
 //! ```
 
+#![forbid(unsafe_code)]
+
 pub mod codec;
 #[rustfmt::skip]
 pub mod generated;

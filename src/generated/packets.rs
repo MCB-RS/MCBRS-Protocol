@@ -2,7 +2,12 @@
 // DO NOT EDIT: run `cargo run --bin proto-codegen` to regenerate this file.
 
 //! Packets and the global [`Packet`] dispatch table.
-#![allow(unused_variables, unused_imports, clippy::all)]
+#![allow(
+    unused_variables,
+    unused_imports,
+    clippy::derivable_impls,
+    clippy::large_enum_variant
+)]
 use super::enums::*;
 use super::types::*;
 use crate::codec::{
@@ -3537,7 +3542,7 @@ impl From<LecternUpdatePacket> for Packet {
 /// It is sent by the Client once, at login, to communicate if it supports the cache or not.
 ///
 /// Sent by the Client once, at login, to communicate if it supports the client blob cache protocol or not.
-/// \<br\> Documented in \<a href=https://github.com/Mojang/bedrock-docs/blob/master/GameplaySystems/ClientBlobCacheProtocol.md\>https://github.com/Mojang/bedrock-docs/blob/master/GameplaySystems/ClientBlobCacheProtocol.md\</a\>
+/// \<br\> Documented in \<a href=<https://github.com/Mojang/bedrock-docs/blob/master/GameplaySystems/ClientBlobCacheProtocol.md>\><https://github.com/Mojang/bedrock-docs/blob/master/GameplaySystems/ClientBlobCacheProtocol.md>\</a\>
 ///
 /// Packet ClientCacheStatusPacket (id 129).
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -9296,1040 +9301,2260 @@ impl Packet {
     /// Writes the packet body (without the packet header).
     pub fn encode<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         match self {
-            Self::Login(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayStatus(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerToClientHandshake(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientToServerHandshake(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Disconnect(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ResourcePacksInfo(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ResourcePackStack(packet) => BedrockCodec::serialize(packet, buf),
+            Self::Login(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LoginPacket::NAME))
+            }
+            Self::PlayStatus(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayStatusPacket::NAME))
+            }
+            Self::ServerToClientHandshake(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerToClientHandshakePacket::NAME))
+            }
+            Self::ClientToServerHandshake(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientToServerHandshakePacket::NAME))
+            }
+            Self::Disconnect(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(DisconnectPacket::NAME))
+            }
+            Self::ResourcePacksInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePacksInfoPacket::NAME))
+            }
+            Self::ResourcePackStack(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePackStackPacket::NAME))
+            }
             Self::ResourcePackClientResponse(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePackClientResponsePacket::NAME))
             }
-            Self::Text(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetTime(packet) => BedrockCodec::serialize(packet, buf),
-            Self::StartGame(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AddPlayer(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AddActor(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RemoveActor(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AddItemActor(packet) => BedrockCodec::serialize(packet, buf),
+            Self::Text(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(TextPacket::NAME))
+            }
+            Self::SetTime(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetTimePacket::NAME))
+            }
+            Self::StartGame(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(StartGamePacket::NAME))
+            }
+            Self::AddPlayer(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddPlayerPacket::NAME))
+            }
+            Self::AddActor(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddActorPacket::NAME))
+            }
+            Self::RemoveActor(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RemoveActorPacket::NAME))
+            }
+            Self::AddItemActor(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddItemActorPacket::NAME))
+            }
             Self::ServerPlayerPostMovePosition(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerPlayerPostMovePositionPacket::NAME))
             }
-            Self::TakeItemActor(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MoveActorAbsolute(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MovePlayer(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateBlock(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AddPainting(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LevelEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::BlockEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ActorEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MobEffect(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateAttributes(packet) => BedrockCodec::serialize(packet, buf),
-            Self::InventoryTransaction(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MobEquipment(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MobArmorEquipment(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Interact(packet) => BedrockCodec::serialize(packet, buf),
-            Self::BlockPickRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ActorPickRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerAction(packet) => BedrockCodec::serialize(packet, buf),
-            Self::HurtArmor(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetActorData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetActorMotion(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetActorLink(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetHealth(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetSpawnPosition(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Animate(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Respawn(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ContainerOpen(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ContainerClose(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerHotbar(packet) => BedrockCodec::serialize(packet, buf),
-            Self::InventoryContent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::InventorySlot(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ContainerSetData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CraftingData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::GuiDataPickItem(packet) => BedrockCodec::serialize(packet, buf),
-            Self::BlockActorData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LevelChunk(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetCommandsEnabled(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetDifficulty(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ChangeDimension(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetPlayerGameType(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerList(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SimpleEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LegacyTelemetryEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SpawnExperienceOrb(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientboundMapItemData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MapInfoRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RequestChunkRadius(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ChunkRadiusUpdated(packet) => BedrockCodec::serialize(packet, buf),
-            Self::GameRulesChanged(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Camera(packet) => BedrockCodec::serialize(packet, buf),
-            Self::BossEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ShowCredits(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AvailableCommands(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CommandRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CommandBlockUpdate(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CommandOutput(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateTrade(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateEquip(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ResourcePackDataInfo(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ResourcePackChunkData(packet) => BedrockCodec::serialize(packet, buf),
+            Self::TakeItemActor(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(TakeItemActorPacket::NAME))
+            }
+            Self::MoveActorAbsolute(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MoveActorAbsolutePacket::NAME))
+            }
+            Self::MovePlayer(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MovePlayerPacket::NAME))
+            }
+            Self::UpdateBlock(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateBlockPacket::NAME))
+            }
+            Self::AddPainting(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddPaintingPacket::NAME))
+            }
+            Self::LevelEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LevelEventPacket::NAME))
+            }
+            Self::BlockEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BlockEventPacket::NAME))
+            }
+            Self::ActorEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ActorEventPacket::NAME))
+            }
+            Self::MobEffect(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MobEffectPacket::NAME))
+            }
+            Self::UpdateAttributes(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateAttributesPacket::NAME))
+            }
+            Self::InventoryTransaction(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(InventoryTransactionPacket::NAME))
+            }
+            Self::MobEquipment(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MobEquipmentPacket::NAME))
+            }
+            Self::MobArmorEquipment(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MobArmorEquipmentPacket::NAME))
+            }
+            Self::Interact(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(InteractPacket::NAME))
+            }
+            Self::BlockPickRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BlockPickRequestPacket::NAME))
+            }
+            Self::ActorPickRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ActorPickRequestPacket::NAME))
+            }
+            Self::PlayerAction(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerActionPacket::NAME))
+            }
+            Self::HurtArmor(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(HurtArmorPacket::NAME))
+            }
+            Self::SetActorData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetActorDataPacket::NAME))
+            }
+            Self::SetActorMotion(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetActorMotionPacket::NAME))
+            }
+            Self::SetActorLink(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetActorLinkPacket::NAME))
+            }
+            Self::SetHealth(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetHealthPacket::NAME))
+            }
+            Self::SetSpawnPosition(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetSpawnPositionPacket::NAME))
+            }
+            Self::Animate(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AnimatePacket::NAME))
+            }
+            Self::Respawn(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RespawnPacket::NAME))
+            }
+            Self::ContainerOpen(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ContainerOpenPacket::NAME))
+            }
+            Self::ContainerClose(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ContainerClosePacket::NAME))
+            }
+            Self::PlayerHotbar(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerHotbarPacket::NAME))
+            }
+            Self::InventoryContent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(InventoryContentPacket::NAME))
+            }
+            Self::InventorySlot(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(InventorySlotPacket::NAME))
+            }
+            Self::ContainerSetData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ContainerSetDataPacket::NAME))
+            }
+            Self::CraftingData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CraftingDataPacket::NAME))
+            }
+            Self::GuiDataPickItem(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(GuiDataPickItemPacket::NAME))
+            }
+            Self::BlockActorData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BlockActorDataPacket::NAME))
+            }
+            Self::LevelChunk(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LevelChunkPacket::NAME))
+            }
+            Self::SetCommandsEnabled(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetCommandsEnabledPacket::NAME))
+            }
+            Self::SetDifficulty(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetDifficultyPacket::NAME))
+            }
+            Self::ChangeDimension(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ChangeDimensionPacket::NAME))
+            }
+            Self::SetPlayerGameType(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetPlayerGameTypePacket::NAME))
+            }
+            Self::PlayerList(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerListPacket::NAME))
+            }
+            Self::SimpleEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SimpleEventPacket::NAME))
+            }
+            Self::LegacyTelemetryEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LegacyTelemetryEventPacket::NAME))
+            }
+            Self::SpawnExperienceOrb(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SpawnExperienceOrbPacket::NAME))
+            }
+            Self::ClientboundMapItemData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundMapItemDataPacket::NAME))
+            }
+            Self::MapInfoRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MapInfoRequestPacket::NAME))
+            }
+            Self::RequestChunkRadius(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RequestChunkRadiusPacket::NAME))
+            }
+            Self::ChunkRadiusUpdated(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ChunkRadiusUpdatedPacket::NAME))
+            }
+            Self::GameRulesChanged(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(GameRulesChangedPacket::NAME))
+            }
+            Self::Camera(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraPacket::NAME))
+            }
+            Self::BossEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BossEventPacket::NAME))
+            }
+            Self::ShowCredits(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ShowCreditsPacket::NAME))
+            }
+            Self::AvailableCommands(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AvailableCommandsPacket::NAME))
+            }
+            Self::CommandRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CommandRequestPacket::NAME))
+            }
+            Self::CommandBlockUpdate(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CommandBlockUpdatePacket::NAME))
+            }
+            Self::CommandOutput(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CommandOutputPacket::NAME))
+            }
+            Self::UpdateTrade(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateTradePacket::NAME))
+            }
+            Self::UpdateEquip(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateEquipPacket::NAME))
+            }
+            Self::ResourcePackDataInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePackDataInfoPacket::NAME))
+            }
+            Self::ResourcePackChunkData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePackChunkDataPacket::NAME))
+            }
             Self::ResourcePackChunkRequest(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ResourcePackChunkRequestPacket::NAME))
             }
-            Self::Transfer(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlaySound(packet) => BedrockCodec::serialize(packet, buf),
-            Self::StopSound(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetTitle(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AddBehaviorTree(packet) => BedrockCodec::serialize(packet, buf),
-            Self::StructureBlockUpdate(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ShowStoreOffer(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PurchaseReceipt(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerSkin(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SubClientLogin(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AutomationClientConnect(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetLastHurtBy(packet) => BedrockCodec::serialize(packet, buf),
-            Self::BookEdit(packet) => BedrockCodec::serialize(packet, buf),
-            Self::NpcRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PhotoTransfer(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ModalFormRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ModalFormResponse(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerSettingsRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerSettingsResponse(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ShowProfile(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetDefaultGameType(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RemoveObjective(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetDisplayObjective(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetScore(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LabTable(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateBlockSynced(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MoveActorDelta(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SetScoreboardIdentity(packet) => BedrockCodec::serialize(packet, buf),
+            Self::Transfer(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(TransferPacket::NAME))
+            }
+            Self::PlaySound(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlaySoundPacket::NAME))
+            }
+            Self::StopSound(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(StopSoundPacket::NAME))
+            }
+            Self::SetTitle(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetTitlePacket::NAME))
+            }
+            Self::AddBehaviorTree(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddBehaviorTreePacket::NAME))
+            }
+            Self::StructureBlockUpdate(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(StructureBlockUpdatePacket::NAME))
+            }
+            Self::ShowStoreOffer(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ShowStoreOfferPacket::NAME))
+            }
+            Self::PurchaseReceipt(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PurchaseReceiptPacket::NAME))
+            }
+            Self::PlayerSkin(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerSkinPacket::NAME))
+            }
+            Self::SubClientLogin(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SubClientLoginPacket::NAME))
+            }
+            Self::AutomationClientConnect(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AutomationClientConnectPacket::NAME))
+            }
+            Self::SetLastHurtBy(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetLastHurtByPacket::NAME))
+            }
+            Self::BookEdit(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BookEditPacket::NAME))
+            }
+            Self::NpcRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(NpcRequestPacket::NAME))
+            }
+            Self::PhotoTransfer(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PhotoTransferPacket::NAME))
+            }
+            Self::ModalFormRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ModalFormRequestPacket::NAME))
+            }
+            Self::ModalFormResponse(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ModalFormResponsePacket::NAME))
+            }
+            Self::ServerSettingsRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerSettingsRequestPacket::NAME))
+            }
+            Self::ServerSettingsResponse(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerSettingsResponsePacket::NAME))
+            }
+            Self::ShowProfile(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ShowProfilePacket::NAME))
+            }
+            Self::SetDefaultGameType(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetDefaultGameTypePacket::NAME))
+            }
+            Self::RemoveObjective(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RemoveObjectivePacket::NAME))
+            }
+            Self::SetDisplayObjective(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetDisplayObjectivePacket::NAME))
+            }
+            Self::SetScore(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetScorePacket::NAME))
+            }
+            Self::LabTable(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LabTablePacket::NAME))
+            }
+            Self::UpdateBlockSynced(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateBlockSyncedPacket::NAME))
+            }
+            Self::MoveActorDelta(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MoveActorDeltaPacket::NAME))
+            }
+            Self::SetScoreboardIdentity(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetScoreboardIdentityPacket::NAME))
+            }
             Self::SetLocalPlayerAsInitialized(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetLocalPlayerAsInitializedPacket::NAME))
             }
-            Self::UpdateSoftEnum(packet) => BedrockCodec::serialize(packet, buf),
-            Self::NetworkStackLatency(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SpawnParticleEffect(packet) => BedrockCodec::serialize(packet, buf),
+            Self::UpdateSoftEnum(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateSoftEnumPacket::NAME))
+            }
+            Self::NetworkStackLatency(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(NetworkStackLatencyPacket::NAME))
+            }
+            Self::SpawnParticleEffect(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SpawnParticleEffectPacket::NAME))
+            }
             Self::AvailableActorIdentifiers(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AvailableActorIdentifiersPacket::NAME))
             }
             Self::NetworkChunkPublisherUpdate(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(NetworkChunkPublisherUpdatePacket::NAME))
             }
-            Self::BiomeDefinitionList(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LevelSoundEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LevelEventGeneric(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LecternUpdate(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientCacheStatus(packet) => BedrockCodec::serialize(packet, buf),
+            Self::BiomeDefinitionList(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(BiomeDefinitionListPacket::NAME))
+            }
+            Self::LevelSoundEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LevelSoundEventPacket::NAME))
+            }
+            Self::LevelEventGeneric(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LevelEventGenericPacket::NAME))
+            }
+            Self::LecternUpdate(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LecternUpdatePacket::NAME))
+            }
+            Self::ClientCacheStatus(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientCacheStatusPacket::NAME))
+            }
             Self::OnScreenTextureAnimation(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(OnScreenTextureAnimationPacket::NAME))
             }
-            Self::MapCreateLockedCopy(packet) => BedrockCodec::serialize(packet, buf),
+            Self::MapCreateLockedCopy(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MapCreateLockedCopyPacket::NAME))
+            }
             Self::StructureTemplateDataRequest(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(StructureTemplateDataRequestPacket::NAME))
             }
             Self::StructureTemplateDataResponse(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(StructureTemplateDataResponsePacket::NAME))
             }
-            Self::ClientCacheBlobStatus(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientCacheMissResponse(packet) => BedrockCodec::serialize(packet, buf),
-            Self::EducationSettings(packet) => BedrockCodec::serialize(packet, buf),
-            Self::Emote(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MultiplayerSettings(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SettingsCommand(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AnvilDamage(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CompletedUsingItem(packet) => BedrockCodec::serialize(packet, buf),
-            Self::NetworkSettings(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerAuthInput(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CreativeContent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerEnchantOptions(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ItemStackRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ItemStackResponse(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerArmorDamage(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CodeBuilder(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdatePlayerGameType(packet) => BedrockCodec::serialize(packet, buf),
-            Self::EmoteList(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ClientCacheBlobStatus(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientCacheBlobStatusPacket::NAME))
+            }
+            Self::ClientCacheMissResponse(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientCacheMissResponsePacket::NAME))
+            }
+            Self::EducationSettings(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(EducationSettingsPacket::NAME))
+            }
+            Self::Emote(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(EmotePacket::NAME))
+            }
+            Self::MultiplayerSettings(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MultiplayerSettingsPacket::NAME))
+            }
+            Self::SettingsCommand(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SettingsCommandPacket::NAME))
+            }
+            Self::AnvilDamage(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AnvilDamagePacket::NAME))
+            }
+            Self::CompletedUsingItem(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CompletedUsingItemPacket::NAME))
+            }
+            Self::NetworkSettings(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(NetworkSettingsPacket::NAME))
+            }
+            Self::PlayerAuthInput(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerAuthInputPacket::NAME))
+            }
+            Self::CreativeContent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CreativeContentPacket::NAME))
+            }
+            Self::PlayerEnchantOptions(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerEnchantOptionsPacket::NAME))
+            }
+            Self::ItemStackRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ItemStackRequestPacket::NAME))
+            }
+            Self::ItemStackResponse(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ItemStackResponsePacket::NAME))
+            }
+            Self::PlayerArmorDamage(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerArmorDamagePacket::NAME))
+            }
+            Self::CodeBuilder(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CodeBuilderPacket::NAME))
+            }
+            Self::UpdatePlayerGameType(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdatePlayerGameTypePacket::NAME))
+            }
+            Self::EmoteList(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(EmoteListPacket::NAME))
+            }
             Self::PositionTrackingDBServerBroadcast(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBServerBroadcastPacket::NAME)
+                    })
             }
             Self::PositionTrackingDBClientRequest(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBClientRequestPacket::NAME)
+                    })
             }
-            Self::DebugInfo(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PacketViolationWarning(packet) => BedrockCodec::serialize(packet, buf),
-            Self::MotionPredictionHints(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AnimateEntity(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraShake(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerFog(packet) => BedrockCodec::serialize(packet, buf),
+            Self::DebugInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(DebugInfoPacket::NAME))
+            }
+            Self::PacketViolationWarning(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PacketViolationWarningPacket::NAME))
+            }
+            Self::MotionPredictionHints(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MotionPredictionHintsPacket::NAME))
+            }
+            Self::AnimateEntity(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AnimateEntityPacket::NAME))
+            }
+            Self::CameraShake(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraShakePacket::NAME))
+            }
+            Self::PlayerFog(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerFogPacket::NAME))
+            }
             Self::CorrectPlayerMovePrediction(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CorrectPlayerMovePredictionPacket::NAME))
             }
-            Self::ItemRegistry(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ItemRegistry(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ItemRegistryPacket::NAME))
+            }
             Self::ClientboundDebugRenderer(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundDebugRendererPacket::NAME))
             }
-            Self::SyncActorProperty(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SimulationType(packet) => BedrockCodec::serialize(packet, buf),
-            Self::NpcDialogue(packet) => BedrockCodec::serialize(packet, buf),
-            Self::EduUriResource(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CreatePhoto(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateSubChunkBlocks(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SubChunk(packet) => BedrockCodec::serialize(packet, buf),
-            Self::SubChunkRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerStartItemCooldown(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ScriptMessage(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CodeBuilderSource(packet) => BedrockCodec::serialize(packet, buf),
-            Self::TickingAreasLoadStatus(packet) => BedrockCodec::serialize(packet, buf),
-            Self::DimensionData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AgentActionEvent(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ChangeMobProperty(packet) => BedrockCodec::serialize(packet, buf),
-            Self::LessonProgress(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RequestAbility(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RequestPermissions(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ToastRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateAbilities(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateAdventureSettings(packet) => BedrockCodec::serialize(packet, buf),
-            Self::DeathInfo(packet) => BedrockCodec::serialize(packet, buf),
-            Self::EditorNetwork(packet) => BedrockCodec::serialize(packet, buf),
-            Self::FeatureRegistry(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerStats(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RequestNetworkSettings(packet) => BedrockCodec::serialize(packet, buf),
-            Self::GameTestRequest(packet) => BedrockCodec::serialize(packet, buf),
-            Self::GameTestResults(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UpdateClientInputLocks(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraPresets(packet) => BedrockCodec::serialize(packet, buf),
-            Self::UnlockedRecipes(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraInstruction(packet) => BedrockCodec::serialize(packet, buf),
-            Self::TrimData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::OpenSign(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AgentAnimation(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RefreshEntitlements(packet) => BedrockCodec::serialize(packet, buf),
+            Self::SyncActorProperty(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
+            }
+            Self::SimulationType(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SimulationTypePacket::NAME))
+            }
+            Self::NpcDialogue(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(NpcDialoguePacket::NAME))
+            }
+            Self::EduUriResource(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(EduUriResourcePacket::NAME))
+            }
+            Self::CreatePhoto(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CreatePhotoPacket::NAME))
+            }
+            Self::UpdateSubChunkBlocks(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateSubChunkBlocksPacket::NAME))
+            }
+            Self::SubChunk(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SubChunkPacket::NAME))
+            }
+            Self::SubChunkRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SubChunkRequestPacket::NAME))
+            }
+            Self::PlayerStartItemCooldown(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerStartItemCooldownPacket::NAME))
+            }
+            Self::ScriptMessage(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ScriptMessagePacket::NAME))
+            }
+            Self::CodeBuilderSource(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CodeBuilderSourcePacket::NAME))
+            }
+            Self::TickingAreasLoadStatus(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(TickingAreasLoadStatusPacket::NAME))
+            }
+            Self::DimensionData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(DimensionDataPacket::NAME))
+            }
+            Self::AgentActionEvent(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AgentActionEventPacket::NAME))
+            }
+            Self::ChangeMobProperty(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ChangeMobPropertyPacket::NAME))
+            }
+            Self::LessonProgress(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LessonProgressPacket::NAME))
+            }
+            Self::RequestAbility(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RequestAbilityPacket::NAME))
+            }
+            Self::RequestPermissions(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RequestPermissionsPacket::NAME))
+            }
+            Self::ToastRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ToastRequestPacket::NAME))
+            }
+            Self::UpdateAbilities(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateAbilitiesPacket::NAME))
+            }
+            Self::UpdateAdventureSettings(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateAdventureSettingsPacket::NAME))
+            }
+            Self::DeathInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(DeathInfoPacket::NAME))
+            }
+            Self::EditorNetwork(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(EditorNetworkPacket::NAME))
+            }
+            Self::FeatureRegistry(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(FeatureRegistryPacket::NAME))
+            }
+            Self::ServerStats(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerStatsPacket::NAME))
+            }
+            Self::RequestNetworkSettings(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RequestNetworkSettingsPacket::NAME))
+            }
+            Self::GameTestRequest(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(GameTestRequestPacket::NAME))
+            }
+            Self::GameTestResults(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(GameTestResultsPacket::NAME))
+            }
+            Self::UpdateClientInputLocks(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateClientInputLocksPacket::NAME))
+            }
+            Self::CameraPresets(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraPresetsPacket::NAME))
+            }
+            Self::UnlockedRecipes(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UnlockedRecipesPacket::NAME))
+            }
+            Self::CameraInstruction(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraInstructionPacket::NAME))
+            }
+            Self::TrimData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(TrimDataPacket::NAME))
+            }
+            Self::OpenSign(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(OpenSignPacket::NAME))
+            }
+            Self::AgentAnimation(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AgentAnimationPacket::NAME))
+            }
+            Self::RefreshEntitlements(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RefreshEntitlementsPacket::NAME))
+            }
             Self::PlayerToggleCrafterSlotRequest(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerToggleCrafterSlotRequestPacket::NAME))
             }
             Self::SetPlayerInventoryOptions(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetPlayerInventoryOptionsPacket::NAME))
             }
-            Self::SetHud(packet) => BedrockCodec::serialize(packet, buf),
-            Self::AwardAchievement(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientboundCloseForm(packet) => BedrockCodec::serialize(packet, buf),
+            Self::SetHud(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetHudPacket::NAME))
+            }
+            Self::AwardAchievement(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AwardAchievementPacket::NAME))
+            }
+            Self::ClientboundCloseForm(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundCloseFormPacket::NAME))
+            }
             Self::ServerboundLoadingScreen(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundLoadingScreenPacket::NAME))
             }
-            Self::JigsawStructureData(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CurrentStructureFeature(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerboundDiagnostics(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraAimAssist(packet) => BedrockCodec::serialize(packet, buf),
+            Self::JigsawStructureData(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(JigsawStructureDataPacket::NAME))
+            }
+            Self::CurrentStructureFeature(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CurrentStructureFeaturePacket::NAME))
+            }
+            Self::ServerboundDiagnostics(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundDiagnosticsPacket::NAME))
+            }
+            Self::CameraAimAssist(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraAimAssistPacket::NAME))
+            }
             Self::ContainerRegistryCleanup(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ContainerRegistryCleanupPacket::NAME))
             }
-            Self::MovementEffect(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraAimAssistPresets(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ClientCameraAimAssist(packet) => BedrockCodec::serialize(packet, buf),
+            Self::MovementEffect(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(MovementEffectPacket::NAME))
+            }
+            Self::CameraAimAssistPresets(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraAimAssistPresetsPacket::NAME))
+            }
+            Self::ClientCameraAimAssist(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientCameraAimAssistPacket::NAME))
+            }
             Self::ClientMovementPredictionSync(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientMovementPredictionSyncPacket::NAME))
             }
-            Self::UpdateClientOptions(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PlayerVideoCapture(packet) => BedrockCodec::serialize(packet, buf),
+            Self::UpdateClientOptions(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(UpdateClientOptionsPacket::NAME))
+            }
+            Self::PlayerVideoCapture(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerVideoCapturePacket::NAME))
+            }
             Self::PlayerUpdateEntityOverrides(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerUpdateEntityOverridesPacket::NAME))
             }
-            Self::PlayerLocation(packet) => BedrockCodec::serialize(packet, buf),
+            Self::PlayerLocation(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PlayerLocationPacket::NAME))
+            }
             Self::ClientboundControlSchemeSet(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundControlSchemeSetPacket::NAME))
             }
-            Self::PrimitiveShapes(packet) => BedrockCodec::serialize(packet, buf),
+            Self::PrimitiveShapes(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PrimitiveShapesPacket::NAME))
+            }
             Self::ServerboundPackSettingChange(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundPackSettingChangePacket::NAME))
             }
-            Self::ClientboundDataStore(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ClientboundDataStore(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundDataStorePacket::NAME))
+            }
             Self::GraphicsOverrideParameter(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(GraphicsOverrideParameterPacket::NAME))
             }
-            Self::ServerboundDataStore(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ServerboundDataStore(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundDataStorePacket::NAME))
+            }
             Self::ClientboundDataDrivenUIShowScreen(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUIShowScreenPacket::NAME)
+                    })
             }
             Self::ClientboundDataDrivenUICloseScreen(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUICloseScreenPacket::NAME)
+                    })
             }
             Self::ClientboundDataDrivenUIReload(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundDataDrivenUIReloadPacket::NAME))
             }
-            Self::ClientboundTextureShift(packet) => BedrockCodec::serialize(packet, buf),
-            Self::VoxelShapes(packet) => BedrockCodec::serialize(packet, buf),
-            Self::CameraSpline(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ClientboundTextureShift(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundTextureShiftPacket::NAME))
+            }
+            Self::VoxelShapes(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(VoxelShapesPacket::NAME))
+            }
+            Self::CameraSpline(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraSplinePacket::NAME))
+            }
             Self::CameraAimAssistActorPriority(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(CameraAimAssistActorPriorityPacket::NAME))
             }
             Self::ResourcePacksReadyForValidation(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ResourcePacksReadyForValidationPacket::NAME)
+                    })
             }
-            Self::LocatorBar(packet) => BedrockCodec::serialize(packet, buf),
-            Self::PartyChanged(packet) => BedrockCodec::serialize(packet, buf),
+            Self::LocatorBar(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(LocatorBarPacket::NAME))
+            }
+            Self::PartyChanged(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PartyChangedPacket::NAME))
+            }
             Self::ServerboundDataDrivenScreenClosed(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundDataDrivenScreenClosedPacket::NAME)
+                    })
             }
-            Self::SyncWorldClocks(packet) => BedrockCodec::serialize(packet, buf),
+            Self::SyncWorldClocks(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SyncWorldClocksPacket::NAME))
+            }
             Self::ClientboundAttributeLayerSync(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundAttributeLayerSyncPacket::NAME))
             }
-            Self::ServerStoreInfo(packet) => BedrockCodec::serialize(packet, buf),
-            Self::ServerPresenceInfo(packet) => BedrockCodec::serialize(packet, buf),
+            Self::ServerStoreInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerStoreInfoPacket::NAME))
+            }
+            Self::ServerPresenceInfo(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerPresenceInfoPacket::NAME))
+            }
             Self::ClientboundUpdateSoundData(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundUpdateSoundDataPacket::NAME))
             }
             Self::SendPartyDestinationCookie(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SendPartyDestinationCookiePacket::NAME))
             }
             Self::PartyDestinationCookieResponse(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(PartyDestinationCookieResponsePacket::NAME))
             }
-            Self::SetPlayerFurnaceOptions(packet) => BedrockCodec::serialize(packet, buf),
-            Self::RecordStarted(packet) => BedrockCodec::serialize(packet, buf),
+            Self::SetPlayerFurnaceOptions(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetPlayerFurnaceOptionsPacket::NAME))
+            }
+            Self::RecordStarted(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RecordStartedPacket::NAME))
+            }
             Self::ClientboundMatchmakingState(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundMatchmakingStatePacket::NAME))
             }
             Self::ServerboundStonecutterSetRecipe(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundStonecutterSetRecipePacket::NAME)
+                    })
             }
             Self::ClientboundStonecutterSetRecipe(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundStonecutterSetRecipePacket::NAME)
+                    })
             }
             Self::ServerboundMatchmakingCancel(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundMatchmakingCancelPacket::NAME))
             }
-            Self::SetPassengerOfBlock(packet) => BedrockCodec::serialize(packet, buf),
+            Self::SetPassengerOfBlock(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(SetPassengerOfBlockPacket::NAME))
+            }
             Self::ServerboundCursorItemDrag(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ServerboundCursorItemDragPacket::NAME))
             }
             Self::ClientboundPlayAudioContent(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ClientboundPlayAudioContentPacket::NAME))
             }
             Self::ServerboundRegisterAudioContent(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
+                    })
             }
-            Self::Chat(packet) => BedrockCodec::serialize(packet, buf),
+            Self::Chat(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(ChatPacket::NAME))
+            }
             Self::ServerboundRequestOnlineMusicPlayback(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
+                    })
             }
             Self::ClientboundOnlineMusicPlaybackResponse(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
+                    })
             }
             Self::PlayerToggleArmorVisibilityRequest(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
+                    })
             }
             Self::ClientboundMusicPlaybackFailure(packet) => {
                 BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
+                    })
             }
-            Self::VirtualContainerOpen(packet) => BedrockCodec::serialize(packet, buf),
-            Self::VirtualContainerClose(packet) => BedrockCodec::serialize(packet, buf),
+            Self::VirtualContainerOpen(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
+            }
+            Self::VirtualContainerClose(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
+            }
         }
     }
     /// Reads the body of the packet identified by `packet_id`.
+    ///
+    /// Bytes left in `buf` afterwards are not an error here: the caller knows where the packet ends. Failures are wrapped in `ProtocolError::Packet` to say which packet was being read.
     pub fn decode<B: Buf>(packet_id: u32, buf: &mut B) -> Result<Self> {
         match packet_id {
-            LoginPacket::ID => Ok(Self::Login(BedrockCodec::deserialize(buf)?)),
-            PlayStatusPacket::ID => Ok(Self::PlayStatus(BedrockCodec::deserialize(buf)?)),
+            LoginPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Login)
+                    .map_err(|e| e.in_packet(LoginPacket::NAME))
+            }
+            PlayStatusPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayStatus)
+                    .map_err(|e| e.in_packet(PlayStatusPacket::NAME))
+            }
             ServerToClientHandshakePacket::ID => {
-                Ok(Self::ServerToClientHandshake(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerToClientHandshake)
+                    .map_err(|e| e.in_packet(ServerToClientHandshakePacket::NAME))
             }
             ClientToServerHandshakePacket::ID => {
-                Ok(Self::ClientToServerHandshake(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientToServerHandshake)
+                    .map_err(|e| e.in_packet(ClientToServerHandshakePacket::NAME))
             }
-            DisconnectPacket::ID => Ok(Self::Disconnect(BedrockCodec::deserialize(buf)?)),
+            DisconnectPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Disconnect)
+                    .map_err(|e| e.in_packet(DisconnectPacket::NAME))
+            }
             ResourcePacksInfoPacket::ID => {
-                Ok(Self::ResourcePacksInfo(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePacksInfo)
+                    .map_err(|e| e.in_packet(ResourcePacksInfoPacket::NAME))
             }
             ResourcePackStackPacket::ID => {
-                Ok(Self::ResourcePackStack(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePackStack)
+                    .map_err(|e| e.in_packet(ResourcePackStackPacket::NAME))
             }
             ResourcePackClientResponsePacket::ID => {
-                Ok(Self::ResourcePackClientResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePackClientResponse)
+                    .map_err(|e| e.in_packet(ResourcePackClientResponsePacket::NAME))
             }
-            TextPacket::ID => Ok(Self::Text(BedrockCodec::deserialize(buf)?)),
-            SetTimePacket::ID => Ok(Self::SetTime(BedrockCodec::deserialize(buf)?)),
-            StartGamePacket::ID => Ok(Self::StartGame(BedrockCodec::deserialize(buf)?)),
-            AddPlayerPacket::ID => Ok(Self::AddPlayer(BedrockCodec::deserialize(buf)?)),
-            AddActorPacket::ID => Ok(Self::AddActor(BedrockCodec::deserialize(buf)?)),
+            TextPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Text)
+                    .map_err(|e| e.in_packet(TextPacket::NAME))
+            }
+            SetTimePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetTime)
+                    .map_err(|e| e.in_packet(SetTimePacket::NAME))
+            }
+            StartGamePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::StartGame)
+                    .map_err(|e| e.in_packet(StartGamePacket::NAME))
+            }
+            AddPlayerPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddPlayer)
+                    .map_err(|e| e.in_packet(AddPlayerPacket::NAME))
+            }
+            AddActorPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddActor)
+                    .map_err(|e| e.in_packet(AddActorPacket::NAME))
+            }
             RemoveActorPacket::ID => {
-                Ok(Self::RemoveActor(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RemoveActor)
+                    .map_err(|e| e.in_packet(RemoveActorPacket::NAME))
             }
             AddItemActorPacket::ID => {
-                Ok(Self::AddItemActor(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddItemActor)
+                    .map_err(|e| e.in_packet(AddItemActorPacket::NAME))
             }
             ServerPlayerPostMovePositionPacket::ID => {
-                Ok(Self::ServerPlayerPostMovePosition(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerPlayerPostMovePosition)
+                    .map_err(|e| e.in_packet(ServerPlayerPostMovePositionPacket::NAME))
             }
             TakeItemActorPacket::ID => {
-                Ok(Self::TakeItemActor(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::TakeItemActor)
+                    .map_err(|e| e.in_packet(TakeItemActorPacket::NAME))
             }
             MoveActorAbsolutePacket::ID => {
-                Ok(Self::MoveActorAbsolute(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MoveActorAbsolute)
+                    .map_err(|e| e.in_packet(MoveActorAbsolutePacket::NAME))
             }
-            MovePlayerPacket::ID => Ok(Self::MovePlayer(BedrockCodec::deserialize(buf)?)),
+            MovePlayerPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MovePlayer)
+                    .map_err(|e| e.in_packet(MovePlayerPacket::NAME))
+            }
             UpdateBlockPacket::ID => {
-                Ok(Self::UpdateBlock(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateBlock)
+                    .map_err(|e| e.in_packet(UpdateBlockPacket::NAME))
             }
             AddPaintingPacket::ID => {
-                Ok(Self::AddPainting(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddPainting)
+                    .map_err(|e| e.in_packet(AddPaintingPacket::NAME))
             }
-            LevelEventPacket::ID => Ok(Self::LevelEvent(BedrockCodec::deserialize(buf)?)),
-            BlockEventPacket::ID => Ok(Self::BlockEvent(BedrockCodec::deserialize(buf)?)),
-            ActorEventPacket::ID => Ok(Self::ActorEvent(BedrockCodec::deserialize(buf)?)),
-            MobEffectPacket::ID => Ok(Self::MobEffect(BedrockCodec::deserialize(buf)?)),
+            LevelEventPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LevelEvent)
+                    .map_err(|e| e.in_packet(LevelEventPacket::NAME))
+            }
+            BlockEventPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BlockEvent)
+                    .map_err(|e| e.in_packet(BlockEventPacket::NAME))
+            }
+            ActorEventPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ActorEvent)
+                    .map_err(|e| e.in_packet(ActorEventPacket::NAME))
+            }
+            MobEffectPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MobEffect)
+                    .map_err(|e| e.in_packet(MobEffectPacket::NAME))
+            }
             UpdateAttributesPacket::ID => {
-                Ok(Self::UpdateAttributes(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateAttributes)
+                    .map_err(|e| e.in_packet(UpdateAttributesPacket::NAME))
             }
             InventoryTransactionPacket::ID => {
-                Ok(Self::InventoryTransaction(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::InventoryTransaction)
+                    .map_err(|e| e.in_packet(InventoryTransactionPacket::NAME))
             }
             MobEquipmentPacket::ID => {
-                Ok(Self::MobEquipment(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MobEquipment)
+                    .map_err(|e| e.in_packet(MobEquipmentPacket::NAME))
             }
             MobArmorEquipmentPacket::ID => {
-                Ok(Self::MobArmorEquipment(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MobArmorEquipment)
+                    .map_err(|e| e.in_packet(MobArmorEquipmentPacket::NAME))
             }
-            InteractPacket::ID => Ok(Self::Interact(BedrockCodec::deserialize(buf)?)),
+            InteractPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Interact)
+                    .map_err(|e| e.in_packet(InteractPacket::NAME))
+            }
             BlockPickRequestPacket::ID => {
-                Ok(Self::BlockPickRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BlockPickRequest)
+                    .map_err(|e| e.in_packet(BlockPickRequestPacket::NAME))
             }
             ActorPickRequestPacket::ID => {
-                Ok(Self::ActorPickRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ActorPickRequest)
+                    .map_err(|e| e.in_packet(ActorPickRequestPacket::NAME))
             }
             PlayerActionPacket::ID => {
-                Ok(Self::PlayerAction(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerAction)
+                    .map_err(|e| e.in_packet(PlayerActionPacket::NAME))
             }
-            HurtArmorPacket::ID => Ok(Self::HurtArmor(BedrockCodec::deserialize(buf)?)),
+            HurtArmorPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::HurtArmor)
+                    .map_err(|e| e.in_packet(HurtArmorPacket::NAME))
+            }
             SetActorDataPacket::ID => {
-                Ok(Self::SetActorData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetActorData)
+                    .map_err(|e| e.in_packet(SetActorDataPacket::NAME))
             }
             SetActorMotionPacket::ID => {
-                Ok(Self::SetActorMotion(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetActorMotion)
+                    .map_err(|e| e.in_packet(SetActorMotionPacket::NAME))
             }
             SetActorLinkPacket::ID => {
-                Ok(Self::SetActorLink(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetActorLink)
+                    .map_err(|e| e.in_packet(SetActorLinkPacket::NAME))
             }
-            SetHealthPacket::ID => Ok(Self::SetHealth(BedrockCodec::deserialize(buf)?)),
+            SetHealthPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetHealth)
+                    .map_err(|e| e.in_packet(SetHealthPacket::NAME))
+            }
             SetSpawnPositionPacket::ID => {
-                Ok(Self::SetSpawnPosition(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetSpawnPosition)
+                    .map_err(|e| e.in_packet(SetSpawnPositionPacket::NAME))
             }
-            AnimatePacket::ID => Ok(Self::Animate(BedrockCodec::deserialize(buf)?)),
-            RespawnPacket::ID => Ok(Self::Respawn(BedrockCodec::deserialize(buf)?)),
+            AnimatePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Animate)
+                    .map_err(|e| e.in_packet(AnimatePacket::NAME))
+            }
+            RespawnPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Respawn)
+                    .map_err(|e| e.in_packet(RespawnPacket::NAME))
+            }
             ContainerOpenPacket::ID => {
-                Ok(Self::ContainerOpen(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ContainerOpen)
+                    .map_err(|e| e.in_packet(ContainerOpenPacket::NAME))
             }
             ContainerClosePacket::ID => {
-                Ok(Self::ContainerClose(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ContainerClose)
+                    .map_err(|e| e.in_packet(ContainerClosePacket::NAME))
             }
             PlayerHotbarPacket::ID => {
-                Ok(Self::PlayerHotbar(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerHotbar)
+                    .map_err(|e| e.in_packet(PlayerHotbarPacket::NAME))
             }
             InventoryContentPacket::ID => {
-                Ok(Self::InventoryContent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::InventoryContent)
+                    .map_err(|e| e.in_packet(InventoryContentPacket::NAME))
             }
             InventorySlotPacket::ID => {
-                Ok(Self::InventorySlot(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::InventorySlot)
+                    .map_err(|e| e.in_packet(InventorySlotPacket::NAME))
             }
             ContainerSetDataPacket::ID => {
-                Ok(Self::ContainerSetData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ContainerSetData)
+                    .map_err(|e| e.in_packet(ContainerSetDataPacket::NAME))
             }
             CraftingDataPacket::ID => {
-                Ok(Self::CraftingData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CraftingData)
+                    .map_err(|e| e.in_packet(CraftingDataPacket::NAME))
             }
             GuiDataPickItemPacket::ID => {
-                Ok(Self::GuiDataPickItem(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::GuiDataPickItem)
+                    .map_err(|e| e.in_packet(GuiDataPickItemPacket::NAME))
             }
             BlockActorDataPacket::ID => {
-                Ok(Self::BlockActorData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BlockActorData)
+                    .map_err(|e| e.in_packet(BlockActorDataPacket::NAME))
             }
-            LevelChunkPacket::ID => Ok(Self::LevelChunk(BedrockCodec::deserialize(buf)?)),
+            LevelChunkPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LevelChunk)
+                    .map_err(|e| e.in_packet(LevelChunkPacket::NAME))
+            }
             SetCommandsEnabledPacket::ID => {
-                Ok(Self::SetCommandsEnabled(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetCommandsEnabled)
+                    .map_err(|e| e.in_packet(SetCommandsEnabledPacket::NAME))
             }
             SetDifficultyPacket::ID => {
-                Ok(Self::SetDifficulty(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetDifficulty)
+                    .map_err(|e| e.in_packet(SetDifficultyPacket::NAME))
             }
             ChangeDimensionPacket::ID => {
-                Ok(Self::ChangeDimension(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ChangeDimension)
+                    .map_err(|e| e.in_packet(ChangeDimensionPacket::NAME))
             }
             SetPlayerGameTypePacket::ID => {
-                Ok(Self::SetPlayerGameType(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetPlayerGameType)
+                    .map_err(|e| e.in_packet(SetPlayerGameTypePacket::NAME))
             }
-            PlayerListPacket::ID => Ok(Self::PlayerList(BedrockCodec::deserialize(buf)?)),
+            PlayerListPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerList)
+                    .map_err(|e| e.in_packet(PlayerListPacket::NAME))
+            }
             SimpleEventPacket::ID => {
-                Ok(Self::SimpleEvent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SimpleEvent)
+                    .map_err(|e| e.in_packet(SimpleEventPacket::NAME))
             }
             LegacyTelemetryEventPacket::ID => {
-                Ok(Self::LegacyTelemetryEvent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LegacyTelemetryEvent)
+                    .map_err(|e| e.in_packet(LegacyTelemetryEventPacket::NAME))
             }
             SpawnExperienceOrbPacket::ID => {
-                Ok(Self::SpawnExperienceOrb(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SpawnExperienceOrb)
+                    .map_err(|e| e.in_packet(SpawnExperienceOrbPacket::NAME))
             }
             ClientboundMapItemDataPacket::ID => {
-                Ok(Self::ClientboundMapItemData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundMapItemData)
+                    .map_err(|e| e.in_packet(ClientboundMapItemDataPacket::NAME))
             }
             MapInfoRequestPacket::ID => {
-                Ok(Self::MapInfoRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MapInfoRequest)
+                    .map_err(|e| e.in_packet(MapInfoRequestPacket::NAME))
             }
             RequestChunkRadiusPacket::ID => {
-                Ok(Self::RequestChunkRadius(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RequestChunkRadius)
+                    .map_err(|e| e.in_packet(RequestChunkRadiusPacket::NAME))
             }
             ChunkRadiusUpdatedPacket::ID => {
-                Ok(Self::ChunkRadiusUpdated(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ChunkRadiusUpdated)
+                    .map_err(|e| e.in_packet(ChunkRadiusUpdatedPacket::NAME))
             }
             GameRulesChangedPacket::ID => {
-                Ok(Self::GameRulesChanged(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::GameRulesChanged)
+                    .map_err(|e| e.in_packet(GameRulesChangedPacket::NAME))
             }
-            CameraPacket::ID => Ok(Self::Camera(BedrockCodec::deserialize(buf)?)),
-            BossEventPacket::ID => Ok(Self::BossEvent(BedrockCodec::deserialize(buf)?)),
+            CameraPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Camera)
+                    .map_err(|e| e.in_packet(CameraPacket::NAME))
+            }
+            BossEventPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BossEvent)
+                    .map_err(|e| e.in_packet(BossEventPacket::NAME))
+            }
             ShowCreditsPacket::ID => {
-                Ok(Self::ShowCredits(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ShowCredits)
+                    .map_err(|e| e.in_packet(ShowCreditsPacket::NAME))
             }
             AvailableCommandsPacket::ID => {
-                Ok(Self::AvailableCommands(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AvailableCommands)
+                    .map_err(|e| e.in_packet(AvailableCommandsPacket::NAME))
             }
             CommandRequestPacket::ID => {
-                Ok(Self::CommandRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CommandRequest)
+                    .map_err(|e| e.in_packet(CommandRequestPacket::NAME))
             }
             CommandBlockUpdatePacket::ID => {
-                Ok(Self::CommandBlockUpdate(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CommandBlockUpdate)
+                    .map_err(|e| e.in_packet(CommandBlockUpdatePacket::NAME))
             }
             CommandOutputPacket::ID => {
-                Ok(Self::CommandOutput(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CommandOutput)
+                    .map_err(|e| e.in_packet(CommandOutputPacket::NAME))
             }
             UpdateTradePacket::ID => {
-                Ok(Self::UpdateTrade(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateTrade)
+                    .map_err(|e| e.in_packet(UpdateTradePacket::NAME))
             }
             UpdateEquipPacket::ID => {
-                Ok(Self::UpdateEquip(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateEquip)
+                    .map_err(|e| e.in_packet(UpdateEquipPacket::NAME))
             }
             ResourcePackDataInfoPacket::ID => {
-                Ok(Self::ResourcePackDataInfo(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePackDataInfo)
+                    .map_err(|e| e.in_packet(ResourcePackDataInfoPacket::NAME))
             }
             ResourcePackChunkDataPacket::ID => {
-                Ok(Self::ResourcePackChunkData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePackChunkData)
+                    .map_err(|e| e.in_packet(ResourcePackChunkDataPacket::NAME))
             }
             ResourcePackChunkRequestPacket::ID => {
-                Ok(Self::ResourcePackChunkRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePackChunkRequest)
+                    .map_err(|e| e.in_packet(ResourcePackChunkRequestPacket::NAME))
             }
-            TransferPacket::ID => Ok(Self::Transfer(BedrockCodec::deserialize(buf)?)),
-            PlaySoundPacket::ID => Ok(Self::PlaySound(BedrockCodec::deserialize(buf)?)),
-            StopSoundPacket::ID => Ok(Self::StopSound(BedrockCodec::deserialize(buf)?)),
-            SetTitlePacket::ID => Ok(Self::SetTitle(BedrockCodec::deserialize(buf)?)),
+            TransferPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Transfer)
+                    .map_err(|e| e.in_packet(TransferPacket::NAME))
+            }
+            PlaySoundPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlaySound)
+                    .map_err(|e| e.in_packet(PlaySoundPacket::NAME))
+            }
+            StopSoundPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::StopSound)
+                    .map_err(|e| e.in_packet(StopSoundPacket::NAME))
+            }
+            SetTitlePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetTitle)
+                    .map_err(|e| e.in_packet(SetTitlePacket::NAME))
+            }
             AddBehaviorTreePacket::ID => {
-                Ok(Self::AddBehaviorTree(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddBehaviorTree)
+                    .map_err(|e| e.in_packet(AddBehaviorTreePacket::NAME))
             }
             StructureBlockUpdatePacket::ID => {
-                Ok(Self::StructureBlockUpdate(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::StructureBlockUpdate)
+                    .map_err(|e| e.in_packet(StructureBlockUpdatePacket::NAME))
             }
             ShowStoreOfferPacket::ID => {
-                Ok(Self::ShowStoreOffer(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ShowStoreOffer)
+                    .map_err(|e| e.in_packet(ShowStoreOfferPacket::NAME))
             }
             PurchaseReceiptPacket::ID => {
-                Ok(Self::PurchaseReceipt(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PurchaseReceipt)
+                    .map_err(|e| e.in_packet(PurchaseReceiptPacket::NAME))
             }
-            PlayerSkinPacket::ID => Ok(Self::PlayerSkin(BedrockCodec::deserialize(buf)?)),
+            PlayerSkinPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerSkin)
+                    .map_err(|e| e.in_packet(PlayerSkinPacket::NAME))
+            }
             SubClientLoginPacket::ID => {
-                Ok(Self::SubClientLogin(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SubClientLogin)
+                    .map_err(|e| e.in_packet(SubClientLoginPacket::NAME))
             }
             AutomationClientConnectPacket::ID => {
-                Ok(Self::AutomationClientConnect(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AutomationClientConnect)
+                    .map_err(|e| e.in_packet(AutomationClientConnectPacket::NAME))
             }
             SetLastHurtByPacket::ID => {
-                Ok(Self::SetLastHurtBy(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetLastHurtBy)
+                    .map_err(|e| e.in_packet(SetLastHurtByPacket::NAME))
             }
-            BookEditPacket::ID => Ok(Self::BookEdit(BedrockCodec::deserialize(buf)?)),
-            NpcRequestPacket::ID => Ok(Self::NpcRequest(BedrockCodec::deserialize(buf)?)),
+            BookEditPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BookEdit)
+                    .map_err(|e| e.in_packet(BookEditPacket::NAME))
+            }
+            NpcRequestPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::NpcRequest)
+                    .map_err(|e| e.in_packet(NpcRequestPacket::NAME))
+            }
             PhotoTransferPacket::ID => {
-                Ok(Self::PhotoTransfer(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PhotoTransfer)
+                    .map_err(|e| e.in_packet(PhotoTransferPacket::NAME))
             }
             ModalFormRequestPacket::ID => {
-                Ok(Self::ModalFormRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ModalFormRequest)
+                    .map_err(|e| e.in_packet(ModalFormRequestPacket::NAME))
             }
             ModalFormResponsePacket::ID => {
-                Ok(Self::ModalFormResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ModalFormResponse)
+                    .map_err(|e| e.in_packet(ModalFormResponsePacket::NAME))
             }
             ServerSettingsRequestPacket::ID => {
-                Ok(Self::ServerSettingsRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerSettingsRequest)
+                    .map_err(|e| e.in_packet(ServerSettingsRequestPacket::NAME))
             }
             ServerSettingsResponsePacket::ID => {
-                Ok(Self::ServerSettingsResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerSettingsResponse)
+                    .map_err(|e| e.in_packet(ServerSettingsResponsePacket::NAME))
             }
             ShowProfilePacket::ID => {
-                Ok(Self::ShowProfile(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ShowProfile)
+                    .map_err(|e| e.in_packet(ShowProfilePacket::NAME))
             }
             SetDefaultGameTypePacket::ID => {
-                Ok(Self::SetDefaultGameType(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetDefaultGameType)
+                    .map_err(|e| e.in_packet(SetDefaultGameTypePacket::NAME))
             }
             RemoveObjectivePacket::ID => {
-                Ok(Self::RemoveObjective(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RemoveObjective)
+                    .map_err(|e| e.in_packet(RemoveObjectivePacket::NAME))
             }
             SetDisplayObjectivePacket::ID => {
-                Ok(Self::SetDisplayObjective(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetDisplayObjective)
+                    .map_err(|e| e.in_packet(SetDisplayObjectivePacket::NAME))
             }
-            SetScorePacket::ID => Ok(Self::SetScore(BedrockCodec::deserialize(buf)?)),
-            LabTablePacket::ID => Ok(Self::LabTable(BedrockCodec::deserialize(buf)?)),
+            SetScorePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetScore)
+                    .map_err(|e| e.in_packet(SetScorePacket::NAME))
+            }
+            LabTablePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LabTable)
+                    .map_err(|e| e.in_packet(LabTablePacket::NAME))
+            }
             UpdateBlockSyncedPacket::ID => {
-                Ok(Self::UpdateBlockSynced(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateBlockSynced)
+                    .map_err(|e| e.in_packet(UpdateBlockSyncedPacket::NAME))
             }
             MoveActorDeltaPacket::ID => {
-                Ok(Self::MoveActorDelta(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MoveActorDelta)
+                    .map_err(|e| e.in_packet(MoveActorDeltaPacket::NAME))
             }
             SetScoreboardIdentityPacket::ID => {
-                Ok(Self::SetScoreboardIdentity(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetScoreboardIdentity)
+                    .map_err(|e| e.in_packet(SetScoreboardIdentityPacket::NAME))
             }
             SetLocalPlayerAsInitializedPacket::ID => {
-                Ok(Self::SetLocalPlayerAsInitialized(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetLocalPlayerAsInitialized)
+                    .map_err(|e| e.in_packet(SetLocalPlayerAsInitializedPacket::NAME))
             }
             UpdateSoftEnumPacket::ID => {
-                Ok(Self::UpdateSoftEnum(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateSoftEnum)
+                    .map_err(|e| e.in_packet(UpdateSoftEnumPacket::NAME))
             }
             NetworkStackLatencyPacket::ID => {
-                Ok(Self::NetworkStackLatency(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::NetworkStackLatency)
+                    .map_err(|e| e.in_packet(NetworkStackLatencyPacket::NAME))
             }
             SpawnParticleEffectPacket::ID => {
-                Ok(Self::SpawnParticleEffect(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SpawnParticleEffect)
+                    .map_err(|e| e.in_packet(SpawnParticleEffectPacket::NAME))
             }
             AvailableActorIdentifiersPacket::ID => {
-                Ok(Self::AvailableActorIdentifiers(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AvailableActorIdentifiers)
+                    .map_err(|e| e.in_packet(AvailableActorIdentifiersPacket::NAME))
             }
             NetworkChunkPublisherUpdatePacket::ID => {
-                Ok(Self::NetworkChunkPublisherUpdate(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::NetworkChunkPublisherUpdate)
+                    .map_err(|e| e.in_packet(NetworkChunkPublisherUpdatePacket::NAME))
             }
             BiomeDefinitionListPacket::ID => {
-                Ok(Self::BiomeDefinitionList(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::BiomeDefinitionList)
+                    .map_err(|e| e.in_packet(BiomeDefinitionListPacket::NAME))
             }
             LevelSoundEventPacket::ID => {
-                Ok(Self::LevelSoundEvent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LevelSoundEvent)
+                    .map_err(|e| e.in_packet(LevelSoundEventPacket::NAME))
             }
             LevelEventGenericPacket::ID => {
-                Ok(Self::LevelEventGeneric(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LevelEventGeneric)
+                    .map_err(|e| e.in_packet(LevelEventGenericPacket::NAME))
             }
             LecternUpdatePacket::ID => {
-                Ok(Self::LecternUpdate(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LecternUpdate)
+                    .map_err(|e| e.in_packet(LecternUpdatePacket::NAME))
             }
             ClientCacheStatusPacket::ID => {
-                Ok(Self::ClientCacheStatus(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientCacheStatus)
+                    .map_err(|e| e.in_packet(ClientCacheStatusPacket::NAME))
             }
             OnScreenTextureAnimationPacket::ID => {
-                Ok(Self::OnScreenTextureAnimation(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::OnScreenTextureAnimation)
+                    .map_err(|e| e.in_packet(OnScreenTextureAnimationPacket::NAME))
             }
             MapCreateLockedCopyPacket::ID => {
-                Ok(Self::MapCreateLockedCopy(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MapCreateLockedCopy)
+                    .map_err(|e| e.in_packet(MapCreateLockedCopyPacket::NAME))
             }
             StructureTemplateDataRequestPacket::ID => {
-                Ok(Self::StructureTemplateDataRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::StructureTemplateDataRequest)
+                    .map_err(|e| e.in_packet(StructureTemplateDataRequestPacket::NAME))
             }
             StructureTemplateDataResponsePacket::ID => {
-                Ok(Self::StructureTemplateDataResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::StructureTemplateDataResponse)
+                    .map_err(|e| e.in_packet(StructureTemplateDataResponsePacket::NAME))
             }
             ClientCacheBlobStatusPacket::ID => {
-                Ok(Self::ClientCacheBlobStatus(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientCacheBlobStatus)
+                    .map_err(|e| e.in_packet(ClientCacheBlobStatusPacket::NAME))
             }
             ClientCacheMissResponsePacket::ID => {
-                Ok(Self::ClientCacheMissResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientCacheMissResponse)
+                    .map_err(|e| e.in_packet(ClientCacheMissResponsePacket::NAME))
             }
             EducationSettingsPacket::ID => {
-                Ok(Self::EducationSettings(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::EducationSettings)
+                    .map_err(|e| e.in_packet(EducationSettingsPacket::NAME))
             }
-            EmotePacket::ID => Ok(Self::Emote(BedrockCodec::deserialize(buf)?)),
+            EmotePacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Emote)
+                    .map_err(|e| e.in_packet(EmotePacket::NAME))
+            }
             MultiplayerSettingsPacket::ID => {
-                Ok(Self::MultiplayerSettings(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MultiplayerSettings)
+                    .map_err(|e| e.in_packet(MultiplayerSettingsPacket::NAME))
             }
             SettingsCommandPacket::ID => {
-                Ok(Self::SettingsCommand(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SettingsCommand)
+                    .map_err(|e| e.in_packet(SettingsCommandPacket::NAME))
             }
             AnvilDamagePacket::ID => {
-                Ok(Self::AnvilDamage(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AnvilDamage)
+                    .map_err(|e| e.in_packet(AnvilDamagePacket::NAME))
             }
             CompletedUsingItemPacket::ID => {
-                Ok(Self::CompletedUsingItem(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CompletedUsingItem)
+                    .map_err(|e| e.in_packet(CompletedUsingItemPacket::NAME))
             }
             NetworkSettingsPacket::ID => {
-                Ok(Self::NetworkSettings(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::NetworkSettings)
+                    .map_err(|e| e.in_packet(NetworkSettingsPacket::NAME))
             }
             PlayerAuthInputPacket::ID => {
-                Ok(Self::PlayerAuthInput(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerAuthInput)
+                    .map_err(|e| e.in_packet(PlayerAuthInputPacket::NAME))
             }
             CreativeContentPacket::ID => {
-                Ok(Self::CreativeContent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CreativeContent)
+                    .map_err(|e| e.in_packet(CreativeContentPacket::NAME))
             }
             PlayerEnchantOptionsPacket::ID => {
-                Ok(Self::PlayerEnchantOptions(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerEnchantOptions)
+                    .map_err(|e| e.in_packet(PlayerEnchantOptionsPacket::NAME))
             }
             ItemStackRequestPacket::ID => {
-                Ok(Self::ItemStackRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ItemStackRequest)
+                    .map_err(|e| e.in_packet(ItemStackRequestPacket::NAME))
             }
             ItemStackResponsePacket::ID => {
-                Ok(Self::ItemStackResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ItemStackResponse)
+                    .map_err(|e| e.in_packet(ItemStackResponsePacket::NAME))
             }
             PlayerArmorDamagePacket::ID => {
-                Ok(Self::PlayerArmorDamage(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerArmorDamage)
+                    .map_err(|e| e.in_packet(PlayerArmorDamagePacket::NAME))
             }
             CodeBuilderPacket::ID => {
-                Ok(Self::CodeBuilder(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CodeBuilder)
+                    .map_err(|e| e.in_packet(CodeBuilderPacket::NAME))
             }
             UpdatePlayerGameTypePacket::ID => {
-                Ok(Self::UpdatePlayerGameType(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdatePlayerGameType)
+                    .map_err(|e| e.in_packet(UpdatePlayerGameTypePacket::NAME))
             }
-            EmoteListPacket::ID => Ok(Self::EmoteList(BedrockCodec::deserialize(buf)?)),
+            EmoteListPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::EmoteList)
+                    .map_err(|e| e.in_packet(EmoteListPacket::NAME))
+            }
             PositionTrackingDBServerBroadcastPacket::ID => {
-                Ok(
-                    Self::PositionTrackingDBServerBroadcast(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PositionTrackingDBServerBroadcast)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBServerBroadcastPacket::NAME)
+                    })
             }
             PositionTrackingDBClientRequestPacket::ID => {
-                Ok(
-                    Self::PositionTrackingDBClientRequest(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PositionTrackingDBClientRequest)
+                    .map_err(|e| {
+                        e.in_packet(PositionTrackingDBClientRequestPacket::NAME)
+                    })
             }
-            DebugInfoPacket::ID => Ok(Self::DebugInfo(BedrockCodec::deserialize(buf)?)),
+            DebugInfoPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::DebugInfo)
+                    .map_err(|e| e.in_packet(DebugInfoPacket::NAME))
+            }
             PacketViolationWarningPacket::ID => {
-                Ok(Self::PacketViolationWarning(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PacketViolationWarning)
+                    .map_err(|e| e.in_packet(PacketViolationWarningPacket::NAME))
             }
             MotionPredictionHintsPacket::ID => {
-                Ok(Self::MotionPredictionHints(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MotionPredictionHints)
+                    .map_err(|e| e.in_packet(MotionPredictionHintsPacket::NAME))
             }
             AnimateEntityPacket::ID => {
-                Ok(Self::AnimateEntity(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AnimateEntity)
+                    .map_err(|e| e.in_packet(AnimateEntityPacket::NAME))
             }
             CameraShakePacket::ID => {
-                Ok(Self::CameraShake(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraShake)
+                    .map_err(|e| e.in_packet(CameraShakePacket::NAME))
             }
-            PlayerFogPacket::ID => Ok(Self::PlayerFog(BedrockCodec::deserialize(buf)?)),
+            PlayerFogPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerFog)
+                    .map_err(|e| e.in_packet(PlayerFogPacket::NAME))
+            }
             CorrectPlayerMovePredictionPacket::ID => {
-                Ok(Self::CorrectPlayerMovePrediction(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CorrectPlayerMovePrediction)
+                    .map_err(|e| e.in_packet(CorrectPlayerMovePredictionPacket::NAME))
             }
             ItemRegistryPacket::ID => {
-                Ok(Self::ItemRegistry(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ItemRegistry)
+                    .map_err(|e| e.in_packet(ItemRegistryPacket::NAME))
             }
             ClientboundDebugRendererPacket::ID => {
-                Ok(Self::ClientboundDebugRenderer(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundDebugRenderer)
+                    .map_err(|e| e.in_packet(ClientboundDebugRendererPacket::NAME))
             }
             SyncActorPropertyPacket::ID => {
-                Ok(Self::SyncActorProperty(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SyncActorProperty)
+                    .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
             }
             SimulationTypePacket::ID => {
-                Ok(Self::SimulationType(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SimulationType)
+                    .map_err(|e| e.in_packet(SimulationTypePacket::NAME))
             }
             NpcDialoguePacket::ID => {
-                Ok(Self::NpcDialogue(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::NpcDialogue)
+                    .map_err(|e| e.in_packet(NpcDialoguePacket::NAME))
             }
             EduUriResourcePacket::ID => {
-                Ok(Self::EduUriResource(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::EduUriResource)
+                    .map_err(|e| e.in_packet(EduUriResourcePacket::NAME))
             }
             CreatePhotoPacket::ID => {
-                Ok(Self::CreatePhoto(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CreatePhoto)
+                    .map_err(|e| e.in_packet(CreatePhotoPacket::NAME))
             }
             UpdateSubChunkBlocksPacket::ID => {
-                Ok(Self::UpdateSubChunkBlocks(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateSubChunkBlocks)
+                    .map_err(|e| e.in_packet(UpdateSubChunkBlocksPacket::NAME))
             }
-            SubChunkPacket::ID => Ok(Self::SubChunk(BedrockCodec::deserialize(buf)?)),
+            SubChunkPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SubChunk)
+                    .map_err(|e| e.in_packet(SubChunkPacket::NAME))
+            }
             SubChunkRequestPacket::ID => {
-                Ok(Self::SubChunkRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SubChunkRequest)
+                    .map_err(|e| e.in_packet(SubChunkRequestPacket::NAME))
             }
             PlayerStartItemCooldownPacket::ID => {
-                Ok(Self::PlayerStartItemCooldown(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerStartItemCooldown)
+                    .map_err(|e| e.in_packet(PlayerStartItemCooldownPacket::NAME))
             }
             ScriptMessagePacket::ID => {
-                Ok(Self::ScriptMessage(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ScriptMessage)
+                    .map_err(|e| e.in_packet(ScriptMessagePacket::NAME))
             }
             CodeBuilderSourcePacket::ID => {
-                Ok(Self::CodeBuilderSource(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CodeBuilderSource)
+                    .map_err(|e| e.in_packet(CodeBuilderSourcePacket::NAME))
             }
             TickingAreasLoadStatusPacket::ID => {
-                Ok(Self::TickingAreasLoadStatus(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::TickingAreasLoadStatus)
+                    .map_err(|e| e.in_packet(TickingAreasLoadStatusPacket::NAME))
             }
             DimensionDataPacket::ID => {
-                Ok(Self::DimensionData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::DimensionData)
+                    .map_err(|e| e.in_packet(DimensionDataPacket::NAME))
             }
             AgentActionEventPacket::ID => {
-                Ok(Self::AgentActionEvent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AgentActionEvent)
+                    .map_err(|e| e.in_packet(AgentActionEventPacket::NAME))
             }
             ChangeMobPropertyPacket::ID => {
-                Ok(Self::ChangeMobProperty(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ChangeMobProperty)
+                    .map_err(|e| e.in_packet(ChangeMobPropertyPacket::NAME))
             }
             LessonProgressPacket::ID => {
-                Ok(Self::LessonProgress(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LessonProgress)
+                    .map_err(|e| e.in_packet(LessonProgressPacket::NAME))
             }
             RequestAbilityPacket::ID => {
-                Ok(Self::RequestAbility(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RequestAbility)
+                    .map_err(|e| e.in_packet(RequestAbilityPacket::NAME))
             }
             RequestPermissionsPacket::ID => {
-                Ok(Self::RequestPermissions(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RequestPermissions)
+                    .map_err(|e| e.in_packet(RequestPermissionsPacket::NAME))
             }
             ToastRequestPacket::ID => {
-                Ok(Self::ToastRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ToastRequest)
+                    .map_err(|e| e.in_packet(ToastRequestPacket::NAME))
             }
             UpdateAbilitiesPacket::ID => {
-                Ok(Self::UpdateAbilities(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateAbilities)
+                    .map_err(|e| e.in_packet(UpdateAbilitiesPacket::NAME))
             }
             UpdateAdventureSettingsPacket::ID => {
-                Ok(Self::UpdateAdventureSettings(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateAdventureSettings)
+                    .map_err(|e| e.in_packet(UpdateAdventureSettingsPacket::NAME))
             }
-            DeathInfoPacket::ID => Ok(Self::DeathInfo(BedrockCodec::deserialize(buf)?)),
+            DeathInfoPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::DeathInfo)
+                    .map_err(|e| e.in_packet(DeathInfoPacket::NAME))
+            }
             EditorNetworkPacket::ID => {
-                Ok(Self::EditorNetwork(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::EditorNetwork)
+                    .map_err(|e| e.in_packet(EditorNetworkPacket::NAME))
             }
             FeatureRegistryPacket::ID => {
-                Ok(Self::FeatureRegistry(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::FeatureRegistry)
+                    .map_err(|e| e.in_packet(FeatureRegistryPacket::NAME))
             }
             ServerStatsPacket::ID => {
-                Ok(Self::ServerStats(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerStats)
+                    .map_err(|e| e.in_packet(ServerStatsPacket::NAME))
             }
             RequestNetworkSettingsPacket::ID => {
-                Ok(Self::RequestNetworkSettings(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RequestNetworkSettings)
+                    .map_err(|e| e.in_packet(RequestNetworkSettingsPacket::NAME))
             }
             GameTestRequestPacket::ID => {
-                Ok(Self::GameTestRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::GameTestRequest)
+                    .map_err(|e| e.in_packet(GameTestRequestPacket::NAME))
             }
             GameTestResultsPacket::ID => {
-                Ok(Self::GameTestResults(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::GameTestResults)
+                    .map_err(|e| e.in_packet(GameTestResultsPacket::NAME))
             }
             UpdateClientInputLocksPacket::ID => {
-                Ok(Self::UpdateClientInputLocks(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateClientInputLocks)
+                    .map_err(|e| e.in_packet(UpdateClientInputLocksPacket::NAME))
             }
             CameraPresetsPacket::ID => {
-                Ok(Self::CameraPresets(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraPresets)
+                    .map_err(|e| e.in_packet(CameraPresetsPacket::NAME))
             }
             UnlockedRecipesPacket::ID => {
-                Ok(Self::UnlockedRecipes(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UnlockedRecipes)
+                    .map_err(|e| e.in_packet(UnlockedRecipesPacket::NAME))
             }
             CameraInstructionPacket::ID => {
-                Ok(Self::CameraInstruction(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraInstruction)
+                    .map_err(|e| e.in_packet(CameraInstructionPacket::NAME))
             }
-            TrimDataPacket::ID => Ok(Self::TrimData(BedrockCodec::deserialize(buf)?)),
-            OpenSignPacket::ID => Ok(Self::OpenSign(BedrockCodec::deserialize(buf)?)),
+            TrimDataPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::TrimData)
+                    .map_err(|e| e.in_packet(TrimDataPacket::NAME))
+            }
+            OpenSignPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::OpenSign)
+                    .map_err(|e| e.in_packet(OpenSignPacket::NAME))
+            }
             AgentAnimationPacket::ID => {
-                Ok(Self::AgentAnimation(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AgentAnimation)
+                    .map_err(|e| e.in_packet(AgentAnimationPacket::NAME))
             }
             RefreshEntitlementsPacket::ID => {
-                Ok(Self::RefreshEntitlements(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RefreshEntitlements)
+                    .map_err(|e| e.in_packet(RefreshEntitlementsPacket::NAME))
             }
             PlayerToggleCrafterSlotRequestPacket::ID => {
-                Ok(Self::PlayerToggleCrafterSlotRequest(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerToggleCrafterSlotRequest)
+                    .map_err(|e| e.in_packet(PlayerToggleCrafterSlotRequestPacket::NAME))
             }
             SetPlayerInventoryOptionsPacket::ID => {
-                Ok(Self::SetPlayerInventoryOptions(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetPlayerInventoryOptions)
+                    .map_err(|e| e.in_packet(SetPlayerInventoryOptionsPacket::NAME))
             }
-            SetHudPacket::ID => Ok(Self::SetHud(BedrockCodec::deserialize(buf)?)),
+            SetHudPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetHud)
+                    .map_err(|e| e.in_packet(SetHudPacket::NAME))
+            }
             AwardAchievementPacket::ID => {
-                Ok(Self::AwardAchievement(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AwardAchievement)
+                    .map_err(|e| e.in_packet(AwardAchievementPacket::NAME))
             }
             ClientboundCloseFormPacket::ID => {
-                Ok(Self::ClientboundCloseForm(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundCloseForm)
+                    .map_err(|e| e.in_packet(ClientboundCloseFormPacket::NAME))
             }
             ServerboundLoadingScreenPacket::ID => {
-                Ok(Self::ServerboundLoadingScreen(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundLoadingScreen)
+                    .map_err(|e| e.in_packet(ServerboundLoadingScreenPacket::NAME))
             }
             JigsawStructureDataPacket::ID => {
-                Ok(Self::JigsawStructureData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::JigsawStructureData)
+                    .map_err(|e| e.in_packet(JigsawStructureDataPacket::NAME))
             }
             CurrentStructureFeaturePacket::ID => {
-                Ok(Self::CurrentStructureFeature(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CurrentStructureFeature)
+                    .map_err(|e| e.in_packet(CurrentStructureFeaturePacket::NAME))
             }
             ServerboundDiagnosticsPacket::ID => {
-                Ok(Self::ServerboundDiagnostics(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundDiagnostics)
+                    .map_err(|e| e.in_packet(ServerboundDiagnosticsPacket::NAME))
             }
             CameraAimAssistPacket::ID => {
-                Ok(Self::CameraAimAssist(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraAimAssist)
+                    .map_err(|e| e.in_packet(CameraAimAssistPacket::NAME))
             }
             ContainerRegistryCleanupPacket::ID => {
-                Ok(Self::ContainerRegistryCleanup(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ContainerRegistryCleanup)
+                    .map_err(|e| e.in_packet(ContainerRegistryCleanupPacket::NAME))
             }
             MovementEffectPacket::ID => {
-                Ok(Self::MovementEffect(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::MovementEffect)
+                    .map_err(|e| e.in_packet(MovementEffectPacket::NAME))
             }
             CameraAimAssistPresetsPacket::ID => {
-                Ok(Self::CameraAimAssistPresets(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraAimAssistPresets)
+                    .map_err(|e| e.in_packet(CameraAimAssistPresetsPacket::NAME))
             }
             ClientCameraAimAssistPacket::ID => {
-                Ok(Self::ClientCameraAimAssist(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientCameraAimAssist)
+                    .map_err(|e| e.in_packet(ClientCameraAimAssistPacket::NAME))
             }
             ClientMovementPredictionSyncPacket::ID => {
-                Ok(Self::ClientMovementPredictionSync(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientMovementPredictionSync)
+                    .map_err(|e| e.in_packet(ClientMovementPredictionSyncPacket::NAME))
             }
             UpdateClientOptionsPacket::ID => {
-                Ok(Self::UpdateClientOptions(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::UpdateClientOptions)
+                    .map_err(|e| e.in_packet(UpdateClientOptionsPacket::NAME))
             }
             PlayerVideoCapturePacket::ID => {
-                Ok(Self::PlayerVideoCapture(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerVideoCapture)
+                    .map_err(|e| e.in_packet(PlayerVideoCapturePacket::NAME))
             }
             PlayerUpdateEntityOverridesPacket::ID => {
-                Ok(Self::PlayerUpdateEntityOverrides(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerUpdateEntityOverrides)
+                    .map_err(|e| e.in_packet(PlayerUpdateEntityOverridesPacket::NAME))
             }
             PlayerLocationPacket::ID => {
-                Ok(Self::PlayerLocation(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerLocation)
+                    .map_err(|e| e.in_packet(PlayerLocationPacket::NAME))
             }
             ClientboundControlSchemeSetPacket::ID => {
-                Ok(Self::ClientboundControlSchemeSet(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundControlSchemeSet)
+                    .map_err(|e| e.in_packet(ClientboundControlSchemeSetPacket::NAME))
             }
             PrimitiveShapesPacket::ID => {
-                Ok(Self::PrimitiveShapes(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PrimitiveShapes)
+                    .map_err(|e| e.in_packet(PrimitiveShapesPacket::NAME))
             }
             ServerboundPackSettingChangePacket::ID => {
-                Ok(Self::ServerboundPackSettingChange(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundPackSettingChange)
+                    .map_err(|e| e.in_packet(ServerboundPackSettingChangePacket::NAME))
             }
             ClientboundDataStorePacket::ID => {
-                Ok(Self::ClientboundDataStore(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundDataStore)
+                    .map_err(|e| e.in_packet(ClientboundDataStorePacket::NAME))
             }
             GraphicsOverrideParameterPacket::ID => {
-                Ok(Self::GraphicsOverrideParameter(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::GraphicsOverrideParameter)
+                    .map_err(|e| e.in_packet(GraphicsOverrideParameterPacket::NAME))
             }
             ServerboundDataStorePacket::ID => {
-                Ok(Self::ServerboundDataStore(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundDataStore)
+                    .map_err(|e| e.in_packet(ServerboundDataStorePacket::NAME))
             }
             ClientboundDataDrivenUIShowScreenPacket::ID => {
-                Ok(
-                    Self::ClientboundDataDrivenUIShowScreen(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundDataDrivenUIShowScreen)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUIShowScreenPacket::NAME)
+                    })
             }
             ClientboundDataDrivenUICloseScreenPacket::ID => {
-                Ok(
-                    Self::ClientboundDataDrivenUICloseScreen(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundDataDrivenUICloseScreen)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundDataDrivenUICloseScreenPacket::NAME)
+                    })
             }
             ClientboundDataDrivenUIReloadPacket::ID => {
-                Ok(Self::ClientboundDataDrivenUIReload(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundDataDrivenUIReload)
+                    .map_err(|e| e.in_packet(ClientboundDataDrivenUIReloadPacket::NAME))
             }
             ClientboundTextureShiftPacket::ID => {
-                Ok(Self::ClientboundTextureShift(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundTextureShift)
+                    .map_err(|e| e.in_packet(ClientboundTextureShiftPacket::NAME))
             }
             VoxelShapesPacket::ID => {
-                Ok(Self::VoxelShapes(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::VoxelShapes)
+                    .map_err(|e| e.in_packet(VoxelShapesPacket::NAME))
             }
             CameraSplinePacket::ID => {
-                Ok(Self::CameraSpline(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraSpline)
+                    .map_err(|e| e.in_packet(CameraSplinePacket::NAME))
             }
             CameraAimAssistActorPriorityPacket::ID => {
-                Ok(Self::CameraAimAssistActorPriority(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::CameraAimAssistActorPriority)
+                    .map_err(|e| e.in_packet(CameraAimAssistActorPriorityPacket::NAME))
             }
             ResourcePacksReadyForValidationPacket::ID => {
-                Ok(
-                    Self::ResourcePacksReadyForValidation(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ResourcePacksReadyForValidation)
+                    .map_err(|e| {
+                        e.in_packet(ResourcePacksReadyForValidationPacket::NAME)
+                    })
             }
-            LocatorBarPacket::ID => Ok(Self::LocatorBar(BedrockCodec::deserialize(buf)?)),
+            LocatorBarPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::LocatorBar)
+                    .map_err(|e| e.in_packet(LocatorBarPacket::NAME))
+            }
             PartyChangedPacket::ID => {
-                Ok(Self::PartyChanged(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PartyChanged)
+                    .map_err(|e| e.in_packet(PartyChangedPacket::NAME))
             }
             ServerboundDataDrivenScreenClosedPacket::ID => {
-                Ok(
-                    Self::ServerboundDataDrivenScreenClosed(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundDataDrivenScreenClosed)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundDataDrivenScreenClosedPacket::NAME)
+                    })
             }
             SyncWorldClocksPacket::ID => {
-                Ok(Self::SyncWorldClocks(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SyncWorldClocks)
+                    .map_err(|e| e.in_packet(SyncWorldClocksPacket::NAME))
             }
             ClientboundAttributeLayerSyncPacket::ID => {
-                Ok(Self::ClientboundAttributeLayerSync(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundAttributeLayerSync)
+                    .map_err(|e| e.in_packet(ClientboundAttributeLayerSyncPacket::NAME))
             }
             ServerStoreInfoPacket::ID => {
-                Ok(Self::ServerStoreInfo(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerStoreInfo)
+                    .map_err(|e| e.in_packet(ServerStoreInfoPacket::NAME))
             }
             ServerPresenceInfoPacket::ID => {
-                Ok(Self::ServerPresenceInfo(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerPresenceInfo)
+                    .map_err(|e| e.in_packet(ServerPresenceInfoPacket::NAME))
             }
             ClientboundUpdateSoundDataPacket::ID => {
-                Ok(Self::ClientboundUpdateSoundData(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundUpdateSoundData)
+                    .map_err(|e| e.in_packet(ClientboundUpdateSoundDataPacket::NAME))
             }
             SendPartyDestinationCookiePacket::ID => {
-                Ok(Self::SendPartyDestinationCookie(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SendPartyDestinationCookie)
+                    .map_err(|e| e.in_packet(SendPartyDestinationCookiePacket::NAME))
             }
             PartyDestinationCookieResponsePacket::ID => {
-                Ok(Self::PartyDestinationCookieResponse(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PartyDestinationCookieResponse)
+                    .map_err(|e| e.in_packet(PartyDestinationCookieResponsePacket::NAME))
             }
             SetPlayerFurnaceOptionsPacket::ID => {
-                Ok(Self::SetPlayerFurnaceOptions(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetPlayerFurnaceOptions)
+                    .map_err(|e| e.in_packet(SetPlayerFurnaceOptionsPacket::NAME))
             }
             RecordStartedPacket::ID => {
-                Ok(Self::RecordStarted(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RecordStarted)
+                    .map_err(|e| e.in_packet(RecordStartedPacket::NAME))
             }
             ClientboundMatchmakingStatePacket::ID => {
-                Ok(Self::ClientboundMatchmakingState(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundMatchmakingState)
+                    .map_err(|e| e.in_packet(ClientboundMatchmakingStatePacket::NAME))
             }
             ServerboundStonecutterSetRecipePacket::ID => {
-                Ok(
-                    Self::ServerboundStonecutterSetRecipe(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundStonecutterSetRecipe)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundStonecutterSetRecipePacket::NAME)
+                    })
             }
             ClientboundStonecutterSetRecipePacket::ID => {
-                Ok(
-                    Self::ClientboundStonecutterSetRecipe(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundStonecutterSetRecipe)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundStonecutterSetRecipePacket::NAME)
+                    })
             }
             ServerboundMatchmakingCancelPacket::ID => {
-                Ok(Self::ServerboundMatchmakingCancel(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundMatchmakingCancel)
+                    .map_err(|e| e.in_packet(ServerboundMatchmakingCancelPacket::NAME))
             }
             SetPassengerOfBlockPacket::ID => {
-                Ok(Self::SetPassengerOfBlock(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::SetPassengerOfBlock)
+                    .map_err(|e| e.in_packet(SetPassengerOfBlockPacket::NAME))
             }
             ServerboundCursorItemDragPacket::ID => {
-                Ok(Self::ServerboundCursorItemDrag(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundCursorItemDrag)
+                    .map_err(|e| e.in_packet(ServerboundCursorItemDragPacket::NAME))
             }
             ClientboundPlayAudioContentPacket::ID => {
-                Ok(Self::ClientboundPlayAudioContent(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundPlayAudioContent)
+                    .map_err(|e| e.in_packet(ClientboundPlayAudioContentPacket::NAME))
             }
             ServerboundRegisterAudioContentPacket::ID => {
-                Ok(
-                    Self::ServerboundRegisterAudioContent(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundRegisterAudioContent)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
+                    })
             }
-            ChatPacket::ID => Ok(Self::Chat(BedrockCodec::deserialize(buf)?)),
+            ChatPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::Chat)
+                    .map_err(|e| e.in_packet(ChatPacket::NAME))
+            }
             ServerboundRequestOnlineMusicPlaybackPacket::ID => {
-                Ok(
-                    Self::ServerboundRequestOnlineMusicPlayback(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ServerboundRequestOnlineMusicPlayback)
+                    .map_err(|e| {
+                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
+                    })
             }
             ClientboundOnlineMusicPlaybackResponsePacket::ID => {
-                Ok(
-                    Self::ClientboundOnlineMusicPlaybackResponse(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundOnlineMusicPlaybackResponse)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
+                    })
             }
             PlayerToggleArmorVisibilityRequestPacket::ID => {
-                Ok(
-                    Self::PlayerToggleArmorVisibilityRequest(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::PlayerToggleArmorVisibilityRequest)
+                    .map_err(|e| {
+                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
+                    })
             }
             ClientboundMusicPlaybackFailurePacket::ID => {
-                Ok(
-                    Self::ClientboundMusicPlaybackFailure(
-                        BedrockCodec::deserialize(buf)?,
-                    ),
-                )
+                BedrockCodec::deserialize(buf)
+                    .map(Self::ClientboundMusicPlaybackFailure)
+                    .map_err(|e| {
+                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
+                    })
             }
             VirtualContainerOpenPacket::ID => {
-                Ok(Self::VirtualContainerOpen(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::VirtualContainerOpen)
+                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
             }
             VirtualContainerClosePacket::ID => {
-                Ok(Self::VirtualContainerClose(BedrockCodec::deserialize(buf)?))
+                BedrockCodec::deserialize(buf)
+                    .map(Self::VirtualContainerClose)
+                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
             }
             other => Err(ProtocolError::UnknownPacketId(other)),
         }
