@@ -29,6 +29,7 @@ packet.encode(&mut out)?;
 | `scripts/fetch-mojang-protocol.sh` | Downloads `json/` and records the commit |
 | `scripts/audit_schema.py` | Exhaustive inventory of the meta-schema |
 | `.github/workflows/sync-mojang-protocol.yml` | Checks Mojang's `main` every 6 hours and opens a PR |
+| `.github/workflows/ci.yml` | On every PR: generated code up to date, check, clippy, tests, docs |
 
 ## Updating the protocol
 

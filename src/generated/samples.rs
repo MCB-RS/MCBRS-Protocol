@@ -2,7 +2,12 @@
 // DO NOT EDIT: run `cargo run --bin proto-codegen` to regenerate this file.
 
 //! Pseudo-random value builders used by the round-trip tests.
-#![allow(unused_variables, unused_imports, clippy::all)]
+#![allow(
+    unused_variables,
+    unused_imports,
+    clippy::derivable_impls,
+    clippy::large_enum_variant
+)]
 use super::enums::*;
 use super::packets::*;
 use super::types::*;
@@ -995,7 +1000,7 @@ impl Sample for ActorDataBoundingBoxComponent {
 impl Sample for ActorDataFlagComponent {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            actor_flag_bitset_data: g.vec(|g| Sample::sample(g)),
+            actor_flag_bitset_data: g.vec(Sample::sample),
         }
     }
 }
@@ -1012,7 +1017,7 @@ impl Sample for ActorEventPacketPayload {
             target_runtime_id: Sample::sample(g),
             event_id: Sample::sample(g),
             data: Sample::sample(g),
-            fire_at_position: g.option(|g| Sample::sample(g)),
+            fire_at_position: g.option(Sample::sample),
         }
     }
 }
@@ -1062,11 +1067,11 @@ impl Sample for AddActorPacketPayload {
             rotation: Sample::sample(g),
             y_head_rotation: Sample::sample(g),
             y_body_rotation: Sample::sample(g),
-            attributes_list: g.vec(|g| Sample::sample(g)),
+            attributes_list: g.vec(Sample::sample),
             actor_data: Sample::sample(g),
             synched_properties: Sample::sample(g),
-            actor_links: g.vec(|g| Sample::sample(g)),
-            passenger_block_data: g.option(|g| Sample::sample(g)),
+            actor_links: g.vec(Sample::sample),
+            passenger_block_data: g.option(Sample::sample),
         }
     }
 }
@@ -1117,8 +1122,8 @@ impl Sample for AddPlayerPacketPayload {
             entity_data: Sample::sample(g),
             synched_properties: Sample::sample(g),
             abilities_data: Sample::sample(g),
-            actor_links: g.vec(|g| Sample::sample(g)),
-            passenger_block_data: g.option(|g| Sample::sample(g)),
+            actor_links: g.vec(Sample::sample),
+            passenger_block_data: g.option(Sample::sample),
             device_id: Sample::sample(g),
             build_platform: Sample::sample(g),
         }
@@ -1128,7 +1133,7 @@ impl Sample for AddTimeMarkerData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             clock_id: Sample::sample(g),
-            time_markers: g.vec(|g| Sample::sample(g)),
+            time_markers: g.vec(Sample::sample),
         }
     }
 }
@@ -1163,7 +1168,7 @@ impl Sample for AgentAnimationPacketPayload {
 impl Sample for AgentCapabilities {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            can_modify_blocks: g.option(|g| Sample::sample(g)),
+            can_modify_blocks: g.option(Sample::sample),
         }
     }
 }
@@ -1186,7 +1191,7 @@ impl Sample for AnimateEntityPacketPayload {
             m_stop_expression_version: Sample::sample(g),
             m_controller: Sample::sample(g),
             m_blend_out_time: Sample::sample(g),
-            m_runtime_ids: g.vec(|g| Sample::sample(g)),
+            m_runtime_ids: g.vec(Sample::sample),
         }
     }
 }
@@ -1196,8 +1201,8 @@ impl Sample for AnimatePacketPayload {
             action: Sample::sample(g),
             target_actor_runtime_id: Sample::sample(g),
             data: Sample::sample(g),
-            swing_source: g.option(|g| Sample::sample(g)),
-            hand: g.option(|g| Sample::sample(g)),
+            swing_source: g.option(Sample::sample),
+            hand: g.option(Sample::sample),
         }
     }
 }
@@ -1237,10 +1242,10 @@ impl Sample for ArmorSlotAndDamagePair {
 impl Sample for ArrowDataPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            arrow_end_location: g.option(|g| Sample::sample(g)),
-            arrow_head_length: g.option(|g| Sample::sample(g)),
-            arrow_head_radius: g.option(|g| Sample::sample(g)),
-            num_segments: g.option(|g| Sample::sample(g)),
+            arrow_end_location: g.option(Sample::sample),
+            arrow_head_length: g.option(Sample::sample),
+            arrow_head_radius: g.option(Sample::sample),
+            num_segments: g.option(Sample::sample),
         }
     }
 }
@@ -1254,7 +1259,7 @@ impl Sample for AttributeData {
             default_max_value: Sample::sample(g),
             default_value: Sample::sample(g),
             name: Sample::sample(g),
-            modifiers: g.vec(|g| Sample::sample(g)),
+            modifiers: g.vec(Sample::sample),
         }
     }
 }
@@ -1264,7 +1269,7 @@ impl Sample for AttributeLayerData {
             name: Sample::sample(g),
             dimension: Sample::sample(g),
             settings: Sample::sample(g),
-            attributes: g.vec(|g| Sample::sample(g)),
+            attributes: g.vec(Sample::sample),
         }
     }
 }
@@ -1304,8 +1309,8 @@ impl Sample for AuthorAndMessage {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            player_name: g.option(|g| Sample::sample(g)),
-            message: g.option(|g| Sample::sample(g)),
+            player_name: g.option(Sample::sample),
+            message: g.option(Sample::sample),
         }
     }
 }
@@ -1327,7 +1332,7 @@ impl Sample for AvailableCommandsPacketChainedSubcommandData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             name: Sample::sample(g),
-            sub_command_values: g.option(|g| g.vec(|g| Sample::sample(g))),
+            sub_command_values: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
@@ -1347,8 +1352,8 @@ impl Sample for AvailableCommandsPacketCommandData {
             flags: Sample::sample(g),
             permission_level: Sample::sample(g),
             alias_enum: Sample::sample(g),
-            command_data_chained_subcommand_indexes: g.vec(|g| Sample::sample(g)),
-            overloads: g.vec(|g| Sample::sample(g)),
+            command_data_chained_subcommand_indexes: g.vec(Sample::sample),
+            overloads: g.vec(Sample::sample),
         }
     }
 }
@@ -1357,7 +1362,7 @@ impl Sample for AvailableCommandsPacketConstrainedValueData {
         Self {
             enum_value_symbol: Sample::sample(g),
             enum_symbol: Sample::sample(g),
-            constraint_indices: g.vec(|g| Sample::sample(g)),
+            constraint_indices: g.vec(Sample::sample),
         }
     }
 }
@@ -1365,7 +1370,7 @@ impl Sample for AvailableCommandsPacketEnumData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             name: Sample::sample(g),
-            values: g.vec(|g| Sample::sample(g)),
+            values: g.vec(Sample::sample),
         }
     }
 }
@@ -1373,7 +1378,7 @@ impl Sample for AvailableCommandsPacketOverloadData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             is_chaining: Sample::sample(g),
-            parameter_data: g.vec(|g| Sample::sample(g)),
+            parameter_data: g.vec(Sample::sample),
         }
     }
 }
@@ -1390,14 +1395,14 @@ impl Sample for AvailableCommandsPacketParamData {
 impl Sample for AvailableCommandsPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            enum_values: g.vec(|g| Sample::sample(g)),
-            chained_subcommand_values: g.vec(|g| Sample::sample(g)),
-            post_fixes: g.vec(|g| Sample::sample(g)),
-            enum_data: g.vec(|g| Sample::sample(g)),
-            chained_subcommand_data: g.vec(|g| Sample::sample(g)),
-            commands: g.vec(|g| Sample::sample(g)),
-            soft_enums: g.vec(|g| Sample::sample(g)),
-            constraints: g.vec(|g| Sample::sample(g)),
+            enum_values: g.vec(Sample::sample),
+            chained_subcommand_values: g.vec(Sample::sample),
+            post_fixes: g.vec(Sample::sample),
+            enum_data: g.vec(Sample::sample),
+            chained_subcommand_data: g.vec(Sample::sample),
+            commands: g.vec(Sample::sample),
+            soft_enums: g.vec(Sample::sample),
+            constraints: g.vec(Sample::sample),
         }
     }
 }
@@ -1405,7 +1410,7 @@ impl Sample for AvailableCommandsPacketSoftEnumData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             enum_name: Sample::sample(g),
-            enum_options: g.vec(|g| Sample::sample(g)),
+            enum_options: g.vec(Sample::sample),
         }
     }
 }
@@ -1420,7 +1425,7 @@ impl Sample for BedrockSafetyRedactableString {
     fn sample(g: &mut Gen) -> Self {
         Self {
             unredacted: Sample::sample(g),
-            redacted: g.option(|g| Sample::sample(g)),
+            redacted: g.option(Sample::sample),
         }
     }
 }
@@ -1432,11 +1437,11 @@ impl Sample for BellUsed {
 impl Sample for BiomeCappedSurfaceData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            floor_blocks: g.vec(|g| Sample::sample(g)),
-            ceiling_blocks: g.vec(|g| Sample::sample(g)),
-            sea_block: g.option(|g| Sample::sample(g)),
-            foundation_block: g.option(|g| Sample::sample(g)),
-            beach_block: g.option(|g| Sample::sample(g)),
+            floor_blocks: g.vec(Sample::sample),
+            ceiling_blocks: g.vec(Sample::sample),
+            sea_block: g.option(Sample::sample),
+            foundation_block: g.option(Sample::sample),
+            beach_block: g.option(Sample::sample),
         }
     }
 }
@@ -1453,7 +1458,7 @@ impl Sample for BiomeClimateData {
 impl Sample for BiomeConditionalTransformationData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            transforms_into: g.vec(|g| Sample::sample(g)),
+            transforms_into: g.vec(Sample::sample),
             condition_json: Sample::sample(g),
             min_passing_neighbors: Sample::sample(g),
         }
@@ -1473,7 +1478,7 @@ impl Sample for BiomeConsolidatedFeatureData {
 impl Sample for BiomeConsolidatedFeaturesData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            features: g.vec(|g| Sample::sample(g)),
+            features: g.vec(Sample::sample),
         }
     }
 }
@@ -1493,17 +1498,17 @@ impl Sample for BiomeCoordinateData {
 impl Sample for BiomeDefinitionChunkGenData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            climate: g.option(|g| Sample::sample(g)),
-            consolidated_features: g.option(|g| Sample::sample(g)),
-            mountain_params: g.option(|g| Sample::sample(g)),
-            surface_material_adjustments: g.option(|g| Sample::sample(g)),
-            overworld_gen_rules: g.option(|g| Sample::sample(g)),
-            multinoise_gen_rules: g.option(|g| Sample::sample(g)),
-            legacy_world_gen_rules: g.option(|g| Sample::sample(g)),
-            replacement_biomes: g.option(|g| Sample::sample(g)),
-            village_type: g.option(|g| Sample::sample(g)),
-            surface_builder_data: g.option(|g| Sample::sample(g)),
-            subsurface_builder_data: g.option(|g| Sample::sample(g)),
+            climate: g.option(Sample::sample),
+            consolidated_features: g.option(Sample::sample),
+            mountain_params: g.option(Sample::sample),
+            surface_material_adjustments: g.option(Sample::sample),
+            overworld_gen_rules: g.option(Sample::sample),
+            multinoise_gen_rules: g.option(Sample::sample),
+            legacy_world_gen_rules: g.option(Sample::sample),
+            replacement_biomes: g.option(Sample::sample),
+            village_type: g.option(Sample::sample),
+            surface_builder_data: g.option(Sample::sample),
+            subsurface_builder_data: g.option(Sample::sample),
         }
     }
 }
@@ -1518,8 +1523,8 @@ impl Sample for BiomeDefinitionData {
             scale: Sample::sample(g),
             map_water_color_argb: Sample::sample(g),
             rain: Sample::sample(g),
-            tags: g.option(|g| Sample::sample(g)),
-            chunk_gen_data: g.option(|g| Sample::sample(g)),
+            tags: g.option(Sample::sample),
+            chunk_gen_data: g.option(Sample::sample),
         }
     }
 }
@@ -1549,7 +1554,7 @@ impl Sample for BiomeElementData {
 impl Sample for BiomeLegacyWorldGenRulesData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            legacy_pre_hills_edge: g.vec(|g| Sample::sample(g)),
+            legacy_pre_hills_edge: g.vec(Sample::sample),
         }
     }
 }
@@ -1589,8 +1594,8 @@ impl Sample for BiomeMultinoiseGenRulesData {
 impl Sample for BiomeNoiseGradientSurfaceData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            non_replaceable_blocks: g.vec(|g| Sample::sample(g)),
-            gradient_blocks: g.vec(|g| Sample::sample(g)),
+            non_replaceable_blocks: g.vec(Sample::sample),
+            gradient_blocks: g.vec(Sample::sample),
             noise: Sample::sample(g),
         }
     }
@@ -1598,13 +1603,13 @@ impl Sample for BiomeNoiseGradientSurfaceData {
 impl Sample for BiomeOverworldGenRulesData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            hills_transformations: g.vec(|g| Sample::sample(g)),
-            mutate_transformations: g.vec(|g| Sample::sample(g)),
-            river_transformations: g.vec(|g| Sample::sample(g)),
-            shore_transformations: g.vec(|g| Sample::sample(g)),
-            pre_hills_edge: g.vec(|g| Sample::sample(g)),
-            post_shore_edge: g.vec(|g| Sample::sample(g)),
-            climate: g.vec(|g| Sample::sample(g)),
+            hills_transformations: g.vec(Sample::sample),
+            mutate_transformations: g.vec(Sample::sample),
+            river_transformations: g.vec(Sample::sample),
+            shore_transformations: g.vec(Sample::sample),
+            pre_hills_edge: g.vec(Sample::sample),
+            post_shore_edge: g.vec(Sample::sample),
+            climate: g.vec(Sample::sample),
         }
     }
 }
@@ -1613,7 +1618,7 @@ impl Sample for BiomeReplacementData {
         Self {
             replacement_biome: Sample::sample(g),
             dimension: Sample::sample(g),
-            target_biomes: g.vec(|g| Sample::sample(g)),
+            target_biomes: g.vec(Sample::sample),
             amount: Sample::sample(g),
             noise_frequency_scale: Sample::sample(g),
             replacement_index: Sample::sample(g),
@@ -1623,14 +1628,14 @@ impl Sample for BiomeReplacementData {
 impl Sample for BiomeReplacementsData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            biome_replacements: g.vec(|g| Sample::sample(g)),
+            biome_replacements: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for BiomeScatterParamData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            coordinates: g.vec(|g| Sample::sample(g)),
+            coordinates: g.vec(Sample::sample),
             eval_order: Sample::sample(g),
             chance_percent_type: Sample::sample(g),
             chance_percent: Sample::sample(g),
@@ -1644,28 +1649,28 @@ impl Sample for BiomeScatterParamData {
 impl Sample for BiomeStringList {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            strings: g.vec(|g| Sample::sample(g)),
+            strings: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for BiomeSurfaceBuilderData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            surface_materials: g.option(|g| Sample::sample(g)),
+            surface_materials: g.option(Sample::sample),
             has_default_overworld_surface: Sample::sample(g),
             has_swamp_surface: Sample::sample(g),
             has_frozen_ocean_surface: Sample::sample(g),
             has_the_end_surface: Sample::sample(g),
-            mesa_surface: g.option(|g| Sample::sample(g)),
-            capped_surface: g.option(|g| Sample::sample(g)),
-            noise_gradient_surface: g.option(|g| Sample::sample(g)),
+            mesa_surface: g.option(Sample::sample),
+            capped_surface: g.option(Sample::sample),
+            noise_gradient_surface: g.option(Sample::sample),
         }
     }
 }
 impl Sample for BiomeSurfaceMaterialAdjustmentData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            adjustments: g.vec(|g| Sample::sample(g)),
+            adjustments: g.vec(Sample::sample),
         }
     }
 }
@@ -1684,7 +1689,7 @@ impl Sample for BiomeSurfaceMaterialData {
 impl Sample for BiomeTagsData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            tags: g.vec(|g| Sample::sample(g)),
+            tags: g.vec(Sample::sample),
         }
     }
 }
@@ -1803,7 +1808,7 @@ impl Sample for BoolAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(|g| Sample::sample(g)),
+            operation: g.option(Sample::sample),
         }
     }
 }
@@ -1844,7 +1849,7 @@ impl Sample for ByteTag {
 impl Sample for CameraAimAssistActorPriorityPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            camera_aim_assist_actor_priority_list: g.vec(|g| Sample::sample(g)),
+            camera_aim_assist_actor_priority_list: g.vec(Sample::sample),
         }
     }
 }
@@ -1864,8 +1869,8 @@ impl Sample for CameraAimAssistCategoryPriorities {
             block_tags: g.option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
             entity_type_families: g
                 .option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
-            entity_default: g.option(|g| Sample::sample(g)),
-            block_default: g.option(|g| Sample::sample(g)),
+            entity_default: g.option(Sample::sample),
+            block_default: g.option(Sample::sample),
         }
     }
 }
@@ -1885,30 +1890,30 @@ impl Sample for CameraAimAssistPresetDefinition {
     fn sample(g: &mut Gen) -> Self {
         Self {
             identifier: Sample::sample(g),
-            exclusion_settings: g.option(|g| Sample::sample(g)),
-            liquid_targeting_list: g.option(|g| g.vec(|g| Sample::sample(g))),
+            exclusion_settings: g.option(Sample::sample),
+            liquid_targeting_list: g.option(|g| g.vec(Sample::sample)),
             item_settings: g
                 .option(|g| g.vec(|g| (Sample::sample(g), Sample::sample(g)))),
-            default_item_settings: g.option(|g| Sample::sample(g)),
-            hand_settings: g.option(|g| Sample::sample(g)),
+            default_item_settings: g.option(Sample::sample),
+            hand_settings: g.option(Sample::sample),
         }
     }
 }
 impl Sample for CameraAimAssistPresetExclusionDefinition {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            blocks: g.option(|g| g.vec(|g| Sample::sample(g))),
-            entities: g.option(|g| g.vec(|g| Sample::sample(g))),
-            block_tags: g.option(|g| g.vec(|g| Sample::sample(g))),
-            entity_type_families: g.option(|g| g.vec(|g| Sample::sample(g))),
+            blocks: g.option(|g| g.vec(Sample::sample)),
+            entities: g.option(|g| g.vec(Sample::sample)),
+            block_tags: g.option(|g| g.vec(Sample::sample)),
+            entity_type_families: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
 impl Sample for CameraAimAssistPresetsPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            camera_aim_assist_presets: g.vec(|g| Sample::sample(g)),
-            camera_aim_assist_categories: g.vec(|g| Sample::sample(g)),
+            camera_aim_assist_presets: g.vec(Sample::sample),
+            camera_aim_assist_categories: g.vec(Sample::sample),
             operation: Sample::sample(g),
         }
     }
@@ -1916,15 +1921,15 @@ impl Sample for CameraAimAssistPresetsPacketPayload {
 impl Sample for CameraInstruction {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            set: g.option(|g| Sample::sample(g)),
-            clear: g.option(|g| Sample::sample(g)),
-            fade: g.option(|g| Sample::sample(g)),
-            target: g.option(|g| Sample::sample(g)),
-            remove_target: g.option(|g| Sample::sample(g)),
-            field_of_view: g.option(|g| Sample::sample(g)),
-            spline: g.option(|g| Sample::sample(g)),
-            attach_to_entity: g.option(|g| Sample::sample(g)),
-            detach_from_entity: g.option(|g| Sample::sample(g)),
+            set: g.option(Sample::sample),
+            clear: g.option(Sample::sample),
+            fade: g.option(Sample::sample),
+            target: g.option(Sample::sample),
+            remove_target: g.option(Sample::sample),
+            field_of_view: g.option(Sample::sample),
+            spline: g.option(Sample::sample),
+            attach_to_entity: g.option(Sample::sample),
+            detach_from_entity: g.option(Sample::sample),
         }
     }
 }
@@ -1938,8 +1943,8 @@ impl Sample for CameraInstructionAttachToEntityInstruction {
 impl Sample for CameraInstructionFadeInstruction {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            time: g.option(|g| Sample::sample(g)),
-            color: g.option(|g| Sample::sample(g)),
+            time: g.option(Sample::sample),
+            color: g.option(Sample::sample),
         }
     }
 }
@@ -1982,13 +1987,13 @@ impl Sample for CameraInstructionSetInstruction {
     fn sample(g: &mut Gen) -> Self {
         Self {
             preset: Sample::sample(g),
-            ease: g.option(|g| Sample::sample(g)),
-            pos: g.option(|g| Sample::sample(g)),
-            rot: g.option(|g| Sample::sample(g)),
-            facing: g.option(|g| Sample::sample(g)),
-            view_offset: g.option(|g| Sample::sample(g)),
-            entity_offset: g.option(|g| Sample::sample(g)),
-            default: g.option(|g| Sample::sample(g)),
+            ease: g.option(Sample::sample),
+            pos: g.option(Sample::sample),
+            rot: g.option(Sample::sample),
+            facing: g.option(Sample::sample),
+            view_offset: g.option(Sample::sample),
+            entity_offset: g.option(Sample::sample),
+            default: g.option(Sample::sample),
             remove_ignore_starting_values_component: Sample::sample(g),
         }
     }
@@ -2041,11 +2046,11 @@ impl Sample for CameraInstructionSplineInstruction {
         Self {
             total_time: Sample::sample(g),
             r#type: Sample::sample(g),
-            curve: g.vec(|g| Sample::sample(g)),
-            progress_key_frames: g.vec(|g| Sample::sample(g)),
-            rotation_option: g.vec(|g| Sample::sample(g)),
-            spline_identifier: g.option(|g| Sample::sample(g)),
-            load_from_json: g.option(|g| Sample::sample(g)),
+            curve: g.vec(Sample::sample),
+            progress_key_frames: g.vec(Sample::sample),
+            rotation_option: g.vec(Sample::sample),
+            spline_identifier: g.option(Sample::sample),
+            load_from_json: g.option(Sample::sample),
         }
     }
 }
@@ -2070,7 +2075,7 @@ impl Sample for CameraInstructionSplineInstructionSplineRotationOption {
 impl Sample for CameraInstructionTargetInstruction {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            target_center_offset: g.option(|g| Sample::sample(g)),
+            target_center_offset: g.option(Sample::sample),
             target_actor_id: Sample::sample(g),
         }
     }
@@ -2088,28 +2093,28 @@ impl Sample for CameraPresets {
         Self {
             name: Sample::sample(g),
             inherit_from: Sample::sample(g),
-            pos_x: g.option(|g| Sample::sample(g)),
-            pos_y: g.option(|g| Sample::sample(g)),
-            pos_z: g.option(|g| Sample::sample(g)),
-            rot_x: g.option(|g| Sample::sample(g)),
-            rot_y: g.option(|g| Sample::sample(g)),
-            rotation_speed: g.option(|g| Sample::sample(g)),
-            snap_to_target: g.option(|g| Sample::sample(g)),
-            horizontal_rotation_limit: g.option(|g| Sample::sample(g)),
-            vertical_rotation_limit: g.option(|g| Sample::sample(g)),
-            continue_targeting: g.option(|g| Sample::sample(g)),
-            block_listening_radius: g.option(|g| Sample::sample(g)),
-            view_offset: g.option(|g| Sample::sample(g)),
-            entity_offset: g.option(|g| Sample::sample(g)),
-            radius: g.option(|g| Sample::sample(g)),
-            yaw_limit_min: g.option(|g| Sample::sample(g)),
-            yaw_limit_max: g.option(|g| Sample::sample(g)),
-            listener: g.option(|g| Sample::sample(g)),
-            player_effects: g.option(|g| Sample::sample(g)),
-            aim_assist: g.option(|g| Sample::sample(g)),
-            control_scheme: g.option(|g| Sample::sample(g)),
+            pos_x: g.option(Sample::sample),
+            pos_y: g.option(Sample::sample),
+            pos_z: g.option(Sample::sample),
+            rot_x: g.option(Sample::sample),
+            rot_y: g.option(Sample::sample),
+            rotation_speed: g.option(Sample::sample),
+            snap_to_target: g.option(Sample::sample),
+            horizontal_rotation_limit: g.option(Sample::sample),
+            vertical_rotation_limit: g.option(Sample::sample),
+            continue_targeting: g.option(Sample::sample),
+            block_listening_radius: g.option(Sample::sample),
+            view_offset: g.option(Sample::sample),
+            entity_offset: g.option(Sample::sample),
+            radius: g.option(Sample::sample),
+            yaw_limit_min: g.option(Sample::sample),
+            yaw_limit_max: g.option(Sample::sample),
+            listener: g.option(Sample::sample),
+            player_effects: g.option(Sample::sample),
+            aim_assist: g.option(Sample::sample),
+            control_scheme: g.option(Sample::sample),
             apply_inherited_starting_rotation: Sample::sample(g),
-            starting_rotation: g.option(|g| Sample::sample(g)),
+            starting_rotation: g.option(Sample::sample),
         }
     }
 }
@@ -2142,17 +2147,17 @@ impl Sample for CameraSplineDefinition {
         Self {
             name: Sample::sample(g),
             total_time: Sample::sample(g),
-            spline_type: g.option(|g| Sample::sample(g)),
-            control_points: g.vec(|g| Sample::sample(g)),
-            progress_key_frames: g.vec(|g| Sample::sample(g)),
-            rotation_key_frames: g.vec(|g| Sample::sample(g)),
+            spline_type: g.option(Sample::sample),
+            control_points: g.vec(Sample::sample),
+            progress_key_frames: g.vec(Sample::sample),
+            rotation_key_frames: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for CameraSplinePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            camera_data_splines: g.vec(|g| Sample::sample(g)),
+            camera_data_splines: g.vec(Sample::sample),
         }
     }
 }
@@ -2161,7 +2166,7 @@ impl Sample for CameraSplineProgressKeyFrame {
         Self {
             progress: Sample::sample(g),
             time: Sample::sample(g),
-            easing: g.option(|g| Sample::sample(g)),
+            easing: g.option(Sample::sample),
         }
     }
 }
@@ -2170,7 +2175,7 @@ impl Sample for CameraSplineRotationKeyFrame {
         Self {
             rotation: Sample::sample(g),
             time: Sample::sample(g),
-            easing: g.option(|g| Sample::sample(g)),
+            easing: g.option(Sample::sample),
         }
     }
 }
@@ -2189,7 +2194,7 @@ impl Sample for CerealizerNetworkItemStackDescriptorSerializedData {
             id: Sample::sample(g),
             stack_size: Sample::sample(g),
             aux_value: Sample::sample(g),
-            net_id_variant: g.option(|g| Sample::sample(g)),
+            net_id_variant: g.option(Sample::sample),
             block_runtime_id: Sample::sample(g),
             user_data_buffer: Sample::sample(g),
         }
@@ -2201,7 +2206,7 @@ impl Sample for ChangeDimensionPacketPayload {
             dimension_id: Sample::sample(g),
             position: Sample::sample(g),
             respawn: Sample::sample(g),
-            loading_screen_id: g.option(|g| Sample::sample(g)),
+            loading_screen_id: g.option(Sample::sample),
         }
     }
 }
@@ -2250,10 +2255,10 @@ impl Sample for ChangePlayerScore {
 impl Sample for ChatFormatting {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            name_prefix: g.option(|g| Sample::sample(g)),
-            name_postfix: g.option(|g| Sample::sample(g)),
-            message_prefix: g.option(|g| Sample::sample(g)),
-            message_postfix: g.option(|g| Sample::sample(g)),
+            name_prefix: g.option(Sample::sample),
+            name_postfix: g.option(Sample::sample),
+            message_prefix: g.option(Sample::sample),
+            message_postfix: g.option(Sample::sample),
         }
     }
 }
@@ -2261,8 +2266,8 @@ impl Sample for ChatPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             signed_chat: Sample::sample(g),
-            room_id: g.option(|g| Sample::sample(g)),
-            formatting: g.option(|g| Sample::sample(g)),
+            room_id: g.option(Sample::sample),
+            formatting: g.option(Sample::sample),
         }
     }
 }
@@ -2289,15 +2294,15 @@ impl Sample for ClearOverride {
 impl Sample for ClientCacheBlobStatusPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            missing_ids: g.vec(|g| Sample::sample(g)),
-            found_ids: g.vec(|g| Sample::sample(g)),
+            missing_ids: g.vec(Sample::sample),
+            found_ids: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for ClientCacheMissResponsePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            missing_blobs: g.vec(|g| Sample::sample(g)),
+            missing_blobs: g.vec(Sample::sample),
         }
     }
 }
@@ -2313,7 +2318,7 @@ impl Sample for ClientCameraAimAssistPacketPayload {
         Self {
             camera_preset_id: Sample::sample(g),
             action: Sample::sample(g),
-            allow_aim_assist: g.option(|g| Sample::sample(g)),
+            allow_aim_assist: g.option(Sample::sample),
         }
     }
 }
@@ -2361,7 +2366,7 @@ impl Sample for ClientboundControlSchemeSetPacketPayload {
 impl Sample for ClientboundDataDrivenUiCloseScreenPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            form_id: g.option(|g| Sample::sample(g)),
+            form_id: g.option(Sample::sample),
         }
     }
 }
@@ -2375,14 +2380,14 @@ impl Sample for ClientboundDataDrivenUiShowScreenPayload {
         Self {
             screen_id: Sample::sample(g),
             form_id: Sample::sample(g),
-            data_instance_id: g.option(|g| Sample::sample(g)),
+            data_instance_id: g.option(Sample::sample),
         }
     }
 }
 impl Sample for ClientboundDataStorePayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            updates: g.vec(|g| Sample::sample(g)),
+            updates: g.vec(Sample::sample),
         }
     }
 }
@@ -2393,15 +2398,15 @@ impl Sample for ClientboundMapItemDataPacketPayload {
             dimension: Sample::sample(g),
             is_locked: Sample::sample(g),
             map_origin: Sample::sample(g),
-            creation_map_ids: g.option(|g| g.vec(|g| Sample::sample(g))),
-            scale: g.option(|g| Sample::sample(g)),
-            tracked_actor_ids: g.option(|g| g.vec(|g| Sample::sample(g))),
-            decorations: g.option(|g| g.vec(|g| Sample::sample(g))),
-            width: g.option(|g| Sample::sample(g)),
-            height: g.option(|g| Sample::sample(g)),
-            start_x: g.option(|g| Sample::sample(g)),
-            start_y: g.option(|g| Sample::sample(g)),
-            pixels: g.option(|g| g.vec(|g| Sample::sample(g))),
+            creation_map_ids: g.option(|g| g.vec(Sample::sample)),
+            scale: g.option(Sample::sample),
+            tracked_actor_ids: g.option(|g| g.vec(Sample::sample)),
+            decorations: g.option(|g| g.vec(Sample::sample)),
+            width: g.option(Sample::sample),
+            height: g.option(Sample::sample),
+            start_x: g.option(Sample::sample),
+            start_y: g.option(Sample::sample),
+            pixels: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
@@ -2410,14 +2415,14 @@ impl Sample for ClientboundMatchmakingStatePacketPayload {
         Self {
             state: Sample::sample(g),
             destination_name: Sample::sample(g),
-            options: g.option(|g| Sample::sample(g)),
+            options: g.option(Sample::sample),
         }
     }
 }
 impl Sample for ClientboundMusicPlaybackFailurePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            failures: g.vec(|g| Sample::sample(g)),
+            failures: g.vec(Sample::sample),
         }
     }
 }
@@ -2457,7 +2462,7 @@ impl Sample for ClientboundTextureShiftPacketPayload {
             collection_name: Sample::sample(g),
             from_step: Sample::sample(g),
             to_step: Sample::sample(g),
-            all_steps: g.vec(|g| Sample::sample(g)),
+            all_steps: g.vec(Sample::sample),
             current_length_in_ticks: Sample::sample(g),
             total_length_in_ticks: Sample::sample(g),
             enabled: Sample::sample(g),
@@ -2513,7 +2518,7 @@ impl Sample for ColorAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(|g| Sample::sample(g)),
+            operation: g.option(Sample::sample),
         }
     }
 }
@@ -2537,8 +2542,8 @@ impl Sample for CommandOriginData {
         Self {
             r#type: Sample::sample(g),
             uuid: Sample::sample(g),
-            request_id: g.option(|g| Sample::sample(g)),
-            player_id: g.option(|g| Sample::sample(g)),
+            request_id: g.option(Sample::sample),
+            player_id: g.option(Sample::sample),
         }
     }
 }
@@ -2547,8 +2552,8 @@ impl Sample for CommandOutput {
         Self {
             output_type: Sample::sample(g),
             success_count: Sample::sample(g),
-            output_messages: g.option(|g| g.vec(|g| Sample::sample(g))),
-            data_set: g.option(|g| Sample::sample(g)),
+            output_messages: g.option(|g| g.vec(Sample::sample)),
+            data_set: g.option(Sample::sample),
         }
     }
 }
@@ -2557,8 +2562,8 @@ impl Sample for CommandOutputMessage {
         Self {
             message_id: Sample::sample(g),
             successful: Sample::sample(g),
-            parameters: g.option(|g| g.vec(|g| Sample::sample(g))),
-            raw_message: g.option(|g| Sample::sample(g)),
+            parameters: g.option(|g| g.vec(Sample::sample)),
+            raw_message: g.option(Sample::sample),
         }
     }
 }
@@ -2643,7 +2648,7 @@ impl Sample for ContainerOpenPacketPayload {
 impl Sample for ContainerRegistryCleanupPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            removed_containers: g.vec(|g| Sample::sample(g)),
+            removed_containers: g.vec(Sample::sample),
         }
     }
 }
@@ -2678,7 +2683,7 @@ impl Sample for CorrectPlayerMovePredictionPacketPayload {
             pos: Sample::sample(g),
             pos_delta: Sample::sample(g),
             rotation: Sample::sample(g),
-            vehicle_angular_velocity: g.option(|g| Sample::sample(g)),
+            vehicle_angular_velocity: g.option(Sample::sample),
             on_ground: Sample::sample(g),
             tick: Sample::sample(g),
         }
@@ -2687,17 +2692,17 @@ impl Sample for CorrectPlayerMovePredictionPacketPayload {
 impl Sample for CraftingDataPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            shaped_recipes: g.vec(|g| Sample::sample(g)),
-            shapeless_recipes: g.vec(|g| Sample::sample(g)),
-            multi_recipes: g.vec(|g| Sample::sample(g)),
-            user_data_shapeless_recipes: g.vec(|g| Sample::sample(g)),
-            shapeless_chemistry_recipes: g.vec(|g| Sample::sample(g)),
-            shaped_chemistry_recipes: g.vec(|g| Sample::sample(g)),
-            smithing_transform_recipes: g.vec(|g| Sample::sample(g)),
-            smithing_trim_recipes: g.vec(|g| Sample::sample(g)),
-            potion_mixes: g.vec(|g| Sample::sample(g)),
-            container_mixes: g.vec(|g| Sample::sample(g)),
-            material_reducers: g.vec(|g| Sample::sample(g)),
+            shaped_recipes: g.vec(Sample::sample),
+            shapeless_recipes: g.vec(Sample::sample),
+            multi_recipes: g.vec(Sample::sample),
+            user_data_shapeless_recipes: g.vec(Sample::sample),
+            shapeless_chemistry_recipes: g.vec(Sample::sample),
+            shaped_chemistry_recipes: g.vec(Sample::sample),
+            smithing_transform_recipes: g.vec(Sample::sample),
+            smithing_trim_recipes: g.vec(Sample::sample),
+            potion_mixes: g.vec(Sample::sample),
+            container_mixes: g.vec(Sample::sample),
+            material_reducers: g.vec(Sample::sample),
             clear_recipes: Sample::sample(g),
         }
     }
@@ -2714,8 +2719,8 @@ impl Sample for CreatePhotoPacketPayload {
 impl Sample for CreativeContentPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            groups: g.vec(|g| Sample::sample(g)),
-            entries: g.vec(|g| Sample::sample(g)),
+            groups: g.vec(Sample::sample),
+            entries: g.vec(Sample::sample),
         }
     }
 }
@@ -2841,7 +2846,7 @@ impl Sample for DeathCauseMessageType {
     fn sample(g: &mut Gen) -> Self {
         Self {
             death_cause_attack_name: Sample::sample(g),
-            death_cause_message_list: g.vec(|g| Sample::sample(g)),
+            death_cause_message_list: g.vec(Sample::sample),
         }
     }
 }
@@ -2874,7 +2879,7 @@ impl Sample for DebugRendererData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             r#type: Sample::sample(g),
-            debug_marker_data: g.option(|g| Sample::sample(g)),
+            debug_marker_data: g.option(Sample::sample),
         }
     }
 }
@@ -2958,17 +2963,17 @@ impl Sample for EducationLevelSettings {
             disable_legacy_title_bar: Sample::sample(g),
             post_process_filter: Sample::sample(g),
             screenshot_border_resource_path: Sample::sample(g),
-            agent_capabilities: g.option(|g| Sample::sample(g)),
+            agent_capabilities: g.option(Sample::sample),
             local_settings: Sample::sample(g),
             deprecated_always_false: Sample::sample(g),
-            external_link_settings: g.option(|g| Sample::sample(g)),
+            external_link_settings: g.option(Sample::sample),
         }
     }
 }
 impl Sample for EducationLocalLevelSettings {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            code_builder_override_uri: g.option(|g| Sample::sample(g)),
+            code_builder_override_uri: g.option(Sample::sample),
         }
     }
 }
@@ -2991,7 +2996,7 @@ impl Sample for EmoteListPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             runtime_id: Sample::sample(g),
-            emote_piece_ids: g.vec(|g| Sample::sample(g)),
+            emote_piece_ids: g.vec(Sample::sample),
         }
     }
 }
@@ -3044,8 +3049,8 @@ impl Sample for EntityDiagnosticTimingInfo {
             entity: Sample::sample(g),
             time_in_ns: Sample::sample(g),
             percent_of_total: Sample::sample(g),
-            position: g.option(|g| Sample::sample(g)),
-            dimension: g.option(|g| Sample::sample(g)),
+            position: g.option(Sample::sample),
+            dimension: g.option(Sample::sample),
         }
     }
 }
@@ -3068,7 +3073,7 @@ impl Sample for ExperimentToggle {
 impl Sample for Experiments {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            toggles: g.vec(|g| Sample::sample(g)),
+            toggles: g.vec(Sample::sample),
             experiments_ever_toggled: Sample::sample(g),
         }
     }
@@ -3100,7 +3105,7 @@ impl Sample for FeatureRegistryFeatureBinaryJsonFormat {
 impl Sample for FeatureRegistryPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            features_data_list: g.vec(|g| Sample::sample(g)),
+            features_data_list: g.vec(Sample::sample),
         }
     }
 }
@@ -3108,9 +3113,9 @@ impl Sample for FloatAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(|g| Sample::sample(g)),
-            constraint_min: g.option(|g| Sample::sample(g)),
-            constraint_max: g.option(|g| Sample::sample(g)),
+            operation: g.option(Sample::sample),
+            constraint_min: g.option(Sample::sample),
+            constraint_max: g.option(Sample::sample),
         }
     }
 }
@@ -3122,8 +3127,8 @@ impl Sample for FloatOverride {
 impl Sample for FloatRange {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            min: g.option(|g| Sample::sample(g)),
-            max: g.option(|g| Sample::sample(g)),
+            min: g.option(Sample::sample),
+            max: g.option(Sample::sample),
         }
     }
 }
@@ -3136,7 +3141,7 @@ impl Sample for FullContainerName {
     fn sample(g: &mut Gen) -> Self {
         Self {
             container_name: Sample::sample(g),
-            dynamic_id: g.option(|g| Sample::sample(g)),
+            dynamic_id: g.option(Sample::sample),
         }
     }
 }
@@ -3161,7 +3166,7 @@ impl Sample for GameRule {
 impl Sample for GameRulesChangedPacketData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            rules_list: g.vec(|g| Sample::sample(g)),
+            rules_list: g.vec(Sample::sample),
         }
     }
 }
@@ -3197,14 +3202,14 @@ impl Sample for GameTestResultsPacketPayload {
 impl Sample for GatheringsConfig {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            experience_id: g.option(|g| Sample::sample(g)),
-            experience_name: g.option(|g| Sample::sample(g)),
-            world_id: g.option(|g| Sample::sample(g)),
-            world_name: g.option(|g| Sample::sample(g)),
-            creator_id: g.option(|g| Sample::sample(g)),
-            target_id: g.option(|g| Sample::sample(g)),
-            scenario_id: g.option(|g| Sample::sample(g)),
-            server_id: g.option(|g| Sample::sample(g)),
+            experience_id: g.option(Sample::sample),
+            experience_name: g.option(Sample::sample),
+            world_id: g.option(Sample::sample),
+            world_name: g.option(Sample::sample),
+            creator_id: g.option(Sample::sample),
+            target_id: g.option(Sample::sample),
+            scenario_id: g.option(Sample::sample),
+            server_id: g.option(Sample::sample),
         }
     }
 }
@@ -3212,10 +3217,10 @@ impl Sample for GraphicsParameterOverridePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             parameter_keyframe_values: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
-            float_value: g.option(|g| Sample::sample(g)),
-            vec3_value: g.option(|g| Sample::sample(g)),
+            float_value: g.option(Sample::sample),
+            vec3_value: g.option(Sample::sample),
             biome_identifier: Sample::sample(g),
-            player_identifier: g.option(|g| Sample::sample(g)),
+            player_identifier: g.option(Sample::sample),
             identifier_for_parameter: Sample::sample(g),
             reset_parameter: Sample::sample(g),
         }
@@ -3249,7 +3254,7 @@ impl Sample for HurtArmorPacketPayload {
 impl Sample for InitializeRegistryData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            clock_data: g.vec(|g| Sample::sample(g)),
+            clock_data: g.vec(Sample::sample),
         }
     }
 }
@@ -3273,7 +3278,7 @@ impl Sample for InteractPacketPayload {
         Self {
             action: Sample::sample(g),
             target_runtime_id: Sample::sample(g),
-            position: g.option(|g| Sample::sample(g)),
+            position: g.option(Sample::sample),
         }
     }
 }
@@ -3302,7 +3307,7 @@ impl Sample for InventoryContentPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             container_id: Sample::sample(g),
-            slots: g.vec(|g| Sample::sample(g)),
+            slots: g.vec(Sample::sample),
             full_container_name: Sample::sample(g),
             storage_item: Sample::sample(g),
         }
@@ -3329,8 +3334,8 @@ impl Sample for InventorySlotPacketPayload {
         Self {
             container_id: Sample::sample(g),
             slot: Sample::sample(g),
-            full_container_name: g.option(|g| Sample::sample(g)),
-            storage_item: g.option(|g| Sample::sample(g)),
+            full_container_name: g.option(Sample::sample),
+            storage_item: g.option(Sample::sample),
             item: Sample::sample(g),
         }
     }
@@ -3339,15 +3344,15 @@ impl Sample for InventorySource {
     fn sample(g: &mut Gen) -> Self {
         Self {
             source_type: Sample::sample(g),
-            container_id: g.option(|g| Sample::sample(g)),
-            bit_flags: g.option(|g| Sample::sample(g)),
+            container_id: g.option(Sample::sample),
+            bit_flags: g.option(Sample::sample),
         }
     }
 }
 impl Sample for InventoryTransaction {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            actions: g.vec(|g| Sample::sample(g)),
+            actions: g.vec(Sample::sample),
         }
     }
 }
@@ -3355,7 +3360,7 @@ impl Sample for InventoryTransactionPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             legacy_request_id: Sample::sample(g),
-            legacy_set_item_slots: g.option(|g| g.vec(|g| Sample::sample(g))),
+            legacy_set_item_slots: g.option(|g| g.vec(Sample::sample)),
             transaction: Sample::sample(g),
         }
     }
@@ -3385,7 +3390,7 @@ impl Sample for ItemEnchants {
     fn sample(g: &mut Gen) -> Self {
         Self {
             slot: Sample::sample(g),
-            item_enchants: std::array::from_fn(|_| g.vec(|g| Sample::sample(g))),
+            item_enchants: std::array::from_fn(|_| g.vec(Sample::sample)),
         }
     }
 }
@@ -3400,7 +3405,7 @@ impl Sample for ItemNameDescriptor {
 impl Sample for ItemRegistryPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            item_data: g.vec(|g| Sample::sample(g)),
+            item_data: g.vec(Sample::sample),
         }
     }
 }
@@ -3430,8 +3435,8 @@ impl Sample for ItemStackRequest {
     fn sample(g: &mut Gen) -> Self {
         Self {
             client_request_id: Sample::sample(g),
-            actions: g.vec(|g| Sample::sample(g)),
-            strings_to_filter: g.vec(|g| Sample::sample(g)),
+            actions: g.vec(Sample::sample),
+            strings_to_filter: g.vec(Sample::sample),
             strings_to_filter_origin: Sample::sample(g),
         }
     }
@@ -3494,7 +3499,7 @@ impl Sample for ItemStackRequestCraftRecipeAutoAction {
         Self {
             recipe_net_id: Sample::sample(g),
             number_of_requested_crafts: Sample::sample(g),
-            ingredients: g.vec(|g| Sample::sample(g)),
+            ingredients: g.vec(Sample::sample),
         }
     }
 }
@@ -3518,7 +3523,7 @@ impl Sample for ItemStackRequestCraftRepairAndDisenchantAction {
 impl Sample for ItemStackRequestCraftResultsDeprecatedAction {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            craft_results: g.vec(|g| Sample::sample(g)),
+            craft_results: g.vec(Sample::sample),
             num_crafts: Sample::sample(g),
         }
     }
@@ -3579,7 +3584,7 @@ impl Sample for ItemStackRequestNetworkItemInstanceDescriptor {
 impl Sample for ItemStackRequestPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            requests: g.vec(|g| Sample::sample(g)),
+            requests: g.vec(Sample::sample),
         }
     }
 }
@@ -3622,7 +3627,7 @@ impl Sample for ItemStackResponseContainerInfo {
     fn sample(g: &mut Gen) -> Self {
         Self {
             full_container_name: Sample::sample(g),
-            slots: g.vec(|g| Sample::sample(g)),
+            slots: g.vec(Sample::sample),
         }
     }
 }
@@ -3631,14 +3636,14 @@ impl Sample for ItemStackResponseInfo {
         Self {
             result: Sample::sample(g),
             client_request_id: Sample::sample(g),
-            containers: g.option(|g| g.vec(|g| Sample::sample(g))),
+            containers: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
 impl Sample for ItemStackResponsePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            responses: g.vec(|g| Sample::sample(g)),
+            responses: g.vec(Sample::sample),
         }
     }
 }
@@ -3648,7 +3653,7 @@ impl Sample for ItemStackResponseSlotInfo {
             requested_slot: Sample::sample(g),
             slot: Sample::sample(g),
             amount: Sample::sample(g),
-            item_stack_net_id: g.option(|g| Sample::sample(g)),
+            item_stack_net_id: g.option(Sample::sample),
             custom_name: Sample::sample(g),
             durability_correction: Sample::sample(g),
         }
@@ -3733,7 +3738,7 @@ impl Sample for LegacySetSlot {
     fn sample(g: &mut Gen) -> Self {
         Self {
             container_enum: Sample::sample(g),
-            slots: g.vec(|g| Sample::sample(g)),
+            slots: g.vec(Sample::sample),
         }
     }
 }
@@ -3762,9 +3767,9 @@ impl Sample for LevelChunkPacketPayload {
             chunk_position: Sample::sample(g),
             dimension_id: Sample::sample(g),
             sub_chunks_count: Sample::sample(g),
-            client_request_sub_chunk_limit: g.option(|g| Sample::sample(g)),
+            client_request_sub_chunk_limit: g.option(Sample::sample),
             cache_enabled: Sample::sample(g),
-            cache_metadata: g.vec(|g| Sample::sample(g)),
+            cache_metadata: g.vec(Sample::sample),
             serialized_chunk_data: Sample::sample(g),
             is_client_biome_update: Sample::sample(g),
         }
@@ -3841,7 +3846,7 @@ impl Sample for LevelSettings {
             limited_world_depth: Sample::sample(g),
             nether_type: Sample::sample(g),
             edu_shared_uri_resource: Sample::sample(g),
-            override_force_experimental_gameplay: g.option(|g| Sample::sample(g)),
+            override_force_experimental_gameplay: g.option(Sample::sample),
             chat_restriction_level: MaybeUnknown::Known(Sample::sample(g)),
             disable_player_interactions: Sample::sample(g),
             server_editor_connection_policy: MaybeUnknown::Known(Sample::sample(g)),
@@ -3859,7 +3864,7 @@ impl Sample for LevelSoundEventPacketPayload {
             is_baby: Sample::sample(g),
             is_global: Sample::sample(g),
             actor_unique_id: Sample::sample(g),
-            fire_at_position: g.option(|g| Sample::sample(g)),
+            fire_at_position: g.option(Sample::sample),
         }
     }
 }
@@ -3873,7 +3878,7 @@ impl Sample for LineDataPayload {
 impl Sample for LocatorBarPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            waypoints: g.vec(|g| Sample::sample(g)),
+            waypoints: g.vec(Sample::sample),
         }
     }
 }
@@ -3897,7 +3902,7 @@ impl Sample for LoginPacketPayload {
 impl Sample for ManagedChatJoinInfo {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            enabled: g.option(|g| Sample::sample(g)),
+            enabled: g.option(Sample::sample),
         }
     }
 }
@@ -3925,7 +3930,7 @@ impl Sample for MapInfoRequestPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             map_unique_id: Sample::sample(g),
-            client_pixels_list: g.vec(|g| Sample::sample(g)),
+            client_pixels_list: g.vec(Sample::sample),
         }
     }
 }
@@ -3933,16 +3938,16 @@ impl Sample for MapItemTrackedActorUniqueId {
     fn sample(g: &mut Gen) -> Self {
         Self {
             r#type: Sample::sample(g),
-            entity_id: g.option(|g| Sample::sample(g)),
-            block_position: g.option(|g| Sample::sample(g)),
+            entity_id: g.option(Sample::sample),
+            block_position: g.option(Sample::sample),
         }
     }
 }
 impl Sample for MatchmakingStateOptions {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            triggering_player_name: g.option(|g| Sample::sample(g)),
-            triggered_by_local_player: g.option(|g| Sample::sample(g)),
+            triggering_player_name: g.option(Sample::sample),
+            triggered_by_local_player: g.option(Sample::sample),
         }
     }
 }
@@ -3950,7 +3955,7 @@ impl Sample for MaterialReducerDataEntry {
     fn sample(g: &mut Gen) -> Self {
         Self {
             from_item_key: Sample::sample(g),
-            item_ids_and_counts: g.vec(|g| Sample::sample(g)),
+            item_ids_and_counts: g.vec(Sample::sample),
         }
     }
 }
@@ -3982,9 +3987,9 @@ impl Sample for MessageAndParams {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            message: g.option(|g| Sample::sample(g)),
-            parameter_list: g.option(|g| g.vec(|g| Sample::sample(g))),
-            queue: g.option(|g| Sample::sample(g)),
+            message: g.option(Sample::sample),
+            parameter_list: g.option(|g| g.vec(Sample::sample)),
+            queue: g.option(Sample::sample),
         }
     }
 }
@@ -3992,7 +3997,7 @@ impl Sample for MessageOnly {
     fn sample(g: &mut Gen) -> Self {
         Self {
             message_type: Sample::sample(g),
-            message: g.option(|g| Sample::sample(g)),
+            message: g.option(Sample::sample),
         }
     }
 }
@@ -4074,8 +4079,8 @@ impl Sample for ModalFormResponsePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             form_id: Sample::sample(g),
-            json_response: g.option(|g| Sample::sample(g)),
-            form_cancel_reason: g.option(|g| Sample::sample(g)),
+            json_response: g.option(Sample::sample),
+            form_cancel_reason: g.option(Sample::sample),
         }
     }
 }
@@ -4119,12 +4124,12 @@ impl Sample for MoveActorDeltaData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             actor_runtime_id: Sample::sample(g),
-            new_position_x: g.option(|g| Sample::sample(g)),
-            new_position_y: g.option(|g| Sample::sample(g)),
-            new_position_z: g.option(|g| Sample::sample(g)),
-            rotation_x: g.option(|g| Sample::sample(g)),
-            rotation_y: g.option(|g| Sample::sample(g)),
-            rotation_y_head: g.option(|g| Sample::sample(g)),
+            new_position_x: g.option(Sample::sample),
+            new_position_y: g.option(Sample::sample),
+            new_position_z: g.option(Sample::sample),
+            rotation_x: g.option(Sample::sample),
+            rotation_y: g.option(Sample::sample),
+            rotation_y_head: g.option(Sample::sample),
             is_on_ground: Sample::sample(g),
             force_move: Sample::sample(g),
             force_move_local_entity: Sample::sample(g),
@@ -4150,7 +4155,7 @@ impl Sample for MovePlayerPacketPayload {
             position_mode: Sample::sample(g),
             on_ground: Sample::sample(g),
             riding_runtime_id: Sample::sample(g),
-            teleport_data: g.option(|g| Sample::sample(g)),
+            teleport_data: g.option(Sample::sample),
             tick: Sample::sample(g),
         }
     }
@@ -4201,7 +4206,7 @@ impl Sample for NetworkChunkPublisherUpdatePacketPayload {
         Self {
             new_position_for_view: Sample::sample(g),
             new_radius_for_view: Sample::sample(g),
-            server_built_chunks_list: g.vec(|g| Sample::sample(g)),
+            server_built_chunks_list: g.vec(Sample::sample),
         }
     }
 }
@@ -4256,7 +4261,7 @@ impl Sample for NoiseDescriptor {
         Self {
             name: Sample::sample(g),
             first_octave: Sample::sample(g),
-            amplitudes: g.vec(|g| Sample::sample(g)),
+            amplitudes: g.vec(Sample::sample),
         }
     }
 }
@@ -4369,7 +4374,7 @@ impl Sample for PackedItemUseLegacyInventoryTransaction {
     fn sample(g: &mut Gen) -> Self {
         Self {
             legacy_request_id: Sample::sample(g),
-            legacy_set_item_slots: g.option(|g| g.vec(|g| Sample::sample(g))),
+            legacy_set_item_slots: g.option(|g| g.vec(Sample::sample)),
             item_use_transaction: Sample::sample(g),
         }
     }
@@ -4387,7 +4392,7 @@ impl Sample for PacketViolationWarningPacketPayload {
 impl Sample for PartyChangedPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            party_info: g.option(|g| Sample::sample(g)),
+            party_info: g.option(Sample::sample),
         }
     }
 }
@@ -4447,10 +4452,10 @@ impl Sample for PlaySoundPacketPayload {
             pitch: Sample::sample(g),
             loop_count: Sample::sample(g),
             bypass_listener_range_check: Sample::sample(g),
-            server_sound_handle: g.option(|g| Sample::sample(g)),
-            playback_position_seconds: g.option(|g| Sample::sample(g)),
-            start_delay_seconds: g.option(|g| Sample::sample(g)),
-            attach_options: g.option(|g| Sample::sample(g)),
+            server_sound_handle: g.option(Sample::sample),
+            playback_position_seconds: g.option(Sample::sample),
+            start_delay_seconds: g.option(Sample::sample),
+            attach_options: g.option(Sample::sample),
         }
     }
 }
@@ -4473,7 +4478,7 @@ impl Sample for PlayerActionPacketPayload {
 impl Sample for PlayerArmorDamagePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            armor_slot_and_damage_pairs: g.vec(|g| Sample::sample(g)),
+            armor_slot_and_damage_pairs: g.vec(Sample::sample),
         }
     }
 }
@@ -4484,18 +4489,18 @@ impl Sample for PlayerAuthInputPacketPayload {
             position: Sample::sample(g),
             move_vector: Sample::sample(g),
             player_head_rotation: Sample::sample(g),
-            input_data: g.vec(|g| Sample::sample(g)),
+            input_data: g.vec(Sample::sample),
             input_mode: Sample::sample(g),
             play_mode: Sample::sample(g),
             new_interaction_model: Sample::sample(g),
             interact_rotation: Sample::sample(g),
             client_tick: Sample::sample(g),
             pos_delta: Sample::sample(g),
-            item_use_transaction: g.option(|g| Sample::sample(g)),
-            item_stack_request: g.option(|g| Sample::sample(g)),
-            player_block_actions: g.option(|g| g.vec(|g| Sample::sample(g))),
-            vehicle_rotation: g.option(|g| Sample::sample(g)),
-            client_predicted_vehicle: g.option(|g| Sample::sample(g)),
+            item_use_transaction: g.option(Sample::sample),
+            item_stack_request: g.option(Sample::sample),
+            player_block_actions: g.option(|g| g.vec(Sample::sample)),
+            vehicle_rotation: g.option(Sample::sample),
+            client_predicted_vehicle: g.option(Sample::sample),
             analog_move_vector: Sample::sample(g),
             camera_orientation: Sample::sample(g),
             raw_move_vector: Sample::sample(g),
@@ -4524,14 +4529,14 @@ impl Sample for PlayerDied {
 impl Sample for PlayerEnchantOptionsPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            options: g.vec(|g| Sample::sample(g)),
+            options: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for PlayerFogPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            fog_stack: g.vec(|g| Sample::sample(g)),
+            fog_stack: g.vec(Sample::sample),
         }
     }
 }
@@ -4573,7 +4578,7 @@ impl Sample for PlayerListAddEntry {
 impl Sample for PlayerListPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            entries: g.option(|g| g.vec(|g| Sample::sample(g))),
+            entries: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
@@ -4656,8 +4661,8 @@ impl Sample for PlayerUpdateEntityOverridesPacketPayload {
 impl Sample for PlayerVideoCapturePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            start_video_capture: g.option(|g| Sample::sample(g)),
-            stop_video_capture: g.option(|g| Sample::sample(g)),
+            start_video_capture: g.option(Sample::sample),
+            stop_video_capture: g.option(Sample::sample),
         }
     }
 }
@@ -4720,7 +4725,7 @@ impl Sample for PotionMixDataEntry {
 impl Sample for PresenceConfig {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            rich_presence_id: g.option(|g| Sample::sample(g)),
+            rich_presence_id: g.option(Sample::sample),
         }
     }
 }
@@ -4728,16 +4733,16 @@ impl Sample for PrimitiveShapeDataPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             network_id: Sample::sample(g),
-            shape_type: g.option(|g| Sample::sample(g)),
-            location: g.option(|g| Sample::sample(g)),
-            scale: g.option(|g| Sample::sample(g)),
-            rotation: g.option(|g| Sample::sample(g)),
-            total_time_left: g.option(|g| Sample::sample(g)),
-            maximum_render_distance: g.option(|g| Sample::sample(g)),
-            color: g.option(|g| Sample::sample(g)),
-            dimension_id: g.option(|g| Sample::sample(g)),
-            attached_to_entity_id: g.option(|g| Sample::sample(g)),
-            extra_shape_data: g.option(|g| Sample::sample(g)),
+            shape_type: g.option(Sample::sample),
+            location: g.option(Sample::sample),
+            scale: g.option(Sample::sample),
+            rotation: g.option(Sample::sample),
+            total_time_left: g.option(Sample::sample),
+            maximum_render_distance: g.option(Sample::sample),
+            color: g.option(Sample::sample),
+            dimension_id: g.option(Sample::sample),
+            attached_to_entity_id: g.option(Sample::sample),
+            extra_shape_data: g.option(Sample::sample),
         }
     }
 }
@@ -4745,15 +4750,15 @@ impl Sample for PrimitiveShapesPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             array_of_primitive_shapes_can_be_a_mix_of_new_updated_or_removed: g
-                .vec(|g| Sample::sample(g)),
+                .vec(Sample::sample),
         }
     }
 }
 impl Sample for PropertySyncData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            int_entries_list: g.vec(|g| Sample::sample(g)),
-            float_entries_list: g.vec(|g| Sample::sample(g)),
+            int_entries_list: g.vec(Sample::sample),
+            float_entries_list: g.vec(Sample::sample),
         }
     }
 }
@@ -4776,7 +4781,7 @@ impl Sample for PropertySyncDataPropertySyncIntEntry {
 impl Sample for PurchaseReceiptPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            purchase_receipts: g.vec(|g| Sample::sample(g)),
+            purchase_receipts: g.vec(Sample::sample),
         }
     }
 }
@@ -4784,7 +4789,7 @@ impl Sample for PyramidDataPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             width: Sample::sample(g),
-            depth: g.option(|g| Sample::sample(g)),
+            depth: g.option(Sample::sample),
             height: Sample::sample(g),
         }
     }
@@ -4815,7 +4820,7 @@ impl Sample for RecipeUnlockingRequirement {
     fn sample(g: &mut Gen) -> Self {
         Self {
             unlocking_context: Sample::sample(g),
-            unlocking_ingredients: g.option(|g| g.vec(|g| Sample::sample(g))),
+            unlocking_ingredients: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
@@ -4844,7 +4849,7 @@ impl Sample for RemoveEnvironmentAttributesData {
         Self {
             attribute_layer_name: Sample::sample(g),
             attribute_layer_dimension: Sample::sample(g),
-            attributes: g.vec(|g| Sample::sample(g)),
+            attributes: g.vec(Sample::sample),
         }
     }
 }
@@ -4864,7 +4869,7 @@ impl Sample for RemoveScore {
     fn sample(g: &mut Gen) -> Self {
         Self {
             scoreboard_id: Sample::sample(g),
-            objective_name: g.option(|g| Sample::sample(g)),
+            objective_name: g.option(Sample::sample),
         }
     }
 }
@@ -4872,7 +4877,7 @@ impl Sample for RemoveTimeMarkerData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             clock_id: Sample::sample(g),
-            time_marker_ids: g.vec(|g| Sample::sample(g)),
+            time_marker_ids: g.vec(Sample::sample),
         }
     }
 }
@@ -4936,7 +4941,7 @@ impl Sample for ResourcePackClientResponseCancel {
 impl Sample for ResourcePackClientResponseDownloading {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            downloading_packs: g.vec(|g| Sample::sample(g)),
+            downloading_packs: g.vec(Sample::sample),
         }
     }
 }
@@ -4974,7 +4979,7 @@ impl Sample for ResourcePackStackPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             texture_pack_required: Sample::sample(g),
-            texture_pack_list: g.vec(|g| Sample::sample(g)),
+            texture_pack_list: g.vec(Sample::sample),
             base_game_version: Sample::sample(g),
             experiments: Sample::sample(g),
             editor_pack_types: MaybeUnknown::Known(Sample::sample(g)),
@@ -4989,7 +4994,7 @@ impl Sample for ResourcePacksInfoPacketPayload {
             has_scripts: Sample::sample(g),
             force_disable_vibrant_visuals: Sample::sample(g),
             world_template_id_and_version: Sample::sample(g),
-            resource_packs: g.vec(|g| Sample::sample(g)),
+            resource_packs: g.vec(Sample::sample),
         }
     }
 }
@@ -5023,7 +5028,7 @@ impl Sample for ScoreboardIdentityPacketInfo {
     fn sample(g: &mut Gen) -> Self {
         Self {
             scoreboard_id: Sample::sample(g),
-            player_unique_id: g.option(|g| Sample::sample(g)),
+            player_unique_id: g.option(Sample::sample),
         }
     }
 }
@@ -5060,7 +5065,7 @@ impl Sample for SerializedAbilitiesData {
             target_player_raw_id: Sample::sample(g),
             player_permissions: Sample::sample(g),
             command_permissions: Sample::sample(g),
-            layers: g.vec(|g| Sample::sample(g)),
+            layers: g.vec(Sample::sample),
         }
     }
 }
@@ -5079,10 +5084,10 @@ impl Sample for SerializedAbilitiesDataSerializedLayer {
 impl Sample for SerializedNoiseBlockSpecifier {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            noise: g.option(|g| Sample::sample(g)),
-            threshold: g.option(|g| Sample::sample(g)),
-            range: g.option(|g| Sample::sample(g)),
-            block: g.option(|g| Sample::sample(g)),
+            noise: g.option(Sample::sample),
+            threshold: g.option(Sample::sample),
+            range: g.option(Sample::sample),
+            block: g.option(Sample::sample),
         }
     }
 }
@@ -5103,7 +5108,7 @@ impl Sample for SerializedSkin {
             id: Sample::sample(g),
             resource_patch: Sample::sample(g),
             image_data: Sample::sample(g),
-            animated_image_data: g.vec(|g| Sample::sample(g)),
+            animated_image_data: g.vec(Sample::sample),
             cape_image_data: Sample::sample(g),
             geometry_data: Sample::sample(g),
             geometry_data_min_engine_version: Sample::sample(g),
@@ -5112,7 +5117,7 @@ impl Sample for SerializedSkin {
             full_id: Sample::sample(g),
             arm_size: Sample::sample(g),
             skin_color: Sample::sample(g),
-            persona_pieces: g.vec(|g| Sample::sample(g)),
+            persona_pieces: g.vec(Sample::sample),
             piece_tint_colors: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
             is_premium: Sample::sample(g),
             is_persona: Sample::sample(g),
@@ -5135,10 +5140,10 @@ impl Sample for ServerBlockProperty {
 impl Sample for ServerConfig {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            gathering: g.option(|g| Sample::sample(g)),
-            client_store_entry_point: g.option(|g| Sample::sample(g)),
-            presence: g.option(|g| Sample::sample(g)),
-            managed_chat: g.option(|g| Sample::sample(g)),
+            gathering: g.option(Sample::sample),
+            client_store_entry_point: g.option(Sample::sample),
+            presence: g.option(Sample::sample),
+            managed_chat: g.option(Sample::sample),
         }
     }
 }
@@ -5150,7 +5155,7 @@ impl Sample for ServerPlayerPostMovePositionPacketPayload {
 impl Sample for ServerPresenceInfoPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            presence_configuration: g.option(|g| Sample::sample(g)),
+            presence_configuration: g.option(Sample::sample),
         }
     }
 }
@@ -5185,7 +5190,7 @@ impl Sample for ServerStatsPacketPayload {
 impl Sample for ServerStoreInfoPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            client_store_entry_point_configuration: g.option(|g| Sample::sample(g)),
+            client_store_entry_point_configuration: g.option(Sample::sample),
         }
     }
 }
@@ -5210,13 +5215,13 @@ impl Sample for ServerWaypointPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             update_flag: Sample::sample(g),
-            is_visible: g.option(|g| Sample::sample(g)),
-            world_position: g.option(|g| Sample::sample(g)),
-            texture_path: g.option(|g| Sample::sample(g)),
-            icon_size: g.option(|g| Sample::sample(g)),
-            color: g.option(|g| Sample::sample(g)),
-            client_position_authority: g.option(|g| Sample::sample(g)),
-            actor_unique_id: g.option(|g| Sample::sample(g)),
+            is_visible: g.option(Sample::sample),
+            world_position: g.option(Sample::sample),
+            texture_path: g.option(Sample::sample),
+            icon_size: g.option(Sample::sample),
+            color: g.option(Sample::sample),
+            client_position_authority: g.option(Sample::sample),
+            actor_unique_id: g.option(Sample::sample),
         }
     }
 }
@@ -5228,7 +5233,7 @@ impl Sample for ServerboundCursorItemDragPacketPayload {
 impl Sample for ServerboundDataDrivenScreenClosedPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            form_id: g.option(|g| Sample::sample(g)),
+            form_id: g.option(Sample::sample),
             close_reason: Sample::sample(g),
         }
     }
@@ -5250,11 +5255,11 @@ impl Sample for ServerboundDiagnosticsPacketPayload {
             avg_end_frame_time_ms: Sample::sample(g),
             avg_remainder_time_percent: Sample::sample(g),
             avg_unaccounted_time_percent: Sample::sample(g),
-            memory_category_values: g.vec(|g| Sample::sample(g)),
-            entity_diagnostics: g.vec(|g| Sample::sample(g)),
-            system_diagnostics: g.vec(|g| Sample::sample(g)),
-            system_categories: g.option(|g| g.vec(|g| Sample::sample(g))),
-            whisker_scopes: g.vec(|g| Sample::sample(g)),
+            memory_category_values: g.vec(Sample::sample),
+            entity_diagnostics: g.vec(Sample::sample),
+            system_diagnostics: g.vec(Sample::sample),
+            system_categories: g.option(|g| g.vec(Sample::sample)),
+            whisker_scopes: g.vec(Sample::sample),
         }
     }
 }
@@ -5262,7 +5267,7 @@ impl Sample for ServerboundLoadingScreenPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             loading_screen_packet_type: Sample::sample(g),
-            loading_screen_id: g.option(|g| Sample::sample(g)),
+            loading_screen_id: g.option(Sample::sample),
         }
     }
 }
@@ -5283,7 +5288,7 @@ impl Sample for ServerboundPackSettingChangePacketPayload {
 impl Sample for ServerboundRegisterAudioContentPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            registrations: g.vec(|g| Sample::sample(g)),
+            registrations: g.vec(Sample::sample),
         }
     }
 }
@@ -5367,7 +5372,7 @@ impl Sample for SetHealthPacketPayload {
 impl Sample for SetHudPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            hud_element: g.vec(|g| Sample::sample(g)),
+            hud_element: g.vec(Sample::sample),
             hud_visible: Sample::sample(g),
         }
     }
@@ -5390,7 +5395,7 @@ impl Sample for SetPassengerOfBlockPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             passenger: Sample::sample(g),
-            passenger_of_block_data: g.option(|g| Sample::sample(g)),
+            passenger_of_block_data: g.option(Sample::sample),
         }
     }
 }
@@ -5424,7 +5429,7 @@ impl Sample for SetPlayerInventoryOptionsPacketPayload {
 impl Sample for SetScorePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            score_info: g.option(|g| g.vec(|g| Sample::sample(g))),
+            score_info: g.option(|g| g.vec(Sample::sample)),
         }
     }
 }
@@ -5432,7 +5437,7 @@ impl Sample for SetScoreboardIdentityPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             scoreboard_identity_packet_type: Sample::sample(g),
-            scoreboard_identity_info: g.vec(|g| Sample::sample(g)),
+            scoreboard_identity_info: g.vec(Sample::sample),
         }
     }
 }
@@ -5484,13 +5489,13 @@ impl Sample for ShapedRecipePayload {
             recipe_id: Sample::sample(g),
             width: Sample::sample(g),
             height: Sample::sample(g),
-            ingredients: g.vec(|g| Sample::sample(g)),
-            results: g.vec(|g| Sample::sample(g)),
+            ingredients: g.vec(Sample::sample),
+            results: g.vec(Sample::sample),
             uuid: Sample::sample(g),
             tag: Sample::sample(g),
             priority: Sample::sample(g),
             assume_symmetry: Sample::sample(g),
-            unlocking_requirement: g.option(|g| Sample::sample(g)),
+            unlocking_requirement: g.option(Sample::sample),
             net_id: Sample::sample(g),
         }
     }
@@ -5499,12 +5504,12 @@ impl Sample for ShapelessRecipePayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             recipe_id: Sample::sample(g),
-            ingredients: g.vec(|g| Sample::sample(g)),
-            results: g.vec(|g| Sample::sample(g)),
+            ingredients: g.vec(Sample::sample),
+            results: g.vec(Sample::sample),
             uuid: Sample::sample(g),
             tag: Sample::sample(g),
             priority: Sample::sample(g),
-            unlocking_requirement: g.option(|g| Sample::sample(g)),
+            unlocking_requirement: g.option(Sample::sample),
             net_id: Sample::sample(g),
         }
     }
@@ -5512,10 +5517,10 @@ impl Sample for ShapelessRecipePayload {
 impl Sample for SharedTypesComprehensiveCameraAimAssistCommandDefinition {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            preset_id: g.option(|g| Sample::sample(g)),
-            target_mode: g.option(|g| Sample::sample(g)),
-            view_angle: g.option(|g| Sample::sample(g)),
-            distance: g.option(|g| Sample::sample(g)),
+            preset_id: g.option(Sample::sample),
+            target_mode: g.option(Sample::sample),
+            view_angle: g.option(Sample::sample),
+            distance: g.option(Sample::sample),
         }
     }
 }
@@ -5584,7 +5589,7 @@ impl Sample for SkinImage {
         Self {
             width: Sample::sample(g),
             height: Sample::sample(g),
-            image_bytes: g.vec(|g| Sample::sample(g)),
+            image_bytes: g.vec(Sample::sample),
         }
     }
 }
@@ -5645,7 +5650,7 @@ impl Sample for SpawnParticleEffectPacketPayload {
             actor_id: Sample::sample(g),
             position: Sample::sample(g),
             effect_name: Sample::sample(g),
-            molang_variables: g.option(|g| Sample::sample(g)),
+            molang_variables: g.option(Sample::sample),
         }
     }
 }
@@ -5681,7 +5686,7 @@ impl Sample for StartGamePacketPayload {
             movement_settings: Sample::sample(g),
             level_current_time: Sample::sample(g),
             enchantment_seed: Sample::sample(g),
-            block_properties: g.vec(|g| Sample::sample(g)),
+            block_properties: g.vec(Sample::sample),
             multiplayer_correlation_id: Sample::sample(g),
             enable_item_stack_net_manager: Sample::sample(g),
             server_version: Sample::sample(g),
@@ -5691,7 +5696,7 @@ impl Sample for StartGamePacketPayload {
             server_enabled_client_side_generation: Sample::sample(g),
             block_network_ids_are_hashes: Sample::sample(g),
             network_permissions: Sample::sample(g),
-            server_configuration_join_info: g.option(|g| Sample::sample(g)),
+            server_configuration_join_info: g.option(Sample::sample),
             server_telemetry_data: Sample::sample(g),
         }
     }
@@ -5727,7 +5732,7 @@ impl Sample for StringAttributeData {
     fn sample(g: &mut Gen) -> Self {
         Self {
             value: Sample::sample(g),
-            operation: g.option(|g| Sample::sample(g)),
+            operation: g.option(Sample::sample),
         }
     }
 }
@@ -5820,9 +5825,9 @@ impl Sample for SubChunkPacketData {
         Self {
             sub_chunk_pos_offset: Sample::sample(g),
             sub_chunk_request_result: Sample::sample(g),
-            serialized_sub_chunk: g.option(|g| Sample::sample(g)),
+            serialized_sub_chunk: g.option(Sample::sample),
             height_map_data: Sample::sample(g),
-            blob_id: g.option(|g| Sample::sample(g)),
+            blob_id: g.option(Sample::sample),
         }
     }
 }
@@ -5832,7 +5837,7 @@ impl Sample for SubChunkPacketPayload {
             cache_enabled: Sample::sample(g),
             dimension_type: Sample::sample(g),
             center_pos: Sample::sample(g),
-            sub_chunk_data: g.vec(|g| Sample::sample(g)),
+            sub_chunk_data: g.vec(Sample::sample),
         }
     }
 }
@@ -5858,7 +5863,7 @@ impl Sample for SubChunkRequestPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             dimension_type: Sample::sample(g),
-            sub_chunk_position_offset_list: g.vec(|g| Sample::sample(g)),
+            sub_chunk_position_offset_list: g.vec(Sample::sample),
             center_pos: Sample::sample(g),
         }
     }
@@ -5880,7 +5885,7 @@ impl Sample for SyncActorPropertyPacketPayload {
 impl Sample for SyncStateData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            clock_data: g.vec(|g| Sample::sample(g)),
+            clock_data: g.vec(Sample::sample),
         }
     }
 }
@@ -5919,7 +5924,7 @@ impl Sample for SyncedPlayerMovementSettings {
 impl Sample for SynchedActorDataList {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            data: g.vec(|g| Sample::sample(g)),
+            data: g.vec(Sample::sample),
         }
     }
 }
@@ -5960,12 +5965,12 @@ impl Sample for TextDataPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             text: Sample::sample(g),
-            use_rotation: g.option(|g| Sample::sample(g)),
-            background_color: g.option(|g| Sample::sample(g)),
-            line_gap_height: g.option(|g| Sample::sample(g)),
-            depth_test: g.option(|g| Sample::sample(g)),
-            show_backface: g.option(|g| Sample::sample(g)),
-            show_text_backface: g.option(|g| Sample::sample(g)),
+            use_rotation: g.option(Sample::sample),
+            background_color: g.option(Sample::sample),
+            line_gap_height: g.option(Sample::sample),
+            depth_test: g.option(Sample::sample),
+            show_backface: g.option(Sample::sample),
+            show_text_backface: g.option(Sample::sample),
         }
     }
 }
@@ -5974,9 +5979,9 @@ impl Sample for TextPacketPayload {
         Self {
             localize: Sample::sample(g),
             body: Sample::sample(g),
-            sender_s_xuid: g.option(|g| Sample::sample(g)),
-            platform_id: g.option(|g| Sample::sample(g)),
-            filtered_message: g.option(|g| Sample::sample(g)),
+            sender_s_xuid: g.option(Sample::sample),
+            platform_id: g.option(Sample::sample),
+            filtered_message: g.option(Sample::sample),
         }
     }
 }
@@ -5993,7 +5998,7 @@ impl Sample for TimeMarkerData {
             id: Sample::sample(g),
             name: Sample::sample(g),
             time: Sample::sample(g),
-            period: g.option(|g| Sample::sample(g)),
+            period: g.option(Sample::sample),
         }
     }
 }
@@ -6018,21 +6023,21 @@ impl Sample for TransferPacketPayload {
             server_address: Sample::sample(g),
             server_port: Sample::sample(g),
             reload_world: Sample::sample(g),
-            gatherings_configuration: g.option(|g| Sample::sample(g)),
-            server_transfer_settings: g.option(|g| Sample::sample(g)),
+            gatherings_configuration: g.option(Sample::sample),
+            server_transfer_settings: g.option(Sample::sample),
         }
     }
 }
 impl Sample for TransferPlayerUIOptions {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            title_text: g.option(|g| Sample::sample(g)),
-            body_text: g.option(|g| Sample::sample(g)),
-            title_visible: g.option(|g| Sample::sample(g)),
-            body_visible: g.option(|g| Sample::sample(g)),
-            cancel_button_text: g.option(|g| Sample::sample(g)),
-            cancel_button_visible: g.option(|g| Sample::sample(g)),
-            cancel_button_delay_seconds: g.option(|g| Sample::sample(g)),
+            title_text: g.option(Sample::sample),
+            body_text: g.option(Sample::sample),
+            title_visible: g.option(Sample::sample),
+            body_visible: g.option(Sample::sample),
+            cancel_button_text: g.option(Sample::sample),
+            cancel_button_visible: g.option(Sample::sample),
+            cancel_button_delay_seconds: g.option(Sample::sample),
         }
     }
 }
@@ -6058,8 +6063,8 @@ impl Sample for TransitionSettingsData {
 impl Sample for TrimDataPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            trim_pattern_list: g.vec(|g| Sample::sample(g)),
-            trim_material_list: g.vec(|g| Sample::sample(g)),
+            trim_pattern_list: g.vec(Sample::sample),
+            trim_material_list: g.vec(Sample::sample),
         }
     }
 }
@@ -6084,7 +6089,7 @@ impl Sample for UnlockedRecipesPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             packet_type: Sample::sample(g),
-            unlocked_recipes_list: g.vec(|g| Sample::sample(g)),
+            unlocked_recipes_list: g.vec(Sample::sample),
         }
     }
 }
@@ -6112,7 +6117,7 @@ impl Sample for UpdateAttributeLayerSettingsData {
 impl Sample for UpdateAttributeLayersData {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            attribute_layers: g.vec(|g| Sample::sample(g)),
+            attribute_layers: g.vec(Sample::sample),
         }
     }
 }
@@ -6120,7 +6125,7 @@ impl Sample for UpdateAttributesPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             target_runtime_id: Sample::sample(g),
-            attribute_list: g.vec(|g| Sample::sample(g)),
+            attribute_list: g.vec(Sample::sample),
             tick: Sample::sample(g),
         }
     }
@@ -6157,8 +6162,8 @@ impl Sample for UpdateClientInputLocksPacketPayload {
 impl Sample for UpdateClientOptionsPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            graphics_mode_change: g.option(|g| Sample::sample(g)),
-            filter_profanity_change: g.option(|g| Sample::sample(g)),
+            graphics_mode_change: g.option(Sample::sample),
+            filter_profanity_change: g.option(Sample::sample),
         }
     }
 }
@@ -6167,7 +6172,7 @@ impl Sample for UpdateEnvironmentAttributesData {
         Self {
             attribute_layer_name: Sample::sample(g),
             attribute_layer_dimension: Sample::sample(g),
-            attributes: g.vec(|g| Sample::sample(g)),
+            attributes: g.vec(Sample::sample),
         }
     }
 }
@@ -6195,7 +6200,7 @@ impl Sample for UpdateSoftEnumPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             enum_name: Sample::sample(g),
-            values: g.vec(|g| Sample::sample(g)),
+            values: g.vec(Sample::sample),
             update_type: Sample::sample(g),
         }
     }
@@ -6203,8 +6208,8 @@ impl Sample for UpdateSoftEnumPacketPayload {
 impl Sample for UpdateSubChunkBlocksChangedInfo {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            blocks_changed_standards: g.vec(|g| Sample::sample(g)),
-            blocks_changed_extras: g.vec(|g| Sample::sample(g)),
+            blocks_changed_standards: g.vec(Sample::sample),
+            blocks_changed_extras: g.vec(Sample::sample),
         }
     }
 }
@@ -6275,14 +6280,14 @@ impl Sample for VirtualContainerOpenPacketPayload {
             container_id: Sample::sample(g),
             session_id: Sample::sample(g),
             title: Sample::sample(g),
-            slots: g.vec(|g| Sample::sample(g)),
+            slots: g.vec(Sample::sample),
         }
     }
 }
 impl Sample for VoxelShapesPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            shapes: g.vec(|g| Sample::sample(g)),
+            shapes: g.vec(Sample::sample),
             name_map: g.vec(|g| (Sample::sample(g), Sample::sample(g))),
             custom_shape_count: Sample::sample(g),
         }
@@ -6299,7 +6304,7 @@ impl Sample for VoxelShapesSerializableCells {
             x_size: Sample::sample(g),
             y_size: Sample::sample(g),
             z_size: Sample::sample(g),
-            storage: g.vec(|g| Sample::sample(g)),
+            storage: g.vec(Sample::sample),
         }
     }
 }
@@ -6307,9 +6312,9 @@ impl Sample for VoxelShapesSerializableVoxelShape {
     fn sample(g: &mut Gen) -> Self {
         Self {
             cells: Sample::sample(g),
-            x_coordinates: g.vec(|g| Sample::sample(g)),
-            y_coordinates: g.vec(|g| Sample::sample(g)),
-            z_coordinates: g.vec(|g| Sample::sample(g)),
+            x_coordinates: g.vec(Sample::sample),
+            y_coordinates: g.vec(Sample::sample),
+            z_coordinates: g.vec(Sample::sample),
         }
     }
 }
@@ -6343,7 +6348,7 @@ impl Sample for WorldClockData {
             name: Sample::sample(g),
             time: Sample::sample(g),
             is_paused: Sample::sample(g),
-            time_markers: g.vec(|g| Sample::sample(g)),
+            time_markers: g.vec(Sample::sample),
         }
     }
 }
@@ -6678,7 +6683,7 @@ impl Sample for ServerboundPackSettingChangePacketPayloadPackSettingValue {
             0 => Self::Float(Sample::sample(g)),
             1 => Self::Bool(Sample::sample(g)),
             2 => Self::String(Sample::sample(g)),
-            _ => Self::List(g.vec(|g| Sample::sample(g))),
+            _ => Self::List(g.vec(Sample::sample)),
         }
     }
 }

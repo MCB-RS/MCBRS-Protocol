@@ -154,7 +154,13 @@ impl NbtEncoding {
         }
     }
 
-    fn put_payload<B: BufMut>(self, buf: &mut B, tag: &NbtTag) -> Result<()> {
+    /// Writes the payload of `tag`. `depth` is the number of containers
+    /// around it: the recursion is bounded by [`MAX_DEPTH`], which both keeps
+    /// the stack use small and guarantees the output can be decoded back.
+    fn put_payload<B: BufMut>(self, buf: &mut B, tag: &NbtTag, depth: usize) -> Result<()> {
+        if depth > MAX_DEPTH {
+            return Err(ProtocolError::NbtTooDeep);
+        }
         match tag {
             NbtTag::End => {}
             NbtTag::Byte(v) => put_i8(buf, *v),
@@ -170,20 +176,26 @@ impl NbtEncoding {
             NbtTag::String(v) => self.put_str(buf, v)?,
             NbtTag::List(items) => {
                 let element_type = items.first().map_or(0, NbtTag::type_id);
-                if items.iter().any(|item| item.type_id() != element_type) {
-                    return Err(ProtocolError::InvalidNbtTagType(element_type));
+                // `End` has no payload and doubles as the compound terminator:
+                // it cannot be an element. Lists are homogeneous.
+                if let Some(bad) = items.iter().find(|item| item.type_id() != element_type || element_type == 0) {
+                    return Err(ProtocolError::InvalidNbtTagType(bad.type_id()));
                 }
                 put_u8(buf, element_type);
                 self.put_len(buf, items.len())?;
                 for item in items {
-                    self.put_payload(buf, item)?;
+                    self.put_payload(buf, item, depth + 1)?;
                 }
             }
             NbtTag::Compound(children) => {
                 for (name, child) in children {
+                    if matches!(child, NbtTag::End) {
+                        // Would be read back as the end of the compound.
+                        return Err(ProtocolError::InvalidNbtTagType(0));
+                    }
                     put_u8(buf, child.type_id());
                     self.put_str(buf, name)?;
-                    self.put_payload(buf, child)?;
+                    self.put_payload(buf, child, depth + 1)?;
                 }
                 put_u8(buf, 0);
             }
@@ -224,7 +236,9 @@ impl NbtEncoding {
                 if element_type > 12 || (element_type == 0 && remaining != 0) {
                     return Err(ProtocolError::InvalidNbtTagType(element_type));
                 }
-                let items = Vec::with_capacity(remaining.min(buf.remaining()));
+                // The count is untrusted: reserve a bounded amount, the
+                // vector grows as elements are really decoded.
+                let items = Vec::with_capacity(bounded_capacity::<NbtTag>(remaining, buf.remaining()));
                 return Ok(Started::Frame(Frame::List { element_type, remaining, items }));
             }
             10 => return Ok(Started::Frame(Frame::Compound { children: Vec::new(), pending: None })),
@@ -259,42 +273,41 @@ impl NbtEncoding {
                     None
                 }
             };
-            // Attach finished values to their parent, closing full containers.
-            loop {
+            // Attach finished values to their parent and close the containers
+            // that are complete, until one of them needs another element.
+            next_type = loop {
+                let Some(top) = stack.last_mut() else {
+                    // No container left: `done` is the root value.
+                    return done.ok_or(ProtocolError::InvalidNbtTagType(type_id));
+                };
                 if let Some(value) = done.take() {
-                    match stack.last_mut() {
-                        None => return Ok(value),
-                        Some(Frame::List { items, .. }) => items.push(value),
-                        Some(Frame::Compound { children, pending }) => {
+                    match top {
+                        Frame::List { items, .. } => items.push(value),
+                        Frame::Compound { children, pending } => {
                             children.push((pending.take().unwrap_or_default(), value))
                         }
                     }
                 }
-                match stack.last_mut() {
-                    None => unreachable!("a value without parent is returned above"),
-                    Some(Frame::List { element_type, remaining, .. }) => {
-                        if *remaining == 0 {
-                            let Some(Frame::List { items, .. }) = stack.pop() else { unreachable!() };
-                            done = Some(NbtTag::List(items));
-                        } else {
-                            *remaining -= 1;
-                            next_type = *element_type;
-                            break;
-                        }
+                match top {
+                    Frame::List { element_type, remaining, .. } if *remaining > 0 => {
+                        *remaining -= 1;
+                        break *element_type;
                     }
-                    Some(Frame::Compound { pending, .. }) => {
+                    Frame::List { .. } => {}
+                    Frame::Compound { pending, .. } => {
                         let child_type = get_u8(buf)?;
-                        if child_type == 0 {
-                            let Some(Frame::Compound { children, .. }) = stack.pop() else { unreachable!() };
-                            done = Some(NbtTag::Compound(children));
-                        } else {
+                        if child_type != 0 {
                             *pending = Some(self.get_str(buf)?);
-                            next_type = child_type;
-                            break;
+                            break child_type;
                         }
                     }
                 }
-            }
+                // The top container is complete: it becomes a finished value.
+                done = stack.pop().map(|frame| match frame {
+                    Frame::List { items, .. } => NbtTag::List(items),
+                    Frame::Compound { children, .. } => NbtTag::Compound(children),
+                });
+            };
         }
     }
 
@@ -305,7 +318,7 @@ impl NbtEncoding {
             return Ok(());
         }
         self.put_str(buf, name)?;
-        self.put_payload(buf, tag)
+        self.put_payload(buf, tag, 0)
     }
 
     /// Reads a root tag and its name.
@@ -422,6 +435,22 @@ mod tests {
         assert_eq!(NetworkNbt::from_bytes(&[13, 0]), Err(ProtocolError::InvalidNbtTagType(13)));
         let mixed = NbtTag::List(vec![NbtTag::Int(1), NbtTag::Byte(1)]);
         assert!(NetworkNbt::new(mixed).to_bytes().is_err());
+        // `End` is only meaningful as a root: anywhere else it corrupts the stream.
+        assert!(NetworkNbt::new(NbtTag::Compound(vec![("x".into(), NbtTag::End)])).to_bytes().is_err());
+        assert!(NetworkNbt::new(NbtTag::List(vec![NbtTag::End])).to_bytes().is_err());
+        // Encoding refuses what decoding would refuse.
+        let mut deep = NbtTag::Byte(0);
+        for _ in 0..MAX_DEPTH + 1 {
+            deep = NbtTag::List(vec![deep]);
+        }
+        assert_eq!(NetworkNbt::new(deep).to_bytes(), Err(ProtocolError::NbtTooDeep));
+        // Nested lists announcing huge counts must not reserve memory for them.
+        let mut bytes = vec![9u8, 0];
+        for _ in 0..400 {
+            bytes.extend_from_slice(&[9, 0xfe, 0xff, 0xff, 0xff, 0x0f]);
+        }
+        bytes.resize(1 << 16, 0);
+        assert!(NetworkNbt::from_bytes(&bytes).is_err());
         // 100 000 nested lists of lists: rejected without touching the stack.
         let mut bytes = vec![9u8, 0];
         for _ in 0..100_000 {

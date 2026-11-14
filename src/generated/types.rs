@@ -2,7 +2,12 @@
 // DO NOT EDIT: run `cargo run --bin proto-codegen` to regenerate this file.
 
 //! Protocol structures, variants (`oneOf`) and aliases.
-#![allow(unused_variables, unused_imports, clippy::all)]
+#![allow(
+    unused_variables,
+    unused_imports,
+    clippy::derivable_impls,
+    clippy::large_enum_variant
+)]
 use super::enums::*;
 use crate::codec::{
     self, BedrockCodec, Buf, BufMut, MaybeUnknown, NetworkNbt, ProtocolEnum,
@@ -64,12 +69,18 @@ pub struct Achievement {
 }
 impl BedrockCodec for Achievement {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.achievement_id).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.achievement_id).to_raw(),
+                "MinecraftEventingAchievementIds",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MinecraftEventingAchievementIds as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         Ok(Self { achievement_id: f0 })
     }
@@ -82,13 +93,13 @@ pub struct ActorDataBoundingBoxComponent {
 }
 impl BedrockCodec for ActorDataBoundingBoxComponent {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        for v0 in (&self.actor_data_bounding_box).iter() {
+        for v0 in self.actor_data_bounding_box.iter() {
             codec::put_f32_le(buf, *v0);
         }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_array(buf, |buf| Ok(codec::get_f32_le(buf)?))?;
+        let f0 = codec::get_array(buf, |buf| codec::get_f32_le(buf))?;
         Ok(Self {
             actor_data_bounding_box: f0,
         })
@@ -102,8 +113,8 @@ pub struct ActorDataFlagComponent {
 }
 impl BedrockCodec for ActorDataFlagComponent {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.actor_flag_bitset_data).len())?;
-        for v0 in (&self.actor_flag_bitset_data).iter() {
+        codec::put_len_var(buf, self.actor_flag_bitset_data.len())?;
+        for v0 in self.actor_flag_bitset_data.iter() {
             codec::put_u8_var(buf, *v0);
         }
         Ok(())
@@ -111,7 +122,7 @@ impl BedrockCodec for ActorDataFlagComponent {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u8_var(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u8_var(buf))?
         };
         Ok(Self { actor_flag_bitset_data: f0 })
     }
@@ -147,7 +158,7 @@ pub struct ActorEventPacketPayload {
 impl BedrockCodec for ActorEventPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_runtime_id, buf)?;
-        codec::put_u8(buf, (self.event_id).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((self.event_id).to_raw(), "ActorEvent")?);
         codec::put_i32_var(buf, self.data);
         match &self.fire_at_position {
             Some(v0) => {
@@ -160,7 +171,9 @@ impl BedrockCodec for ActorEventPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
-        let f1 = <ActorEvent as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f1 = <ActorEvent as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = if codec::get_bool(buf)? {
             Some(<Vec3 as BedrockCodec>::deserialize(buf)?)
@@ -197,7 +210,10 @@ impl BedrockCodec for ActorLink {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_a, buf)?;
         BedrockCodec::serialize(&self.target_b, buf)?;
-        codec::put_u8(buf, (self.r#type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.r#type).to_raw(), "ActorLinkType")?,
+        );
         codec::put_bool(buf, self.immediate);
         codec::put_bool(buf, self.passenger_initiated);
         codec::put_f32_le(buf, self.vehicle_angular_velocity);
@@ -206,7 +222,9 @@ impl BedrockCodec for ActorLink {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f1 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
-        let f2 = <ActorLinkType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f2 = <ActorLinkType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f3 = codec::get_bool(buf)?;
         let f4 = codec::get_bool(buf)?;
         let f5 = codec::get_f32_le(buf)?;
@@ -326,14 +344,14 @@ impl BedrockCodec for AddActorPacketPayload {
         BedrockCodec::serialize(&self.rotation, buf)?;
         codec::put_f32_le(buf, self.y_head_rotation);
         codec::put_f32_le(buf, self.y_body_rotation);
-        codec::put_len_var(buf, (&self.attributes_list).len())?;
-        for v0 in (&self.attributes_list).iter() {
+        codec::put_len_var(buf, self.attributes_list.len())?;
+        for v0 in self.attributes_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.actor_data, buf)?;
         BedrockCodec::serialize(&self.synched_properties, buf)?;
-        codec::put_len_var(buf, (&self.actor_links).len())?;
-        for v0 in (&self.actor_links).iter() {
+        codec::put_len_var(buf, self.actor_links.len())?;
+        for v0 in self.actor_links.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         match &self.passenger_block_data {
@@ -359,7 +377,7 @@ impl BedrockCodec for AddActorPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SyncedAttribute as BedrockCodec>::deserialize(buf)?),
+                |buf| <SyncedAttribute as BedrockCodec>::deserialize(buf),
             )?
         };
         let f9 = <SynchedActorDataList as BedrockCodec>::deserialize(buf)?;
@@ -369,7 +387,7 @@ impl BedrockCodec for AddActorPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ActorLink as BedrockCodec>::deserialize(buf)?),
+                |buf| <ActorLink as BedrockCodec>::deserialize(buf),
             )?
         };
         let f12 = if codec::get_bool(buf)? {
@@ -583,12 +601,15 @@ impl BedrockCodec for AddPlayerPacketPayload {
         BedrockCodec::serialize(&self.rotation, buf)?;
         codec::put_f32_le(buf, self.y_head_rotation);
         BedrockCodec::serialize(&self.carried_item, buf)?;
-        codec::put_i32_var(buf, (self.player_game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.player_game_type).to_raw(), "GameType")?,
+        );
         BedrockCodec::serialize(&self.entity_data, buf)?;
         BedrockCodec::serialize(&self.synched_properties, buf)?;
         BedrockCodec::serialize(&self.abilities_data, buf)?;
-        codec::put_len_var(buf, (&self.actor_links).len())?;
-        for v0 in (&self.actor_links).iter() {
+        codec::put_len_var(buf, self.actor_links.len())?;
+        for v0 in self.actor_links.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         match &self.passenger_block_data {
@@ -599,7 +620,10 @@ impl BedrockCodec for AddPlayerPacketPayload {
             None => codec::put_bool(buf, false),
         }
         codec::put_string(buf, &self.device_id)?;
-        codec::put_i32_le(buf, (self.build_platform).to_raw() as i32);
+        codec::put_i32_le(
+            buf,
+            codec::enum_to_wire((self.build_platform).to_raw(), "BuildPlatform")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -614,7 +638,9 @@ impl BedrockCodec for AddPlayerPacketPayload {
         let f8 = <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
             buf,
         )?;
-        let f9 = <GameType as ProtocolEnum>::from_wire(codec::get_i32_var(buf)? as i64)?;
+        let f9 = <GameType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
+        )?;
         let f10 = <SynchedActorDataList as BedrockCodec>::deserialize(buf)?;
         let f11 = <PropertySyncData as BedrockCodec>::deserialize(buf)?;
         let f12 = <SerializedAbilitiesData as BedrockCodec>::deserialize(buf)?;
@@ -623,7 +649,7 @@ impl BedrockCodec for AddPlayerPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ActorLink as BedrockCodec>::deserialize(buf)?),
+                |buf| <ActorLink as BedrockCodec>::deserialize(buf),
             )?
         };
         let f14 = if codec::get_bool(buf)? {
@@ -633,7 +659,7 @@ impl BedrockCodec for AddPlayerPacketPayload {
         };
         let f15 = codec::get_string(buf)?;
         let f16 = <BuildPlatform as ProtocolEnum>::from_wire(
-            codec::get_i32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_le(buf)?)?,
         )?;
         Ok(Self {
             uuid: f0,
@@ -667,8 +693,8 @@ pub struct AddTimeMarkerData {
 impl BedrockCodec for AddTimeMarkerData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u64_var(buf, self.clock_id);
-        codec::put_len_var(buf, (&self.time_markers).len())?;
-        for v0 in (&self.time_markers).iter() {
+        codec::put_len_var(buf, self.time_markers.len())?;
+        for v0 in self.time_markers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -680,7 +706,7 @@ impl BedrockCodec for AddTimeMarkerData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<TimeMarkerData as BedrockCodec>::deserialize(buf)?),
+                |buf| <TimeMarkerData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -740,14 +766,17 @@ pub struct AgentActionEventPacketPayload {
 impl BedrockCodec for AgentActionEventPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.request_id)?;
-        codec::put_i32_le(buf, (self.action).to_raw() as i32);
+        codec::put_i32_le(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "AgentActionType")?,
+        );
         codec::put_string(buf, &self.response)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_string(buf)?;
         let f1 = <AgentActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_le(buf)?)?,
         )?;
         let f2 = codec::get_string(buf)?;
         Ok(Self {
@@ -767,13 +796,16 @@ pub struct AgentAnimationPacketPayload {
 }
 impl BedrockCodec for AgentAnimationPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.agent_animation).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.agent_animation).to_raw(), "AgentAnimation")?,
+        );
         BedrockCodec::serialize(&self.runtime_id, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <AgentAnimation as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -863,8 +895,8 @@ impl BedrockCodec for AnimateEntityPacketPayload {
         codec::put_i32_le(buf, self.m_stop_expression_version);
         codec::put_string(buf, &self.m_controller)?;
         codec::put_f32_le(buf, self.m_blend_out_time);
-        codec::put_len_var(buf, (&self.m_runtime_ids).len())?;
-        for v0 in (&self.m_runtime_ids).iter() {
+        codec::put_len_var(buf, self.m_runtime_ids.len())?;
+        for v0 in self.m_runtime_ids.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -881,7 +913,7 @@ impl BedrockCodec for AnimateEntityPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ActorRuntimeID as BedrockCodec>::deserialize(buf)?),
+                |buf| <ActorRuntimeID as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -913,20 +945,23 @@ pub struct AnimatePacketPayload {
 }
 impl BedrockCodec for AnimatePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "AnimatePacketPayloadAction")?,
+        );
         BedrockCodec::serialize(&self.target_actor_runtime_id, buf)?;
         codec::put_f32_le(buf, self.data);
         match &self.swing_source {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
         match &self.hand {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8_var(buf, (*v0).to_raw() as u8);
+                codec::put_u8_var(buf, codec::enum_to_wire((*v0).to_raw(), "HandSlot")?);
             }
             None => codec::put_bool(buf, false),
         }
@@ -934,7 +969,7 @@ impl BedrockCodec for AnimatePacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <AnimatePacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f2 = codec::get_f32_le(buf)?;
@@ -948,7 +983,11 @@ impl BedrockCodec for AnimatePacketPayload {
             None
         };
         let f4 = if codec::get_bool(buf)? {
-            Some(<HandSlot as ProtocolEnum>::from_wire(codec::get_u8_var(buf)? as i64)?)
+            Some(
+                <HandSlot as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_u8_var(buf)?)?,
+                )?,
+            )
         } else {
             None
         };
@@ -976,19 +1015,31 @@ pub struct AnimatedImageData {
 impl BedrockCodec for AnimatedImageData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.skin_image, buf)?;
-        codec::put_u32_var(buf, (self.animated_texture_type).to_raw() as u32);
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.animated_texture_type).to_raw(),
+                "PersonaAnimatedTextureType",
+            )?,
+        );
         codec::put_f32_le(buf, self.frames);
-        codec::put_u32_var(buf, (self.animation_expression).to_raw() as u32);
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.animation_expression).to_raw(),
+                "PersonaAnimationExpression",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SkinImage as BedrockCodec>::deserialize(buf)?;
         let f1 = <PersonaAnimatedTextureType as ProtocolEnum>::from_wire(
-            codec::get_u32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_var(buf)?)?,
         )?;
         let f2 = codec::get_f32_le(buf)?;
         let f3 = <PersonaAnimationExpression as ProtocolEnum>::from_wire(
-            codec::get_u32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_var(buf)?)?,
         )?;
         Ok(Self {
             skin_image: f0,
@@ -1044,13 +1095,19 @@ pub struct ArmorSlotAndDamagePair {
 }
 impl BedrockCodec for ArmorSlotAndDamagePair {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.armor_slot).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.armor_slot).to_raw(),
+                "SharedTypesLegacyArmorSlot",
+            )?,
+        );
         codec::put_i16_le(buf, self.damage);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SharedTypesLegacyArmorSlot as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = codec::get_i16_le(buf)?;
         Ok(Self { armor_slot: f0, damage: f1 })
@@ -1162,8 +1219,8 @@ impl BedrockCodec for AttributeData {
         codec::put_f32_le(buf, self.default_max_value);
         codec::put_f32_le(buf, self.default_value);
         codec::put_string(buf, &self.name)?;
-        codec::put_len_var(buf, (&self.modifiers).len())?;
-        for v0 in (&self.modifiers).iter() {
+        codec::put_len_var(buf, self.modifiers.len())?;
+        for v0 in self.modifiers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -1181,7 +1238,7 @@ impl BedrockCodec for AttributeData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<AttributeModifier as BedrockCodec>::deserialize(buf)?),
+                |buf| <AttributeModifier as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -1213,8 +1270,8 @@ impl BedrockCodec for AttributeLayerData {
         codec::put_string(buf, &self.name)?;
         BedrockCodec::serialize(&self.dimension, buf)?;
         BedrockCodec::serialize(&self.settings, buf)?;
-        codec::put_len_var(buf, (&self.attributes).len())?;
-        for v0 in (&self.attributes).iter() {
+        codec::put_len_var(buf, self.attributes.len())?;
+        for v0 in self.attributes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -1228,7 +1285,7 @@ impl BedrockCodec for AttributeLayerData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<EnvironmentAttributeData as BedrockCodec>::deserialize(buf)?),
+                |buf| <EnvironmentAttributeData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -1360,7 +1417,13 @@ pub struct AuthorAndMessage {
 }
 impl BedrockCodec for AuthorAndMessage {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.message_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.message_type).to_raw(),
+                "AuthorAndMessageMessageType",
+            )?,
+        );
         match &self.player_name {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -1379,7 +1442,7 @@ impl BedrockCodec for AuthorAndMessage {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <AuthorAndMessageMessageType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_string(buf)?)
@@ -1454,8 +1517,8 @@ impl BedrockCodec for AvailableCommandsPacketChainedSubcommandData {
         match &self.sub_command_values {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -1471,10 +1534,8 @@ impl BedrockCodec for AvailableCommandsPacketChainedSubcommandData {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(
-                        <AvailableCommandsPacketChainedSubcommandRelationship as BedrockCodec>::deserialize(
-                            buf,
-                        )?,
+                    |buf| <AvailableCommandsPacketChainedSubcommandRelationship as BedrockCodec>::deserialize(
+                        buf,
                     ),
                 )?
             })
@@ -1551,14 +1612,14 @@ impl BedrockCodec for AvailableCommandsPacketCommandData {
         codec::put_string(buf, &self.name)?;
         codec::put_string(buf, &self.description)?;
         codec::put_u16_le(buf, self.flags);
-        codec::put_string(buf, &(self.permission_level).wire_name())?;
+        codec::put_string(buf, (self.permission_level).wire_name())?;
         codec::put_i32_le(buf, self.alias_enum);
-        codec::put_len_var(buf, (&self.command_data_chained_subcommand_indexes).len())?;
-        for v0 in (&self.command_data_chained_subcommand_indexes).iter() {
+        codec::put_len_var(buf, self.command_data_chained_subcommand_indexes.len())?;
+        for v0 in self.command_data_chained_subcommand_indexes.iter() {
             codec::put_u32_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.overloads).len())?;
-        for v0 in (&self.overloads).iter() {
+        codec::put_len_var(buf, self.overloads.len())?;
+        for v0 in self.overloads.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -1573,17 +1634,15 @@ impl BedrockCodec for AvailableCommandsPacketCommandData {
         let f4 = codec::get_i32_le(buf)?;
         let f5 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
         };
         let f6 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketOverloadData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AvailableCommandsPacketOverloadData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1618,8 +1677,8 @@ impl BedrockCodec for AvailableCommandsPacketConstrainedValueData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_le(buf, self.enum_value_symbol);
         codec::put_u32_le(buf, self.enum_symbol);
-        codec::put_len_var(buf, (&self.constraint_indices).len())?;
-        for v0 in (&self.constraint_indices).iter() {
+        codec::put_len_var(buf, self.constraint_indices.len())?;
+        for v0 in self.constraint_indices.iter() {
             codec::put_u8(buf, *v0);
         }
         Ok(())
@@ -1629,7 +1688,7 @@ impl BedrockCodec for AvailableCommandsPacketConstrainedValueData {
         let f1 = codec::get_u32_le(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u8(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u8(buf))?
         };
         Ok(Self {
             enum_value_symbol: f0,
@@ -1653,8 +1712,8 @@ pub struct AvailableCommandsPacketEnumData {
 impl BedrockCodec for AvailableCommandsPacketEnumData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.name)?;
-        codec::put_len_var(buf, (&self.values).len())?;
-        for v0 in (&self.values).iter() {
+        codec::put_len_var(buf, self.values.len())?;
+        for v0 in self.values.iter() {
             codec::put_u32_le(buf, *v0);
         }
         Ok(())
@@ -1663,7 +1722,7 @@ impl BedrockCodec for AvailableCommandsPacketEnumData {
         let f0 = codec::get_string(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
         };
         Ok(Self { name: f0, values: f1 })
     }
@@ -1683,8 +1742,8 @@ pub struct AvailableCommandsPacketOverloadData {
 impl BedrockCodec for AvailableCommandsPacketOverloadData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_bool(buf, self.is_chaining);
-        codec::put_len_var(buf, (&self.parameter_data).len())?;
-        for v0 in (&self.parameter_data).iter() {
+        codec::put_len_var(buf, self.parameter_data.len())?;
+        for v0 in self.parameter_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -1696,8 +1755,8 @@ impl BedrockCodec for AvailableCommandsPacketOverloadData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketParamData as BedrockCodec>::deserialize(buf)?,
+                |buf| <AvailableCommandsPacketParamData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1786,36 +1845,36 @@ pub struct AvailableCommandsPacketPayload {
 }
 impl BedrockCodec for AvailableCommandsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.enum_values).len())?;
-        for v0 in (&self.enum_values).iter() {
+        codec::put_len_var(buf, self.enum_values.len())?;
+        for v0 in self.enum_values.iter() {
             codec::put_string(buf, v0)?;
         }
-        codec::put_len_var(buf, (&self.chained_subcommand_values).len())?;
-        for v0 in (&self.chained_subcommand_values).iter() {
+        codec::put_len_var(buf, self.chained_subcommand_values.len())?;
+        for v0 in self.chained_subcommand_values.iter() {
             codec::put_string(buf, v0)?;
         }
-        codec::put_len_var(buf, (&self.post_fixes).len())?;
-        for v0 in (&self.post_fixes).iter() {
+        codec::put_len_var(buf, self.post_fixes.len())?;
+        for v0 in self.post_fixes.iter() {
             codec::put_string(buf, v0)?;
         }
-        codec::put_len_var(buf, (&self.enum_data).len())?;
-        for v0 in (&self.enum_data).iter() {
+        codec::put_len_var(buf, self.enum_data.len())?;
+        for v0 in self.enum_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.chained_subcommand_data).len())?;
-        for v0 in (&self.chained_subcommand_data).iter() {
+        codec::put_len_var(buf, self.chained_subcommand_data.len())?;
+        for v0 in self.chained_subcommand_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.commands).len())?;
-        for v0 in (&self.commands).iter() {
+        codec::put_len_var(buf, self.commands.len())?;
+        for v0 in self.commands.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.soft_enums).len())?;
-        for v0 in (&self.soft_enums).iter() {
+        codec::put_len_var(buf, self.soft_enums.len())?;
+        for v0 in self.soft_enums.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.constraints).len())?;
-        for v0 in (&self.constraints).iter() {
+        codec::put_len_var(buf, self.constraints.len())?;
+        for v0 in self.constraints.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -1823,24 +1882,22 @@ impl BedrockCodec for AvailableCommandsPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f3 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketEnumData as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <AvailableCommandsPacketEnumData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = {
@@ -1848,10 +1905,8 @@ impl BedrockCodec for AvailableCommandsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketChainedSubcommandData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AvailableCommandsPacketChainedSubcommandData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1860,10 +1915,8 @@ impl BedrockCodec for AvailableCommandsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketCommandData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AvailableCommandsPacketCommandData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1872,10 +1925,8 @@ impl BedrockCodec for AvailableCommandsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketSoftEnumData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AvailableCommandsPacketSoftEnumData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1884,10 +1935,8 @@ impl BedrockCodec for AvailableCommandsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AvailableCommandsPacketConstrainedValueData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AvailableCommandsPacketConstrainedValueData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -1918,8 +1967,8 @@ pub struct AvailableCommandsPacketSoftEnumData {
 impl BedrockCodec for AvailableCommandsPacketSoftEnumData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.enum_name)?;
-        codec::put_len_var(buf, (&self.enum_options).len())?;
-        for v0 in (&self.enum_options).iter() {
+        codec::put_len_var(buf, self.enum_options.len())?;
+        for v0 in self.enum_options.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -1928,7 +1977,7 @@ impl BedrockCodec for AvailableCommandsPacketSoftEnumData {
         let f0 = codec::get_string(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self {
             enum_name: f0,
@@ -2019,12 +2068,12 @@ pub struct BiomeCappedSurfaceData {
 }
 impl BedrockCodec for BiomeCappedSurfaceData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.floor_blocks).len())?;
-        for v0 in (&self.floor_blocks).iter() {
+        codec::put_len_var(buf, self.floor_blocks.len())?;
+        for v0 in self.floor_blocks.iter() {
             codec::put_u32_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.ceiling_blocks).len())?;
-        for v0 in (&self.ceiling_blocks).iter() {
+        codec::put_len_var(buf, self.ceiling_blocks.len())?;
+        for v0 in self.ceiling_blocks.iter() {
             codec::put_u32_le(buf, *v0);
         }
         match &self.sea_block {
@@ -2053,11 +2102,11 @@ impl BedrockCodec for BiomeCappedSurfaceData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
         };
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
         };
         let f2 = if codec::get_bool(buf)? {
             Some(codec::get_u32_le(buf)?)
@@ -2128,8 +2177,8 @@ pub struct BiomeConditionalTransformationData {
 }
 impl BedrockCodec for BiomeConditionalTransformationData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.transforms_into).len())?;
-        for v0 in (&self.transforms_into).iter() {
+        codec::put_len_var(buf, self.transforms_into.len())?;
+        for v0 in self.transforms_into.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_u16_le(buf, self.condition_json);
@@ -2142,7 +2191,7 @@ impl BedrockCodec for BiomeConditionalTransformationData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeWeightedData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeWeightedData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = codec::get_u16_le(buf)?;
@@ -2200,8 +2249,8 @@ pub struct BiomeConsolidatedFeaturesData {
 }
 impl BedrockCodec for BiomeConsolidatedFeaturesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.features).len())?;
-        for v0 in (&self.features).iter() {
+        codec::put_len_var(buf, self.features.len())?;
+        for v0 in self.features.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -2212,9 +2261,7 @@ impl BedrockCodec for BiomeConsolidatedFeaturesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <BiomeConsolidatedFeatureData as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <BiomeConsolidatedFeatureData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { features: f0 })
@@ -2246,7 +2293,10 @@ impl BedrockCodec for BiomeCoordinateData {
         codec::put_u16_le(buf, self.max_value);
         codec::put_u32_le(buf, self.grid_offset);
         codec::put_u32_le(buf, self.grid_step_size);
-        codec::put_i32_var(buf, (self.distribution).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.distribution).to_raw(), "RandomDistributionType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -2257,7 +2307,7 @@ impl BedrockCodec for BiomeCoordinateData {
         let f4 = codec::get_u32_le(buf)?;
         let f5 = codec::get_u32_le(buf)?;
         let f6 = <RandomDistributionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self {
             min_value_type: f0,
@@ -2357,7 +2407,7 @@ impl BedrockCodec for BiomeDefinitionChunkGenData {
         match &self.village_type {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(buf, codec::enum_to_wire((*v0).to_raw(), "VillageType")?);
             }
             None => codec::put_bool(buf, false),
         }
@@ -2419,7 +2469,11 @@ impl BedrockCodec for BiomeDefinitionChunkGenData {
             None
         };
         let f8 = if codec::get_bool(buf)? {
-            Some(<VillageType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?)
+            Some(
+                <VillageType as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
+                )?,
+            )
         } else {
             None
         };
@@ -2545,8 +2599,8 @@ pub struct BiomeDefinitionListPacketPayload {
 }
 impl BedrockCodec for BiomeDefinitionListPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.map_of_biome_names_to_data).len())?;
-        for (k0, v0) in (&self.map_of_biome_names_to_data).iter() {
+        codec::put_len_var(buf, self.map_of_biome_names_to_data.len())?;
+        for (k0, v0) in self.map_of_biome_names_to_data.iter() {
             codec::put_u16_le(buf, *k0);
             BedrockCodec::serialize(v0, buf)?;
         }
@@ -2633,8 +2687,8 @@ pub struct BiomeLegacyWorldGenRulesData {
 }
 impl BedrockCodec for BiomeLegacyWorldGenRulesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.legacy_pre_hills_edge).len())?;
-        for v0 in (&self.legacy_pre_hills_edge).iter() {
+        codec::put_len_var(buf, self.legacy_pre_hills_edge.len())?;
+        for v0 in self.legacy_pre_hills_edge.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -2645,10 +2699,8 @@ impl BedrockCodec for BiomeLegacyWorldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -2781,12 +2833,12 @@ pub struct BiomeNoiseGradientSurfaceData {
 }
 impl BedrockCodec for BiomeNoiseGradientSurfaceData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.non_replaceable_blocks).len())?;
-        for v0 in (&self.non_replaceable_blocks).iter() {
+        codec::put_len_var(buf, self.non_replaceable_blocks.len())?;
+        for v0 in self.non_replaceable_blocks.iter() {
             codec::put_u32_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.gradient_blocks).len())?;
-        for v0 in (&self.gradient_blocks).iter() {
+        codec::put_len_var(buf, self.gradient_blocks.len())?;
+        for v0 in self.gradient_blocks.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.noise, buf)?;
@@ -2795,16 +2847,14 @@ impl BedrockCodec for BiomeNoiseGradientSurfaceData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
         };
         let f1 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <SerializedNoiseBlockSpecifier as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <SerializedNoiseBlockSpecifier as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = <NoiseDescriptor as BedrockCodec>::deserialize(buf)?;
@@ -2835,32 +2885,32 @@ pub struct BiomeOverworldGenRulesData {
 }
 impl BedrockCodec for BiomeOverworldGenRulesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.hills_transformations).len())?;
-        for v0 in (&self.hills_transformations).iter() {
+        codec::put_len_var(buf, self.hills_transformations.len())?;
+        for v0 in self.hills_transformations.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.mutate_transformations).len())?;
-        for v0 in (&self.mutate_transformations).iter() {
+        codec::put_len_var(buf, self.mutate_transformations.len())?;
+        for v0 in self.mutate_transformations.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.river_transformations).len())?;
-        for v0 in (&self.river_transformations).iter() {
+        codec::put_len_var(buf, self.river_transformations.len())?;
+        for v0 in self.river_transformations.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.shore_transformations).len())?;
-        for v0 in (&self.shore_transformations).iter() {
+        codec::put_len_var(buf, self.shore_transformations.len())?;
+        for v0 in self.shore_transformations.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.pre_hills_edge).len())?;
-        for v0 in (&self.pre_hills_edge).iter() {
+        codec::put_len_var(buf, self.pre_hills_edge.len())?;
+        for v0 in self.pre_hills_edge.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.post_shore_edge).len())?;
-        for v0 in (&self.post_shore_edge).iter() {
+        codec::put_len_var(buf, self.post_shore_edge.len())?;
+        for v0 in self.post_shore_edge.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.climate).len())?;
-        for v0 in (&self.climate).iter() {
+        codec::put_len_var(buf, self.climate.len())?;
+        for v0 in self.climate.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -2871,7 +2921,7 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeWeightedData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeWeightedData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = {
@@ -2879,7 +2929,7 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeWeightedData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeWeightedData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = {
@@ -2887,7 +2937,7 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeWeightedData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeWeightedData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f3 = {
@@ -2895,7 +2945,7 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeWeightedData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeWeightedData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = {
@@ -2903,10 +2953,8 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -2915,10 +2963,8 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <BiomeConditionalTransformationData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -2927,9 +2973,7 @@ impl BedrockCodec for BiomeOverworldGenRulesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <BiomeWeightedTemperatureData as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <BiomeWeightedTemperatureData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -2963,8 +3007,8 @@ impl BedrockCodec for BiomeReplacementData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u16_le(buf, self.replacement_biome);
         codec::put_u16_le(buf, self.dimension);
-        codec::put_len_var(buf, (&self.target_biomes).len())?;
-        for v0 in (&self.target_biomes).iter() {
+        codec::put_len_var(buf, self.target_biomes.len())?;
+        for v0 in self.target_biomes.iter() {
             codec::put_u16_le(buf, *v0);
         }
         codec::put_f32_le(buf, self.amount);
@@ -2977,7 +3021,7 @@ impl BedrockCodec for BiomeReplacementData {
         let f1 = codec::get_u16_le(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u16_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u16_le(buf))?
         };
         let f3 = codec::get_f32_le(buf)?;
         let f4 = codec::get_f32_le(buf)?;
@@ -3000,8 +3044,8 @@ pub struct BiomeReplacementsData {
 }
 impl BedrockCodec for BiomeReplacementsData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.biome_replacements).len())?;
-        for v0 in (&self.biome_replacements).iter() {
+        codec::put_len_var(buf, self.biome_replacements.len())?;
+        for v0 in self.biome_replacements.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -3012,7 +3056,7 @@ impl BedrockCodec for BiomeReplacementsData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeReplacementData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeReplacementData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { biome_replacements: f0 })
@@ -3040,11 +3084,14 @@ pub struct BiomeScatterParamData {
 }
 impl BedrockCodec for BiomeScatterParamData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.coordinates).len())?;
-        for v0 in (&self.coordinates).iter() {
+        codec::put_len_var(buf, self.coordinates.len())?;
+        for v0 in self.coordinates.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_i32_var(buf, (self.eval_order).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.eval_order).to_raw(), "CoordinateEvaluationOrder")?,
+        );
         codec::put_i32_var(buf, self.chance_percent_type);
         codec::put_u16_le(buf, self.chance_percent);
         codec::put_i32_le(buf, self.chance_numerator);
@@ -3059,11 +3106,11 @@ impl BedrockCodec for BiomeScatterParamData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeCoordinateData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeCoordinateData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = <CoordinateEvaluationOrder as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = codec::get_u16_le(buf)?;
@@ -3093,8 +3140,8 @@ pub struct BiomeStringList {
 }
 impl BedrockCodec for BiomeStringList {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.strings).len())?;
-        for v0 in (&self.strings).iter() {
+        codec::put_len_var(buf, self.strings.len())?;
+        for v0 in self.strings.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -3102,7 +3149,7 @@ impl BedrockCodec for BiomeStringList {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self { strings: f0 })
     }
@@ -3208,8 +3255,8 @@ pub struct BiomeSurfaceMaterialAdjustmentData {
 }
 impl BedrockCodec for BiomeSurfaceMaterialAdjustmentData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.adjustments).len())?;
-        for v0 in (&self.adjustments).iter() {
+        codec::put_len_var(buf, self.adjustments.len())?;
+        for v0 in self.adjustments.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -3220,7 +3267,7 @@ impl BedrockCodec for BiomeSurfaceMaterialAdjustmentData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<BiomeElementData as BedrockCodec>::deserialize(buf)?),
+                |buf| <BiomeElementData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { adjustments: f0 })
@@ -3277,8 +3324,8 @@ pub struct BiomeTagsData {
 }
 impl BedrockCodec for BiomeTagsData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.tags).len())?;
-        for v0 in (&self.tags).iter() {
+        codec::put_len_var(buf, self.tags.len())?;
+        for v0 in self.tags.iter() {
             codec::put_u16_le(buf, *v0);
         }
         Ok(())
@@ -3286,7 +3333,7 @@ impl BedrockCodec for BiomeTagsData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u16_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u16_le(buf))?
         };
         Ok(Self { tags: f0 })
     }
@@ -3635,7 +3682,7 @@ impl BedrockCodec for BoolAttributeData {
         match &self.operation {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -3690,27 +3737,36 @@ pub struct BossEventPacketPayload {
 impl BedrockCodec for BossEventPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_actor_id, buf)?;
-        codec::put_u8_var(buf, (self.event_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.event_type).to_raw(), "BossEventUpdateType")?,
+        );
         codec::put_string(buf, &self.name)?;
         codec::put_string(buf, &self.filtered_name)?;
         codec::put_f32_le(buf, self.health_percent);
-        codec::put_u8_var(buf, (self.color).to_raw() as u8);
-        codec::put_u8_var(buf, (self.overlay).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.color).to_raw(), "BossBarColor")?,
+        );
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.overlay).to_raw(), "BossBarOverlay")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f1 = <BossEventUpdateType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f2 = codec::get_string(buf)?;
         let f3 = codec::get_string(buf)?;
         let f4 = codec::get_f32_le(buf)?;
         let f5 = <BossBarColor as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f6 = <BossBarOverlay as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         Ok(Self {
             target_actor_id: f0,
@@ -3793,8 +3849,8 @@ pub struct CameraAimAssistActorPriorityPacketPayload {
 }
 impl BedrockCodec for CameraAimAssistActorPriorityPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.camera_aim_assist_actor_priority_list).len())?;
-        for v0 in (&self.camera_aim_assist_actor_priority_list).iter() {
+        codec::put_len_var(buf, self.camera_aim_assist_actor_priority_list.len())?;
+        for v0 in self.camera_aim_assist_actor_priority_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -3805,7 +3861,7 @@ impl BedrockCodec for CameraAimAssistActorPriorityPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<AimAssistActorPriorityData as BedrockCodec>::deserialize(buf)?),
+                |buf| <AimAssistActorPriorityData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -3870,8 +3926,8 @@ impl BedrockCodec for CameraAimAssistCategoryPriorities {
         match &self.entities {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for (k1, v1) in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for (k1, v1) in v0.iter() {
                     codec::put_string(buf, k1)?;
                     codec::put_i32_le(buf, *v1);
                 }
@@ -3881,8 +3937,8 @@ impl BedrockCodec for CameraAimAssistCategoryPriorities {
         match &self.blocks {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for (k1, v1) in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for (k1, v1) in v0.iter() {
                     codec::put_string(buf, k1)?;
                     codec::put_i32_le(buf, *v1);
                 }
@@ -3892,8 +3948,8 @@ impl BedrockCodec for CameraAimAssistCategoryPriorities {
         match &self.block_tags {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for (k1, v1) in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for (k1, v1) in v0.iter() {
                     codec::put_string(buf, k1)?;
                     codec::put_i32_le(buf, *v1);
                 }
@@ -3903,8 +3959,8 @@ impl BedrockCodec for CameraAimAssistCategoryPriorities {
         match &self.entity_type_families {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for (k1, v1) in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for (k1, v1) in v0.iter() {
                     codec::put_string(buf, k1)?;
                     codec::put_i32_le(buf, *v1);
                 }
@@ -4019,8 +4075,20 @@ impl BedrockCodec for CameraAimAssistPacketPayload {
         codec::put_string(buf, &self.preset_id)?;
         BedrockCodec::serialize(&self.view_angle, buf)?;
         codec::put_f32_le(buf, self.distance);
-        codec::put_u8(buf, (self.target_mode).to_raw() as u8);
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.target_mode).to_raw(),
+                "CameraAimAssistPacketPayloadTargetMode",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.action).to_raw(),
+                "CameraAimAssistPacketPayloadAction",
+            )?,
+        );
         codec::put_bool(buf, self.show_debug_render);
         Ok(())
     }
@@ -4029,10 +4097,10 @@ impl BedrockCodec for CameraAimAssistPacketPayload {
         let f1 = <Vec2 as BedrockCodec>::deserialize(buf)?;
         let f2 = codec::get_f32_le(buf)?;
         let f3 = <CameraAimAssistPacketPayloadTargetMode as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f4 = <CameraAimAssistPacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f5 = codec::get_bool(buf)?;
         Ok(Self {
@@ -4086,8 +4154,8 @@ impl BedrockCodec for CameraAimAssistPresetDefinition {
         match &self.liquid_targeting_list {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -4096,8 +4164,8 @@ impl BedrockCodec for CameraAimAssistPresetDefinition {
         match &self.item_settings {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for (k1, v1) in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for (k1, v1) in v0.iter() {
                     codec::put_string(buf, k1)?;
                     codec::put_string(buf, v1)?;
                 }
@@ -4134,7 +4202,7 @@ impl BedrockCodec for CameraAimAssistPresetDefinition {
         let f2 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -4196,8 +4264,8 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         match &self.blocks {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -4206,8 +4274,8 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         match &self.entities {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -4216,8 +4284,8 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         match &self.block_tags {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -4226,8 +4294,8 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         match &self.entity_type_families {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -4239,7 +4307,7 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         let f0 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -4247,7 +4315,7 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         let f1 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -4255,7 +4323,7 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         let f2 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -4263,7 +4331,7 @@ impl BedrockCodec for CameraAimAssistPresetExclusionDefinition {
         let f3 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -4288,15 +4356,21 @@ pub struct CameraAimAssistPresetsPacketPayload {
 }
 impl BedrockCodec for CameraAimAssistPresetsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.camera_aim_assist_presets).len())?;
-        for v0 in (&self.camera_aim_assist_presets).iter() {
+        codec::put_len_var(buf, self.camera_aim_assist_presets.len())?;
+        for v0 in self.camera_aim_assist_presets.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.camera_aim_assist_categories).len())?;
-        for v0 in (&self.camera_aim_assist_categories).iter() {
+        codec::put_len_var(buf, self.camera_aim_assist_categories.len())?;
+        for v0 in self.camera_aim_assist_categories.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_u8(buf, (self.operation).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.operation).to_raw(),
+                "CameraAimAssistPresetsPacketOperation",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -4305,10 +4379,8 @@ impl BedrockCodec for CameraAimAssistPresetsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraAimAssistCategoryDefinition as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <CameraAimAssistCategoryDefinition as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -4317,13 +4389,11 @@ impl BedrockCodec for CameraAimAssistPresetsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraAimAssistPresetDefinition as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <CameraAimAssistPresetDefinition as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = <CameraAimAssistPresetsPacketOperation as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             camera_aim_assist_presets: f0,
@@ -4608,7 +4678,7 @@ impl BedrockCodec for CameraInstructionFovInstruction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_f32_le(buf, self.field_of_view);
         codec::put_f32_le(buf, self.fov_ease_time);
-        codec::put_string(buf, &(self.fov_ease_type).wire_name())?;
+        codec::put_string(buf, (self.fov_ease_type).wire_name())?;
         codec::put_bool(buf, self.field_of_view_clear);
         Ok(())
     }
@@ -4933,16 +5003,16 @@ impl BedrockCodec for CameraInstructionSplineInstruction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_f32_le(buf, self.total_time);
         codec::put_u8(buf, self.r#type);
-        codec::put_len_var(buf, (&self.curve).len())?;
-        for v0 in (&self.curve).iter() {
+        codec::put_len_var(buf, self.curve.len())?;
+        for v0 in self.curve.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.progress_key_frames).len())?;
-        for v0 in (&self.progress_key_frames).iter() {
+        codec::put_len_var(buf, self.progress_key_frames.len())?;
+        for v0 in self.progress_key_frames.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.rotation_option).len())?;
-        for v0 in (&self.rotation_option).iter() {
+        codec::put_len_var(buf, self.rotation_option.len())?;
+        for v0 in self.rotation_option.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         match &self.spline_identifier {
@@ -4966,21 +5036,15 @@ impl BedrockCodec for CameraInstructionSplineInstruction {
         let f1 = codec::get_u8(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| Ok(<Vec3 as BedrockCodec>::deserialize(buf)?),
-            )?
+            codec::get_vec(buf, len, |buf| <Vec3 as BedrockCodec>::deserialize(buf))?
         };
         let f3 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraInstructionSplineInstructionSplineProgressOption as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <CameraInstructionSplineInstructionSplineProgressOption as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -4989,10 +5053,8 @@ impl BedrockCodec for CameraInstructionSplineInstruction {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraInstructionSplineInstructionSplineRotationOption as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <CameraInstructionSplineInstructionSplineRotationOption as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -5027,7 +5089,7 @@ impl BedrockCodec for CameraInstructionSplineInstructionSplineProgressOption {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_f32_le(buf, self.key_frame_value);
         codec::put_f32_le(buf, self.key_frame_time);
-        codec::put_string(buf, &(self.key_frame_easing_func).wire_name())?;
+        codec::put_string(buf, (self.key_frame_easing_func).wire_name())?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -5057,7 +5119,7 @@ impl BedrockCodec for CameraInstructionSplineInstructionSplineRotationOption {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.key_frame_value, buf)?;
         codec::put_f32_le(buf, self.key_frame_time);
-        codec::put_string(buf, &(self.key_frame_easing_func).wire_name())?;
+        codec::put_string(buf, (self.key_frame_easing_func).wire_name())?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -5302,7 +5364,13 @@ impl BedrockCodec for CameraPresets {
         match &self.listener {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(
+                    buf,
+                    codec::enum_to_wire(
+                        (*v0).to_raw(),
+                        "SharedTypesComprehensiveCameraPresetAudioListener",
+                    )?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -5323,7 +5391,10 @@ impl BedrockCodec for CameraPresets {
         match &self.control_scheme {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(
+                    buf,
+                    codec::enum_to_wire((*v0).to_raw(), "ControlScheme")?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -5415,7 +5486,7 @@ impl BedrockCodec for CameraPresets {
         let f18 = if codec::get_bool(buf)? {
             Some(
                 <SharedTypesComprehensiveCameraPresetAudioListener as ProtocolEnum>::from_wire(
-                    codec::get_u8(buf)? as i64,
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
                 )?,
             )
         } else {
@@ -5432,7 +5503,11 @@ impl BedrockCodec for CameraPresets {
             None
         };
         let f21 = if codec::get_bool(buf)? {
-            Some(<ControlScheme as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?)
+            Some(
+                <ControlScheme as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
+                )?,
+            )
         } else {
             None
         };
@@ -5510,18 +5585,24 @@ impl BedrockCodec for CameraShakePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_f32_le(buf, self.intensity);
         codec::put_f32_le(buf, self.seconds);
-        codec::put_u8(buf, (self.shake_type).to_raw() as u8);
-        codec::put_u8(buf, (self.shake_action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.shake_type).to_raw(), "CameraShakeType")?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.shake_action).to_raw(), "CameraShakeAction")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_f32_le(buf)?;
         let f1 = codec::get_f32_le(buf)?;
         let f2 = <CameraShakeType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f3 = <CameraShakeAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             intensity: f0,
@@ -5588,16 +5669,16 @@ impl BedrockCodec for CameraSplineDefinition {
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_len_var(buf, (&self.control_points).len())?;
-        for v0 in (&self.control_points).iter() {
+        codec::put_len_var(buf, self.control_points.len())?;
+        for v0 in self.control_points.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.progress_key_frames).len())?;
-        for v0 in (&self.progress_key_frames).iter() {
+        codec::put_len_var(buf, self.progress_key_frames.len())?;
+        for v0 in self.progress_key_frames.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.rotation_key_frames).len())?;
-        for v0 in (&self.rotation_key_frames).iter() {
+        codec::put_len_var(buf, self.rotation_key_frames.len())?;
+        for v0 in self.rotation_key_frames.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -5615,7 +5696,7 @@ impl BedrockCodec for CameraSplineDefinition {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<CameraSplineControlPoint as BedrockCodec>::deserialize(buf)?),
+                |buf| <CameraSplineControlPoint as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = {
@@ -5623,9 +5704,7 @@ impl BedrockCodec for CameraSplineDefinition {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraSplineProgressKeyFrame as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <CameraSplineProgressKeyFrame as BedrockCodec>::deserialize(buf),
             )?
         };
         let f5 = {
@@ -5633,9 +5712,7 @@ impl BedrockCodec for CameraSplineDefinition {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CameraSplineRotationKeyFrame as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <CameraSplineRotationKeyFrame as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -5656,8 +5733,8 @@ pub struct CameraSplinePacketPayload {
 }
 impl BedrockCodec for CameraSplinePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.camera_data_splines).len())?;
-        for v0 in (&self.camera_data_splines).iter() {
+        codec::put_len_var(buf, self.camera_data_splines.len())?;
+        for v0 in self.camera_data_splines.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -5668,7 +5745,7 @@ impl BedrockCodec for CameraSplinePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<CameraSplineDefinition as BedrockCodec>::deserialize(buf)?),
+                |buf| <CameraSplineDefinition as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { camera_data_splines: f0 })
@@ -5697,7 +5774,7 @@ impl BedrockCodec for CameraSplineProgressKeyFrame {
         match &self.easing {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -5745,7 +5822,7 @@ impl BedrockCodec for CameraSplineRotationKeyFrame {
         match &self.easing {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -5957,7 +6034,7 @@ impl ChangeEntityScore {
 }
 impl BedrockCodec for ChangeEntityScore {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::ACTION).wire_name())?;
+        codec::put_string(buf, (Self::ACTION).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -6023,7 +6100,7 @@ impl ChangeFakePlayerScore {
 }
 impl BedrockCodec for ChangeFakePlayerScore {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::ACTION).wire_name())?;
+        codec::put_string(buf, (Self::ACTION).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -6132,7 +6209,7 @@ impl ChangePlayerScore {
 }
 impl BedrockCodec for ChangePlayerScore {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::ACTION).wire_name())?;
+        codec::put_string(buf, (Self::ACTION).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -6339,7 +6416,7 @@ impl ClearOverride {
 }
 impl BedrockCodec for ClearOverride {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::TYPE).wire_name())?;
+        codec::put_string(buf, (Self::TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -6368,12 +6445,12 @@ pub struct ClientCacheBlobStatusPacketPayload {
 }
 impl BedrockCodec for ClientCacheBlobStatusPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.missing_ids).len())?;
-        for v0 in (&self.missing_ids).iter() {
+        codec::put_len_var(buf, self.missing_ids.len())?;
+        for v0 in self.missing_ids.iter() {
             codec::put_u64_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.found_ids).len())?;
-        for v0 in (&self.found_ids).iter() {
+        codec::put_len_var(buf, self.found_ids.len())?;
+        for v0 in self.found_ids.iter() {
             codec::put_u64_le(buf, *v0);
         }
         Ok(())
@@ -6381,11 +6458,11 @@ impl BedrockCodec for ClientCacheBlobStatusPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u64_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u64_le(buf))?
         };
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u64_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u64_le(buf))?
         };
         Ok(Self {
             missing_ids: f0,
@@ -6403,8 +6480,8 @@ pub struct ClientCacheMissResponsePacketPayload {
 }
 impl BedrockCodec for ClientCacheMissResponsePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.missing_blobs).len())?;
-        for v0 in (&self.missing_blobs).iter() {
+        codec::put_len_var(buf, self.missing_blobs.len())?;
+        for v0 in self.missing_blobs.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -6415,7 +6492,7 @@ impl BedrockCodec for ClientCacheMissResponsePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MissingBlobData as BedrockCodec>::deserialize(buf)?),
+                |buf| <MissingBlobData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { missing_blobs: f0 })
@@ -6450,7 +6527,13 @@ pub struct ClientCameraAimAssistPacketPayload {
 impl BedrockCodec for ClientCameraAimAssistPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.camera_preset_id)?;
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.action).to_raw(),
+                "ClientCameraAimAssistPacketAction",
+            )?,
+        );
         match &self.allow_aim_assist {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -6463,7 +6546,7 @@ impl BedrockCodec for ClientCameraAimAssistPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_string(buf)?;
         let f1 = <ClientCameraAimAssistPacketAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = if codec::get_bool(buf)? { Some(codec::get_bool(buf)?) } else { None };
         Ok(Self {
@@ -6491,7 +6574,7 @@ impl BedrockCodec for ClientMovementPredictionSyncPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.actor_data_flag, buf)?;
         BedrockCodec::serialize(&self.actor_bounding_box, buf)?;
-        for v0 in (&self.movement_attributes).iter() {
+        for v0 in self.movement_attributes.iter() {
             codec::put_f32_le(buf, *v0);
         }
         BedrockCodec::serialize(&self.actor_unique_id, buf)?;
@@ -6501,7 +6584,7 @@ impl BedrockCodec for ClientMovementPredictionSyncPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorDataFlagComponent as BedrockCodec>::deserialize(buf)?;
         let f1 = <ActorDataBoundingBoxComponent as BedrockCodec>::deserialize(buf)?;
-        let f2 = codec::get_array(buf, |buf| Ok(codec::get_f32_le(buf)?))?;
+        let f2 = codec::get_array(buf, |buf| codec::get_f32_le(buf))?;
         let f3 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f4 = codec::get_bool(buf)?;
         Ok(Self {
@@ -6588,11 +6671,16 @@ pub struct ClientboundControlSchemeSetPacketPayload {
 }
 impl BedrockCodec for ClientboundControlSchemeSetPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.control_scheme).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.control_scheme).to_raw(), "ControlScheme")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <ControlScheme as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f0 = <ControlScheme as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         Ok(Self { control_scheme: f0 })
     }
 }
@@ -6689,8 +6777,8 @@ pub struct ClientboundDataStorePayload {
 }
 impl BedrockCodec for ClientboundDataStorePayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.updates).len())?;
-        for v0 in (&self.updates).iter() {
+        codec::put_len_var(buf, self.updates.len())?;
+        for v0 in self.updates.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -6701,10 +6789,8 @@ impl BedrockCodec for ClientboundDataStorePayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <ClientboundDataStorePayloadUpdates as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <ClientboundDataStorePayloadUpdates as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -6768,8 +6854,8 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
         match &self.creation_map_ids {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -6785,8 +6871,8 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
         match &self.tracked_actor_ids {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -6795,8 +6881,8 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
         match &self.decorations {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -6833,8 +6919,8 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
         match &self.pixels {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_u32_le(buf, *v1);
                 }
             }
@@ -6853,7 +6939,7 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<ActorUniqueID as BedrockCodec>::deserialize(buf)?),
+                    |buf| <ActorUniqueID as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -6866,9 +6952,7 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(
-                        <MapItemTrackedActorUniqueId as BedrockCodec>::deserialize(buf)?,
-                    ),
+                    |buf| <MapItemTrackedActorUniqueId as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -6880,7 +6964,7 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<MapDecoration as BedrockCodec>::deserialize(buf)?),
+                    |buf| <MapDecoration as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -6909,7 +6993,7 @@ impl BedrockCodec for ClientboundMapItemDataPacketPayload {
         let f12 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_u32_le(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_u32_le(buf))?
             })
         } else {
             None
@@ -6943,7 +7027,10 @@ pub struct ClientboundMatchmakingStatePacketPayload {
 }
 impl BedrockCodec for ClientboundMatchmakingStatePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.state).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.state).to_raw(), "MatchmakingState")?,
+        );
         codec::put_string(buf, &self.destination_name)?;
         match &self.options {
             Some(v0) => {
@@ -6956,7 +7043,7 @@ impl BedrockCodec for ClientboundMatchmakingStatePacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MatchmakingState as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = codec::get_string(buf)?;
         let f2 = if codec::get_bool(buf)? {
@@ -6979,8 +7066,8 @@ pub struct ClientboundMusicPlaybackFailurePacketPayload {
 }
 impl BedrockCodec for ClientboundMusicPlaybackFailurePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.failures).len())?;
-        for v0 in (&self.failures).iter() {
+        codec::put_len_var(buf, self.failures.len())?;
+        for v0 in self.failures.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -6991,7 +7078,7 @@ impl BedrockCodec for ClientboundMusicPlaybackFailurePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MusicPlaybackFailureEntry as BedrockCodec>::deserialize(buf)?),
+                |buf| <MusicPlaybackFailureEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { failures: f0 })
@@ -7012,7 +7099,7 @@ pub struct ClientboundOnlineMusicPlaybackResponsePacketPayload {
 impl BedrockCodec for ClientboundOnlineMusicPlaybackResponsePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_le(buf, self.request_id);
-        codec::put_string(buf, &(self.state).wire_name())?;
+        codec::put_string(buf, (self.state).wire_name())?;
         BedrockCodec::serialize(&self.shared_metadata, buf)?;
         BedrockCodec::serialize(&self.playback_content, buf)?;
         Ok(())
@@ -7048,7 +7135,7 @@ impl BedrockCodec for ClientboundPlayAudioContentPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.shared_metadata, buf)?;
         BedrockCodec::serialize(&self.playback_content, buf)?;
-        codec::put_string(buf, &(self.playback_type).wire_name())?;
+        codec::put_string(buf, (self.playback_type).wire_name())?;
         BedrockCodec::serialize(&self.play_sound, buf)?;
         Ok(())
     }
@@ -7117,12 +7204,18 @@ pub struct ClientboundTextureShiftPacketPayload {
 }
 impl BedrockCodec for ClientboundTextureShiftPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action_id).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.action_id).to_raw(),
+                "ClientboundTextureShiftPacketPayloadAction",
+            )?,
+        );
         codec::put_string(buf, &self.collection_name)?;
         codec::put_string(buf, &self.from_step)?;
         codec::put_string(buf, &self.to_step)?;
-        codec::put_len_var(buf, (&self.all_steps).len())?;
-        for v0 in (&self.all_steps).iter() {
+        codec::put_len_var(buf, self.all_steps.len())?;
+        for v0 in self.all_steps.iter() {
             codec::put_string(buf, v0)?;
         }
         codec::put_u64_var(buf, self.current_length_in_ticks);
@@ -7132,14 +7225,14 @@ impl BedrockCodec for ClientboundTextureShiftPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ClientboundTextureShiftPacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = codec::get_string(buf)?;
         let f2 = codec::get_string(buf)?;
         let f3 = codec::get_string(buf)?;
         let f4 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f5 = codec::get_u64_var(buf)?;
         let f6 = codec::get_u64_var(buf)?;
@@ -7261,20 +7354,38 @@ pub struct CodeBuilderSourcePacketPayload {
 }
 impl BedrockCodec for CodeBuilderSourcePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.operation).to_raw() as u8);
-        codec::put_u8(buf, (self.category).to_raw() as u8);
-        codec::put_u8(buf, (self.code_status).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.operation).to_raw(),
+                "CodeBuilderStorageQueryOptionsOperation",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.category).to_raw(),
+                "CodeBuilderStorageQueryOptionsCategory",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.code_status).to_raw(),
+                "CodeBuilderExecutionStateCodeStatus",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <CodeBuilderStorageQueryOptionsOperation as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <CodeBuilderStorageQueryOptionsCategory as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = <CodeBuilderExecutionStateCodeStatus as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             operation: f0,
@@ -7313,7 +7424,7 @@ impl BedrockCodec for ColorAttributeData {
         match &self.operation {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -7419,7 +7530,7 @@ pub struct CommandOriginData {
 }
 impl BedrockCodec for CommandOriginData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(self.r#type).wire_name())?;
+        codec::put_string(buf, (self.r#type).wire_name())?;
         BedrockCodec::serialize(&self.uuid, buf)?;
         match &self.request_id {
             Some(v0) => {
@@ -7482,13 +7593,13 @@ pub struct CommandOutput {
 }
 impl BedrockCodec for CommandOutput {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(self.output_type).wire_name())?;
+        codec::put_string(buf, (self.output_type).wire_name())?;
         codec::put_u32_le(buf, self.success_count);
         match &self.output_messages {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -7514,7 +7625,7 @@ impl BedrockCodec for CommandOutput {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<CommandOutputMessage as BedrockCodec>::deserialize(buf)?),
+                    |buf| <CommandOutputMessage as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -7560,8 +7671,8 @@ impl BedrockCodec for CommandOutputMessage {
         match &self.parameters {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -7582,7 +7693,7 @@ impl BedrockCodec for CommandOutputMessage {
         let f2 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -7652,7 +7763,7 @@ impl BedrockCodec for CommandRequestPacketPayload {
         codec::put_string(buf, &self.command)?;
         BedrockCodec::serialize(&self.origin, buf)?;
         codec::put_bool(buf, self.is_internal);
-        codec::put_string(buf, &(self.version).wire_name())?;
+        codec::put_string(buf, (self.version).wire_name())?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -7705,13 +7816,19 @@ pub struct ComposterUsed {
 }
 impl BedrockCodec for ComposterUsed {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.block_interaction_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.block_interaction_type).to_raw(),
+                "MinecraftEventingPOIBlockInteractionType",
+            )?,
+        );
         codec::put_i16_var(buf, self.item_id);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MinecraftEventingPOIBlockInteractionType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = codec::get_i16_var(buf)?;
         Ok(Self {
@@ -7875,8 +7992,8 @@ pub struct ContainerRegistryCleanupPacketPayload {
 }
 impl BedrockCodec for ContainerRegistryCleanupPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.removed_containers).len())?;
-        for v0 in (&self.removed_containers).iter() {
+        codec::put_len_var(buf, self.removed_containers.len())?;
+        for v0 in self.removed_containers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -7887,7 +8004,7 @@ impl BedrockCodec for ContainerRegistryCleanupPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<FullContainerName as BedrockCodec>::deserialize(buf)?),
+                |buf| <FullContainerName as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { removed_containers: f0 })
@@ -7953,13 +8070,19 @@ pub struct CoordinatesLocation {
 }
 impl BedrockCodec for CoordinatesLocation {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.packet_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.packet_type).to_raw(),
+                "CoordinatesLocationPacketType",
+            )?,
+        );
         BedrockCodec::serialize(&self.position, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <CoordinatesLocationPacketType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -8002,7 +8125,10 @@ pub struct CorrectPlayerMovePredictionPacketPayload {
 }
 impl BedrockCodec for CorrectPlayerMovePredictionPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.prediction_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.prediction_type).to_raw(), "RewindType")?,
+        );
         BedrockCodec::serialize(&self.pos, buf)?;
         BedrockCodec::serialize(&self.pos_delta, buf)?;
         BedrockCodec::serialize(&self.rotation, buf)?;
@@ -8018,7 +8144,9 @@ impl BedrockCodec for CorrectPlayerMovePredictionPacketPayload {
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <RewindType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f0 = <RewindType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f1 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         let f2 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         let f3 = <Vec2 as BedrockCodec>::deserialize(buf)?;
@@ -8094,48 +8222,48 @@ pub struct CraftingDataPacketPayload {
 }
 impl BedrockCodec for CraftingDataPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.shaped_recipes).len())?;
-        for v0 in (&self.shaped_recipes).iter() {
+        codec::put_len_var(buf, self.shaped_recipes.len())?;
+        for v0 in self.shaped_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.shapeless_recipes).len())?;
-        for v0 in (&self.shapeless_recipes).iter() {
+        codec::put_len_var(buf, self.shapeless_recipes.len())?;
+        for v0 in self.shapeless_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.multi_recipes).len())?;
-        for v0 in (&self.multi_recipes).iter() {
+        codec::put_len_var(buf, self.multi_recipes.len())?;
+        for v0 in self.multi_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.user_data_shapeless_recipes).len())?;
-        for v0 in (&self.user_data_shapeless_recipes).iter() {
+        codec::put_len_var(buf, self.user_data_shapeless_recipes.len())?;
+        for v0 in self.user_data_shapeless_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.shapeless_chemistry_recipes).len())?;
-        for v0 in (&self.shapeless_chemistry_recipes).iter() {
+        codec::put_len_var(buf, self.shapeless_chemistry_recipes.len())?;
+        for v0 in self.shapeless_chemistry_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.shaped_chemistry_recipes).len())?;
-        for v0 in (&self.shaped_chemistry_recipes).iter() {
+        codec::put_len_var(buf, self.shaped_chemistry_recipes.len())?;
+        for v0 in self.shaped_chemistry_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.smithing_transform_recipes).len())?;
-        for v0 in (&self.smithing_transform_recipes).iter() {
+        codec::put_len_var(buf, self.smithing_transform_recipes.len())?;
+        for v0 in self.smithing_transform_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.smithing_trim_recipes).len())?;
-        for v0 in (&self.smithing_trim_recipes).iter() {
+        codec::put_len_var(buf, self.smithing_trim_recipes.len())?;
+        for v0 in self.smithing_trim_recipes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.potion_mixes).len())?;
-        for v0 in (&self.potion_mixes).iter() {
+        codec::put_len_var(buf, self.potion_mixes.len())?;
+        for v0 in self.potion_mixes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.container_mixes).len())?;
-        for v0 in (&self.container_mixes).iter() {
+        codec::put_len_var(buf, self.container_mixes.len())?;
+        for v0 in self.container_mixes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.material_reducers).len())?;
-        for v0 in (&self.material_reducers).iter() {
+        codec::put_len_var(buf, self.material_reducers.len())?;
+        for v0 in self.material_reducers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_bool(buf, self.clear_recipes);
@@ -8147,7 +8275,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ShapedRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <ShapedRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = {
@@ -8155,7 +8283,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ShapelessRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <ShapelessRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = {
@@ -8163,7 +8291,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MultiRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <MultiRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f3 = {
@@ -8171,7 +8299,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ShapelessRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <ShapelessRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = {
@@ -8179,7 +8307,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ShapelessRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <ShapelessRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f5 = {
@@ -8187,7 +8315,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ShapedRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <ShapedRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f6 = {
@@ -8195,9 +8323,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <SmithingTransformRecipePayload as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <SmithingTransformRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f7 = {
@@ -8205,7 +8331,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SmithingTrimRecipePayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <SmithingTrimRecipePayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f8 = {
@@ -8213,7 +8339,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<PotionMixDataEntry as BedrockCodec>::deserialize(buf)?),
+                |buf| <PotionMixDataEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         let f9 = {
@@ -8221,7 +8347,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ContainerMixDataEntry as BedrockCodec>::deserialize(buf)?),
+                |buf| <ContainerMixDataEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         let f10 = {
@@ -8229,7 +8355,7 @@ impl BedrockCodec for CraftingDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MaterialReducerDataEntry as BedrockCodec>::deserialize(buf)?),
+                |buf| <MaterialReducerDataEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         let f11 = codec::get_bool(buf)?;
@@ -8291,12 +8417,12 @@ pub struct CreativeContentPacketPayload {
 }
 impl BedrockCodec for CreativeContentPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.groups).len())?;
-        for v0 in (&self.groups).iter() {
+        codec::put_len_var(buf, self.groups.len())?;
+        for v0 in self.groups.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.entries).len())?;
-        for v0 in (&self.entries).iter() {
+        codec::put_len_var(buf, self.entries.len())?;
+        for v0 in self.entries.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -8307,7 +8433,7 @@ impl BedrockCodec for CreativeContentPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<CreativeGroupInfoPayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <CreativeGroupInfoPayload as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = {
@@ -8315,7 +8441,7 @@ impl BedrockCodec for CreativeContentPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<CreativeItemEntryPayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <CreativeItemEntryPayload as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { groups: f0, entries: f1 })
@@ -8339,14 +8465,20 @@ pub struct CreativeGroupInfoPayload {
 }
 impl BedrockCodec for CreativeGroupInfoPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.creative_category).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.creative_category).to_raw(),
+                "CreativeGroupInfoPayloadCreativeCategory",
+            )?,
+        );
         codec::put_string(buf, &self.name)?;
         BedrockCodec::serialize(&self.group_icon_item, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <CreativeGroupInfoPayloadCreativeCategory as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = codec::get_string(buf)?;
         let f2 = <NetworkItemInstanceDescriptorData as BedrockCodec>::deserialize(buf)?;
@@ -8488,13 +8620,13 @@ impl DataItemBytePayload {
 }
 impl BedrockCodec for DataItemBytePayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8529,13 +8661,13 @@ impl DataItemCompoundTagPayload {
 }
 impl BedrockCodec for DataItemCompoundTagPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8590,13 +8722,13 @@ impl DataItemFloatPayload {
 }
 impl BedrockCodec for DataItemFloatPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8631,13 +8763,13 @@ impl DataItemInt64Payload {
 }
 impl BedrockCodec for DataItemInt64Payload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8672,13 +8804,13 @@ impl DataItemIntPayload {
 }
 impl BedrockCodec for DataItemIntPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8713,13 +8845,13 @@ impl DataItemPosPayload {
 }
 impl BedrockCodec for DataItemPosPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8754,13 +8886,13 @@ impl DataItemShortPayload {
 }
 impl BedrockCodec for DataItemShortPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8795,13 +8927,13 @@ impl DataItemStringPayload {
 }
 impl BedrockCodec for DataItemStringPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8836,13 +8968,13 @@ impl DataItemVec3Payload {
 }
 impl BedrockCodec for DataItemVec3Payload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((Self::TYPE).to_raw(), "DataItemType")?);
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <DataItemType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -8944,8 +9076,8 @@ pub struct DeathCauseMessageType {
 impl BedrockCodec for DeathCauseMessageType {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.death_cause_attack_name)?;
-        codec::put_len_var(buf, (&self.death_cause_message_list).len())?;
-        for v0 in (&self.death_cause_message_list).iter() {
+        codec::put_len_var(buf, self.death_cause_message_list.len())?;
+        for v0 in self.death_cause_message_list.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -8954,7 +9086,7 @@ impl BedrockCodec for DeathCauseMessageType {
         let f0 = codec::get_string(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self {
             death_cause_attack_name: f0,
@@ -9053,7 +9185,7 @@ pub struct DebugRendererData {
 }
 impl BedrockCodec for DebugRendererData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(self.r#type).wire_name())?;
+        codec::put_string(buf, (self.r#type).wire_name())?;
         match &self.debug_marker_data {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -9088,8 +9220,8 @@ pub struct DimensionDataPacketPayload {
 }
 impl BedrockCodec for DimensionDataPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.definitions).len())?;
-        for (k0, v0) in (&self.definitions).iter() {
+        codec::put_len_var(buf, self.definitions.len())?;
+        for (k0, v0) in self.definitions.iter() {
             codec::put_string(buf, k0)?;
             BedrockCodec::serialize(v0, buf)?;
         }
@@ -9144,7 +9276,13 @@ impl BedrockCodec for DimensionDefinition {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i32_var(buf, self.minimum_y);
         codec::put_i32_var(buf, self.height_range);
-        codec::put_i32_var(buf, (self.generator_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.generator_type).to_raw(),
+                "DimensionDefinitionGeneratorType",
+            )?,
+        );
         BedrockCodec::serialize(&self.dimension_type, buf)?;
         BedrockCodec::serialize(&self.pack_id, buf)?;
         codec::put_string(buf, &self.default_biome)?;
@@ -9156,7 +9294,7 @@ impl BedrockCodec for DimensionDefinition {
         let f0 = codec::get_i32_var(buf)?;
         let f1 = codec::get_i32_var(buf)?;
         let f2 = <DimensionDefinitionGeneratorType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f3 = <DimensionType as BedrockCodec>::deserialize(buf)?;
         let f4 = <MceUuid as BedrockCodec>::deserialize(buf)?;
@@ -9224,13 +9362,16 @@ pub struct DisconnectPacketPayload {
 }
 impl BedrockCodec for DisconnectPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.reason).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.reason).to_raw(), "DisconnectFailReason")?,
+        );
         BedrockCodec::serialize(&self.messages, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <DisconnectFailReason as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <DisconnectPacketPayloadMessages as BedrockCodec>::deserialize(buf)?;
         Ok(Self { reason: f0, messages: f1 })
@@ -9488,8 +9629,8 @@ pub struct EmoteListPacketPayload {
 impl BedrockCodec for EmoteListPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.runtime_id, buf)?;
-        codec::put_len_var(buf, (&self.emote_piece_ids).len())?;
-        for v0 in (&self.emote_piece_ids).iter() {
+        codec::put_len_var(buf, self.emote_piece_ids.len())?;
+        for v0 in self.emote_piece_ids.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -9498,11 +9639,7 @@ impl BedrockCodec for EmoteListPacketPayload {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| Ok(<MceUuid as BedrockCodec>::deserialize(buf)?),
-            )?
+            codec::get_vec(buf, len, |buf| <MceUuid as BedrockCodec>::deserialize(buf))?
         };
         Ok(Self {
             runtime_id: f0,
@@ -9583,13 +9720,16 @@ impl EmptyItemDescriptor {
 }
 impl BedrockCodec for EmptyItemDescriptor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::DESCRIPTOR_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::DESCRIPTOR_TYPE).to_raw(), "ItemDescriptorType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemDescriptorType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::DESCRIPTOR_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -9612,13 +9752,16 @@ pub struct EnchantmentInstance {
 }
 impl BedrockCodec for EnchantmentInstance {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.enchant_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.enchant_type).to_raw(), "EnchantType")?,
+        );
         codec::put_u8(buf, self.enchant_level);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <EnchantType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = codec::get_u8(buf)?;
         Ok(Self {
@@ -9774,8 +9917,8 @@ pub struct Experiments {
 }
 impl BedrockCodec for Experiments {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_u32_le(buf, (&self.toggles).len())?;
-        for v0 in (&self.toggles).iter() {
+        codec::put_len_u32_le(buf, self.toggles.len())?;
+        for v0 in self.toggles.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_bool(buf, self.experiments_ever_toggled);
@@ -9787,7 +9930,7 @@ impl BedrockCodec for Experiments {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ExperimentToggle as BedrockCodec>::deserialize(buf)?),
+                |buf| <ExperimentToggle as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = codec::get_bool(buf)?;
@@ -9850,13 +9993,16 @@ impl Fade {
 }
 impl BedrockCodec for Fade {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -9900,8 +10046,8 @@ pub struct FeatureRegistryPacketPayload {
 }
 impl BedrockCodec for FeatureRegistryPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.features_data_list).len())?;
-        for v0 in (&self.features_data_list).iter() {
+        codec::put_len_var(buf, self.features_data_list.len())?;
+        for v0 in self.features_data_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -9912,10 +10058,8 @@ impl BedrockCodec for FeatureRegistryPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <FeatureRegistryFeatureBinaryJsonFormat as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <FeatureRegistryFeatureBinaryJsonFormat as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -9940,7 +10084,7 @@ impl BedrockCodec for FloatAttributeData {
         match &self.operation {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -10015,7 +10159,7 @@ impl FloatOverride {
 }
 impl BedrockCodec for FloatOverride {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::TYPE).wire_name())?;
+        codec::put_string(buf, (Self::TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -10100,7 +10244,10 @@ pub struct FullContainerName {
 }
 impl BedrockCodec for FullContainerName {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.container_name).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.container_name).to_raw(), "ContainerEnumName")?,
+        );
         match &self.dynamic_id {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -10112,7 +10259,7 @@ impl BedrockCodec for FullContainerName {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ContainerEnumName as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_u32_le(buf)?)
@@ -10137,18 +10284,24 @@ pub struct FurnaceOptions {
 }
 impl BedrockCodec for FurnaceOptions {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.left_furnace_tab).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.left_furnace_tab).to_raw(), "FurnaceLeftTabIndex")?,
+        );
         codec::put_bool(buf, self.filtering);
-        codec::put_i32_var(buf, (self.layout).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.layout).to_raw(), "FurnaceLayout")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <FurnaceLeftTabIndex as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = codec::get_bool(buf)?;
         let f2 = <FurnaceLayout as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self {
             left_furnace_tab: f0,
@@ -10193,8 +10346,8 @@ pub struct GameRulesChangedPacketData {
 }
 impl BedrockCodec for GameRulesChangedPacketData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.rules_list).len())?;
-        for v0 in (&self.rules_list).iter() {
+        codec::put_len_var(buf, self.rules_list.len())?;
+        for v0 in self.rules_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -10202,11 +10355,7 @@ impl BedrockCodec for GameRulesChangedPacketData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| Ok(<GameRule as BedrockCodec>::deserialize(buf)?),
-            )?
+            codec::get_vec(buf, len, |buf| <GameRule as BedrockCodec>::deserialize(buf))?
         };
         Ok(Self { rules_list: f0 })
     }
@@ -10249,7 +10398,7 @@ impl BedrockCodec for GameTestRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i32_var(buf, self.max_tests_per_batch);
         codec::put_i32_var(buf, self.repeat_count);
-        codec::put_u8(buf, (self.rotation).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((self.rotation).to_raw(), "Rotation")?);
         codec::put_bool(buf, self.stop_on_failure);
         BedrockCodec::serialize(&self.test_pos, buf)?;
         codec::put_i32_var(buf, self.tests_per_row);
@@ -10259,7 +10408,9 @@ impl BedrockCodec for GameTestRequestPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_i32_var(buf)?;
         let f1 = codec::get_i32_var(buf)?;
-        let f2 = <Rotation as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f2 = <Rotation as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f3 = codec::get_bool(buf)?;
         let f4 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f5 = codec::get_i32_var(buf)?;
@@ -10486,8 +10637,8 @@ pub struct GraphicsParameterOverridePacketPayload {
 }
 impl BedrockCodec for GraphicsParameterOverridePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.parameter_keyframe_values).len())?;
-        for (k0, v0) in (&self.parameter_keyframe_values).iter() {
+        codec::put_len_var(buf, self.parameter_keyframe_values.len())?;
+        for (k0, v0) in self.parameter_keyframe_values.iter() {
             codec::put_f32_le(buf, *k0);
             BedrockCodec::serialize(v0, buf)?;
         }
@@ -10513,7 +10664,13 @@ impl BedrockCodec for GraphicsParameterOverridePacketPayload {
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_u8(buf, (self.identifier_for_parameter).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.identifier_for_parameter).to_raw(),
+                "GraphicsOverrideParameterType",
+            )?,
+        );
         codec::put_bool(buf, self.reset_parameter);
         Ok(())
     }
@@ -10546,7 +10703,7 @@ impl BedrockCodec for GraphicsParameterOverridePacketPayload {
             None
         };
         let f5 = <GraphicsOverrideParameterType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f6 = codec::get_bool(buf)?;
         Ok(Self {
@@ -10598,12 +10755,15 @@ pub struct HiddenLocation {
 }
 impl BedrockCodec for HiddenLocation {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.packet_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.packet_type).to_raw(), "HiddenLocationPacketType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <HiddenLocationPacketType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self { packet_type: f0 })
     }
@@ -10646,8 +10806,8 @@ pub struct InitializeRegistryData {
 }
 impl BedrockCodec for InitializeRegistryData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.clock_data).len())?;
-        for v0 in (&self.clock_data).iter() {
+        codec::put_len_var(buf, self.clock_data.len())?;
+        for v0 in self.clock_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -10658,7 +10818,7 @@ impl BedrockCodec for InitializeRegistryData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<WorldClockData as BedrockCodec>::deserialize(buf)?),
+                |buf| <WorldClockData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { clock_data: f0 })
@@ -10704,7 +10864,7 @@ impl IntOverride {
 }
 impl BedrockCodec for IntOverride {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::TYPE).wire_name())?;
+        codec::put_string(buf, (Self::TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -10751,7 +10911,10 @@ pub struct InteractPacketPayload {
 }
 impl BedrockCodec for InteractPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "InteractPacketPayloadAction")?,
+        );
         BedrockCodec::serialize(&self.target_runtime_id, buf)?;
         match &self.position {
             Some(v0) => {
@@ -10764,7 +10927,7 @@ impl BedrockCodec for InteractPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <InteractPacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f2 = if codec::get_bool(buf)? {
@@ -10796,7 +10959,13 @@ pub struct Interaction {
 impl BedrockCodec for Interaction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i64_var(buf, self.interacted_entity_id);
-        codec::put_u8_var(buf, (self.interaction_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.interaction_type).to_raw(),
+                "MinecraftEventingInteractionType",
+            )?,
+        );
         codec::put_i32_var(buf, self.interaction_actor_type);
         codec::put_i32_var(buf, self.interaction_actor_variant);
         codec::put_u8_var(buf, self.interaction_actor_color);
@@ -10805,7 +10974,7 @@ impl BedrockCodec for Interaction {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_i64_var(buf)?;
         let f1 = <MinecraftEventingInteractionType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = codec::get_i32_var(buf)?;
@@ -10887,8 +11056,8 @@ pub struct InventoryContentPacketPayload {
 impl BedrockCodec for InventoryContentPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_var(buf, self.container_id);
-        codec::put_len_var(buf, (&self.slots).len())?;
-        for v0 in (&self.slots).iter() {
+        codec::put_len_var(buf, self.slots.len())?;
+        for v0 in self.slots.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.full_container_name, buf)?;
@@ -10902,10 +11071,8 @@ impl BedrockCodec for InventoryContentPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -10955,26 +11122,44 @@ pub struct InventoryOptions {
 }
 impl BedrockCodec for InventoryOptions {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.left_inventory_tab).to_raw() as i32);
-        codec::put_i32_var(buf, (self.right_inventory_tab).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.left_inventory_tab).to_raw(),
+                "InventoryLeftTabIndex",
+            )?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.right_inventory_tab).to_raw(),
+                "InventoryRightTabIndex",
+            )?,
+        );
         codec::put_bool(buf, self.filtering);
-        codec::put_i32_var(buf, (self.layout_inv).to_raw() as i32);
-        codec::put_i32_var(buf, (self.layout_craft).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.layout_inv).to_raw(), "InventoryLayout")?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.layout_craft).to_raw(), "InventoryLayout")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <InventoryLeftTabIndex as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <InventoryRightTabIndex as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_bool(buf)?;
         let f3 = <InventoryLayout as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f4 = <InventoryLayout as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self {
             left_inventory_tab: f0,
@@ -11077,7 +11262,10 @@ pub struct InventorySource {
 }
 impl BedrockCodec for InventorySource {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u32_var(buf, (self.source_type).to_raw() as u32);
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire((self.source_type).to_raw(), "InventorySourceType")?,
+        );
         match &self.container_id {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -11088,7 +11276,10 @@ impl BedrockCodec for InventorySource {
         match &self.bit_flags {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u32_var(buf, (*v0).to_raw() as u32);
+                codec::put_u32_var(
+                    buf,
+                    codec::enum_to_wire((*v0).to_raw(), "InventorySourceFlags")?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -11096,7 +11287,7 @@ impl BedrockCodec for InventorySource {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <InventorySourceType as ProtocolEnum>::from_wire(
-            codec::get_u32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_i8_var(buf)?)
@@ -11106,7 +11297,7 @@ impl BedrockCodec for InventorySource {
         let f2 = if codec::get_bool(buf)? {
             Some(
                 <InventorySourceFlags as ProtocolEnum>::from_wire(
-                    codec::get_u32_var(buf)? as i64,
+                    codec::enum_from_wire(codec::get_u32_var(buf)?)?,
                 )?,
             )
         } else {
@@ -11131,8 +11322,8 @@ pub struct InventoryTransaction {
 }
 impl BedrockCodec for InventoryTransaction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.actions).len())?;
-        for v0 in (&self.actions).iter() {
+        codec::put_len_var(buf, self.actions.len())?;
+        for v0 in self.actions.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -11143,7 +11334,7 @@ impl BedrockCodec for InventoryTransaction {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<InventoryAction as BedrockCodec>::deserialize(buf)?),
+                |buf| <InventoryAction as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { actions: f0 })
@@ -11171,8 +11362,8 @@ impl BedrockCodec for InventoryTransactionPacketPayload {
         match &self.legacy_set_item_slots {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -11189,7 +11380,7 @@ impl BedrockCodec for InventoryTransactionPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<LegacySetSlot as BedrockCodec>::deserialize(buf)?),
+                    |buf| <LegacySetSlot as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -11226,7 +11417,10 @@ impl BedrockCodec for ItemData {
         codec::put_string(buf, &self.item_name)?;
         codec::put_i16_le(buf, self.item_id);
         codec::put_bool(buf, self.is_component_based);
-        codec::put_i32_var(buf, (self.item_version).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.item_version).to_raw(), "ItemVersion")?,
+        );
         BedrockCodec::serialize(&self.item_component_data, buf)?;
         Ok(())
     }
@@ -11235,7 +11429,7 @@ impl BedrockCodec for ItemData {
         let f1 = codec::get_i16_le(buf)?;
         let f2 = codec::get_bool(buf)?;
         let f3 = <ItemVersion as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f4 = <NetworkNbt as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -11295,9 +11489,9 @@ pub struct ItemEnchants {
 impl BedrockCodec for ItemEnchants {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i32_le(buf, self.slot);
-        for v0 in (&self.item_enchants).iter() {
-            codec::put_len_var(buf, (v0).len())?;
-            for v1 in (v0).iter() {
+        for v0 in self.item_enchants.iter() {
+            codec::put_len_var(buf, v0.len())?;
+            for v1 in v0.iter() {
                 BedrockCodec::serialize(v1, buf)?;
             }
         }
@@ -11312,7 +11506,7 @@ impl BedrockCodec for ItemEnchants {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<EnchantmentInstance as BedrockCodec>::deserialize(buf)?),
+                    |buf| <EnchantmentInstance as BedrockCodec>::deserialize(buf),
                 )?
             }),
         )?;
@@ -11351,13 +11545,16 @@ impl ItemNameDescriptor {
 }
 impl BedrockCodec for ItemNameDescriptor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::DESCRIPTOR_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::DESCRIPTOR_TYPE).to_raw(), "ItemDescriptorType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemDescriptorType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::DESCRIPTOR_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11380,8 +11577,8 @@ pub struct ItemRegistryPacketPayload {
 }
 impl BedrockCodec for ItemRegistryPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.item_data).len())?;
-        for v0 in (&self.item_data).iter() {
+        codec::put_len_var(buf, self.item_data.len())?;
+        for v0 in self.item_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -11389,11 +11586,7 @@ impl BedrockCodec for ItemRegistryPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| Ok(<ItemData as BedrockCodec>::deserialize(buf)?),
-            )?
+            codec::get_vec(buf, len, |buf| <ItemData as BedrockCodec>::deserialize(buf))?
         };
         Ok(Self { item_data: f0 })
     }
@@ -11429,24 +11622,29 @@ pub struct ItemReleaseInventoryTransaction {
 impl BedrockCodec for ItemReleaseInventoryTransaction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.actions, buf)?;
-        codec::put_i32_var(buf, (self.action_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.action_type).to_raw(), "ItemReleaseActionType")?,
+        );
         codec::put_i32_var(buf, self.slot);
         BedrockCodec::serialize(&self.item, buf)?;
         BedrockCodec::serialize(&self.from_position, buf)?;
-        codec::put_u8_var(buf, (self.hand).to_raw() as u8);
+        codec::put_u8_var(buf, codec::enum_to_wire((self.hand).to_raw(), "HandSlot")?);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <InventoryTransaction as BedrockCodec>::deserialize(buf)?;
         let f1 = <ItemReleaseActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
             buf,
         )?;
         let f4 = <Vec3 as BedrockCodec>::deserialize(buf)?;
-        let f5 = <HandSlot as ProtocolEnum>::from_wire(codec::get_u8_var(buf)? as i64)?;
+        let f5 = <HandSlot as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
+        )?;
         Ok(Self {
             actions: f0,
             action_type: f1,
@@ -11514,15 +11712,21 @@ pub struct ItemStackRequest {
 impl BedrockCodec for ItemStackRequest {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.client_request_id, buf)?;
-        codec::put_len_var(buf, (&self.actions).len())?;
-        for v0 in (&self.actions).iter() {
+        codec::put_len_var(buf, self.actions.len())?;
+        for v0 in self.actions.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.strings_to_filter).len())?;
-        for v0 in (&self.strings_to_filter).iter() {
+        codec::put_len_var(buf, self.strings_to_filter.len())?;
+        for v0 in self.strings_to_filter.iter() {
             codec::put_string(buf, v0)?;
         }
-        codec::put_i32_le(buf, (self.strings_to_filter_origin).to_raw() as i32);
+        codec::put_i32_le(
+            buf,
+            codec::enum_to_wire(
+                (self.strings_to_filter_origin).to_raw(),
+                "TextProcessingEventOrigin",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -11532,15 +11736,15 @@ impl BedrockCodec for ItemStackRequest {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ItemStackRequestActions as BedrockCodec>::deserialize(buf)?),
+                |buf| <ItemStackRequestActions as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f3 = <TextProcessingEventOrigin as ProtocolEnum>::from_wire(
-            codec::get_i32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_le(buf)?)?,
         )?;
         Ok(Self {
             client_request_id: f0,
@@ -11579,13 +11783,19 @@ impl ItemStackRequestBeaconPaymentAction {
 }
 impl BedrockCodec for ItemStackRequestBeaconPaymentAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11624,13 +11834,19 @@ impl ItemStackRequestConsumeAction {
 }
 impl BedrockCodec for ItemStackRequestConsumeAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11672,13 +11888,19 @@ impl ItemStackRequestCraftCreativeAction {
 }
 impl BedrockCodec for ItemStackRequestCraftCreativeAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11722,13 +11944,19 @@ impl ItemStackRequestCraftDiscPressAction {
 }
 impl BedrockCodec for ItemStackRequestCraftDiscPressAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11770,13 +11998,19 @@ impl ItemStackRequestCraftLoomAction {
 }
 impl BedrockCodec for ItemStackRequestCraftLoomAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11808,13 +12042,19 @@ impl ItemStackRequestCraftNonImplementedDeprecatedAction {
 }
 impl BedrockCodec for ItemStackRequestCraftNonImplementedDeprecatedAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11858,13 +12098,19 @@ impl ItemStackRequestCraftRecipeAction {
 }
 impl BedrockCodec for ItemStackRequestCraftRecipeAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11898,8 +12144,8 @@ impl ItemStackRequestCraftRecipeAutoAction {
     pub fn serialize_body<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.recipe_net_id, buf)?;
         codec::put_u8(buf, self.number_of_requested_crafts);
-        codec::put_len_var(buf, (&self.ingredients).len())?;
-        for v0 in (&self.ingredients).iter() {
+        codec::put_len_var(buf, self.ingredients.len())?;
+        for v0 in self.ingredients.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -11913,7 +12159,7 @@ impl ItemStackRequestCraftRecipeAutoAction {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<RecipeIngredient as BedrockCodec>::deserialize(buf)?),
+                |buf| <RecipeIngredient as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -11925,13 +12171,19 @@ impl ItemStackRequestCraftRecipeAutoAction {
 }
 impl BedrockCodec for ItemStackRequestCraftRecipeAutoAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -11973,13 +12225,19 @@ impl ItemStackRequestCraftRecipeOptionalAction {
 }
 impl BedrockCodec for ItemStackRequestCraftRecipeOptionalAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12026,13 +12284,19 @@ impl ItemStackRequestCraftRepairAndDisenchantAction {
 }
 impl BedrockCodec for ItemStackRequestCraftRepairAndDisenchantAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12058,8 +12322,8 @@ impl ItemStackRequestCraftResultsDeprecatedAction {
     pub const ACTION_TYPE: ItemStackRequestActionType = ItemStackRequestActionType::CraftResults;
     /// Writes the fields that follow the leading discriminator.
     pub fn serialize_body<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.craft_results).len())?;
-        for v0 in (&self.craft_results).iter() {
+        codec::put_len_var(buf, self.craft_results.len())?;
+        for v0 in self.craft_results.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_u8(buf, self.num_crafts);
@@ -12072,10 +12336,8 @@ impl ItemStackRequestCraftResultsDeprecatedAction {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <ItemStackRequestNetworkItemInstanceDescriptor as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <ItemStackRequestNetworkItemInstanceDescriptor as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -12088,13 +12350,19 @@ impl ItemStackRequestCraftResultsDeprecatedAction {
 }
 impl BedrockCodec for ItemStackRequestCraftResultsDeprecatedAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12129,13 +12397,19 @@ impl ItemStackRequestCreateAction {
 }
 impl BedrockCodec for ItemStackRequestCreateAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12174,13 +12448,19 @@ impl ItemStackRequestDestroyAction {
 }
 impl BedrockCodec for ItemStackRequestDestroyAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12227,13 +12507,19 @@ impl ItemStackRequestDropAction {
 }
 impl BedrockCodec for ItemStackRequestDropAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12283,13 +12569,19 @@ impl ItemStackRequestLabTableCombineAction {
 }
 impl BedrockCodec for ItemStackRequestLabTableCombineAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12336,13 +12628,19 @@ impl ItemStackRequestMineBlockAction {
 }
 impl BedrockCodec for ItemStackRequestMineBlockAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12400,8 +12698,8 @@ pub struct ItemStackRequestPacketPayload {
 }
 impl BedrockCodec for ItemStackRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.requests).len())?;
-        for v0 in (&self.requests).iter() {
+        codec::put_len_var(buf, self.requests.len())?;
+        for v0 in self.requests.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -12412,7 +12710,7 @@ impl BedrockCodec for ItemStackRequestPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ItemStackRequest as BedrockCodec>::deserialize(buf)?),
+                |buf| <ItemStackRequest as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { requests: f0 })
@@ -12452,13 +12750,19 @@ impl ItemStackRequestPlaceAction {
 }
 impl BedrockCodec for ItemStackRequestPlaceAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12530,13 +12834,19 @@ impl ItemStackRequestSwapAction {
 }
 impl BedrockCodec for ItemStackRequestSwapAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12583,13 +12893,19 @@ impl ItemStackRequestTakeAction {
 }
 impl BedrockCodec for ItemStackRequestTakeAction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::ACTION_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::ACTION_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12617,8 +12933,8 @@ pub struct ItemStackResponseContainerInfo {
 impl BedrockCodec for ItemStackResponseContainerInfo {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.full_container_name, buf)?;
-        codec::put_len_var(buf, (&self.slots).len())?;
-        for v0 in (&self.slots).iter() {
+        codec::put_len_var(buf, self.slots.len())?;
+        for v0 in self.slots.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -12630,7 +12946,7 @@ impl BedrockCodec for ItemStackResponseContainerInfo {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ItemStackResponseSlotInfo as BedrockCodec>::deserialize(buf)?),
+                |buf| <ItemStackResponseSlotInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -12657,13 +12973,16 @@ pub struct ItemStackResponseInfo {
 }
 impl BedrockCodec for ItemStackResponseInfo {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.result).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.result).to_raw(), "ItemStackResponseInfoResult")?,
+        );
         BedrockCodec::serialize(&self.client_request_id, buf)?;
         match &self.containers {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -12673,7 +12992,7 @@ impl BedrockCodec for ItemStackResponseInfo {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ItemStackResponseInfoResult as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <ItemStackRequestId as BedrockCodec>::deserialize(buf)?;
         let f2 = if codec::get_bool(buf)? {
@@ -12682,10 +13001,8 @@ impl BedrockCodec for ItemStackResponseInfo {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(
-                        <ItemStackResponseContainerInfo as BedrockCodec>::deserialize(
-                            buf,
-                        )?,
+                    |buf| <ItemStackResponseContainerInfo as BedrockCodec>::deserialize(
+                        buf,
                     ),
                 )?
             })
@@ -12709,8 +13026,8 @@ pub struct ItemStackResponsePacketPayload {
 }
 impl BedrockCodec for ItemStackResponsePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.responses).len())?;
-        for v0 in (&self.responses).iter() {
+        codec::put_len_var(buf, self.responses.len())?;
+        for v0 in self.responses.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -12721,7 +13038,7 @@ impl BedrockCodec for ItemStackResponsePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ItemStackResponseInfo as BedrockCodec>::deserialize(buf)?),
+                |buf| <ItemStackResponseInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { responses: f0 })
@@ -12814,13 +13131,16 @@ impl ItemTagDescriptor {
 }
 impl BedrockCodec for ItemTagDescriptor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::DESCRIPTOR_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::DESCRIPTOR_TYPE).to_raw(), "ItemDescriptorType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemDescriptorType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::DESCRIPTOR_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -12892,32 +13212,52 @@ pub struct ItemUseInventoryTransaction {
 impl BedrockCodec for ItemUseInventoryTransaction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.actions, buf)?;
-        codec::put_i32_var(buf, (self.action_type).to_raw() as i32);
-        codec::put_u8_var(buf, (self.trigger_type).to_raw() as u8);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.action_type).to_raw(), "ItemUseActionType")?,
+        );
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.trigger_type).to_raw(), "ItemUseTriggerType")?,
+        );
         BedrockCodec::serialize(&self.position, buf)?;
         codec::put_u8_var(buf, self.face);
         codec::put_i32_var(buf, self.slot);
-        codec::put_u8_var(buf, (self.hand).to_raw() as u8);
+        codec::put_u8_var(buf, codec::enum_to_wire((self.hand).to_raw(), "HandSlot")?);
         BedrockCodec::serialize(&self.item, buf)?;
         BedrockCodec::serialize(&self.from_position, buf)?;
         BedrockCodec::serialize(&self.click_position, buf)?;
         codec::put_u32_var(buf, self.target_block_id);
-        codec::put_u8(buf, (self.client_interact_prediction).to_raw() as u8);
-        codec::put_u8(buf, (self.client_cooldown_state).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.client_interact_prediction).to_raw(),
+                "ItemUsePredictedResult",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.client_cooldown_state).to_raw(),
+                "ItemUseClientCooldownState",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <InventoryTransaction as BedrockCodec>::deserialize(buf)?;
         let f1 = <ItemUseActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = <ItemUseTriggerType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f3 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f4 = codec::get_u8_var(buf)?;
         let f5 = codec::get_i32_var(buf)?;
-        let f6 = <HandSlot as ProtocolEnum>::from_wire(codec::get_u8_var(buf)? as i64)?;
+        let f6 = <HandSlot as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
+        )?;
         let f7 = <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
             buf,
         )?;
@@ -12925,10 +13265,10 @@ impl BedrockCodec for ItemUseInventoryTransaction {
         let f9 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         let f10 = codec::get_u32_var(buf)?;
         let f11 = <ItemUsePredictedResult as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f12 = <ItemUseClientCooldownState as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             actions: f0,
@@ -12987,9 +13327,12 @@ impl BedrockCodec for ItemUseOnActorInventoryTransaction {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.actions, buf)?;
         BedrockCodec::serialize(&self.runtime_id, buf)?;
-        codec::put_i32_var(buf, (self.action_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.action_type).to_raw(), "ItemUseOnActorActionType")?,
+        );
         codec::put_i32_var(buf, self.slot);
-        codec::put_u8_var(buf, (self.hand).to_raw() as u8);
+        codec::put_u8_var(buf, codec::enum_to_wire((self.hand).to_raw(), "HandSlot")?);
         BedrockCodec::serialize(&self.item, buf)?;
         BedrockCodec::serialize(&self.from_position, buf)?;
         BedrockCodec::serialize(&self.hit_position, buf)?;
@@ -12999,10 +13342,12 @@ impl BedrockCodec for ItemUseOnActorInventoryTransaction {
         let f0 = <InventoryTransaction as BedrockCodec>::deserialize(buf)?;
         let f1 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f2 = <ItemUseOnActorActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f3 = codec::get_i32_var(buf)?;
-        let f4 = <HandSlot as ProtocolEnum>::from_wire(codec::get_u8_var(buf)? as i64)?;
+        let f4 = <HandSlot as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
+        )?;
         let f5 = <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
             buf,
         )?;
@@ -13083,18 +13428,24 @@ pub struct LabTablePacketPayload {
 }
 impl BedrockCodec for LabTablePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.r#type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.r#type).to_raw(), "LabTablePacketPayloadType")?,
+        );
         BedrockCodec::serialize(&self.position, buf)?;
-        codec::put_u8(buf, (self.reaction).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.reaction).to_raw(), "LabTableReactionType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <LabTablePacketPayloadType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f2 = <LabTableReactionType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             r#type: f0,
@@ -13145,20 +13496,23 @@ pub struct LegacySetSlot {
 }
 impl BedrockCodec for LegacySetSlot {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.container_enum).to_raw() as u8);
-        codec::put_len_var(buf, (&self.slots).len())?;
-        for v0 in (&self.slots).iter() {
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.container_enum).to_raw(), "ContainerEnumName")?,
+        );
+        codec::put_len_var(buf, self.slots.len())?;
+        for v0 in self.slots.iter() {
             codec::put_u8(buf, *v0);
         }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ContainerEnumName as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u8(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u8(buf))?
         };
         Ok(Self {
             container_enum: f0,
@@ -13183,7 +13537,13 @@ pub struct LegacyTelemetryEventPacketPayload {
 impl BedrockCodec for LegacyTelemetryEventPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_actor_id, buf)?;
-        codec::put_i32_var(buf, (self.event_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.event_type).to_raw(),
+                "LegacyTelemetryEventPacketPayloadType",
+            )?,
+        );
         codec::put_bool(buf, self.use_player_id);
         BedrockCodec::serialize(&self.event_data, buf)?;
         Ok(())
@@ -13191,7 +13551,7 @@ impl BedrockCodec for LegacyTelemetryEventPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f1 = <LegacyTelemetryEventPacketPayloadType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_bool(buf)?;
         let f3 = <LegacyTelemetryEventPacketPayloadEventData as BedrockCodec>::deserialize(
@@ -13282,8 +13642,8 @@ impl BedrockCodec for LevelChunkPacketPayload {
             None => codec::put_bool(buf, false),
         }
         codec::put_bool(buf, self.cache_enabled);
-        codec::put_len_var(buf, (&self.cache_metadata).len())?;
-        for v0 in (&self.cache_metadata).iter() {
+        codec::put_len_var(buf, self.cache_metadata.len())?;
+        for v0 in self.cache_metadata.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_string(buf, &self.serialized_chunk_data)?;
@@ -13305,10 +13665,8 @@ impl BedrockCodec for LevelChunkPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <LevelChunkPacketPayloadSubChunkMetadata as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <LevelChunkPacketPayloadSubChunkMetadata as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -13504,18 +13862,42 @@ impl BedrockCodec for LevelSettings {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u64_le(buf, self.seed);
         BedrockCodec::serialize(&self.spawn_settings, buf)?;
-        codec::put_i32_var(buf, (self.generator_type).to_raw() as i32);
-        codec::put_i32_var(buf, (self.game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.generator_type).to_raw(), "GeneratorType")?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.game_type).to_raw(), "GameType")?,
+        );
         codec::put_bool(buf, self.is_hardcore);
-        codec::put_i32_var(buf, (self.game_difficulty).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.game_difficulty).to_raw(), "Difficulty")?,
+        );
         BedrockCodec::serialize(&self.default_spawn_block_position, buf)?;
         codec::put_bool(buf, self.achievements_disabled);
-        codec::put_i32_var(buf, (self.editor_world_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.editor_world_type).to_raw(), "EditorWorldType")?,
+        );
         codec::put_bool(buf, self.is_created_in_editor);
         codec::put_bool(buf, self.is_exported_from_editor);
-        codec::put_i8_var(buf, (self.editor_level_migration_version).to_raw() as i8);
+        codec::put_i8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.editor_level_migration_version).to_raw(),
+                "EditorLevelMigrationVersion",
+            )?,
+        );
         codec::put_i32_var(buf, self.day_cycle_stop_time);
-        codec::put_u32_var(buf, (self.education_edition_offer).to_raw() as u32);
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.education_edition_offer).to_raw(),
+                "EducationEditionOffer",
+            )?,
+        );
         codec::put_bool(buf, self.education_features_enabled);
         codec::put_string(buf, &self.education_product_id)?;
         codec::put_f32_le(buf, self.rain_level);
@@ -13523,15 +13905,33 @@ impl BedrockCodec for LevelSettings {
         codec::put_bool(buf, self.has_confirmed_platform_locked_content);
         codec::put_bool(buf, self.multiplayer_game_intent);
         codec::put_bool(buf, self.lan_broadcast_intent);
-        codec::put_i32_var(buf, (self.xbox_live_broadcast_setting).to_raw() as i32);
-        codec::put_i32_var(buf, (self.platform_broadcast_setting).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.xbox_live_broadcast_setting).to_raw(),
+                "GamePublishSetting",
+            )?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.platform_broadcast_setting).to_raw(),
+                "GamePublishSetting",
+            )?,
+        );
         codec::put_bool(buf, self.commands_enabled);
         codec::put_bool(buf, self.texture_packs_required);
         BedrockCodec::serialize(&self.rule_data, buf)?;
         BedrockCodec::serialize(&self.experiments, buf)?;
         codec::put_bool(buf, self.has_bonus_chest_enabled);
         codec::put_bool(buf, self.start_with_map_enabled);
-        codec::put_i8_var(buf, (self.player_permissions).to_raw() as i8);
+        codec::put_i8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.player_permissions).to_raw(),
+                "PlayerPermissionLevel",
+            )?,
+        );
         codec::put_i32_le(buf, self.server_chunk_tick_range);
         codec::put_bool(buf, self.has_locked_behavior_pack);
         codec::put_bool(buf, self.has_locked_resource_pack);
@@ -13555,9 +13955,21 @@ impl BedrockCodec for LevelSettings {
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_u8(buf, (self.chat_restriction_level).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.chat_restriction_level).to_raw(),
+                "ChatRestrictionLevel",
+            )?,
+        );
         codec::put_bool(buf, self.disable_player_interactions);
-        codec::put_i32_var(buf, (self.server_editor_connection_policy).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.server_editor_connection_policy).to_raw(),
+                "ServerEditorConnectionPolicy",
+            )?,
+        );
         codec::put_bool(buf, self.allow_anonymous_block_drops_in_editor_worlds);
         Ok(())
     }
@@ -13566,24 +13978,28 @@ impl BedrockCodec for LevelSettings {
         let f1 = <SpawnSettings as BedrockCodec>::deserialize(buf)?;
         let f2 = MaybeUnknown::<
             GeneratorType,
-        >::from_raw(codec::get_i32_var(buf)? as i64);
-        let f3 = MaybeUnknown::<GameType>::from_raw(codec::get_i32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
+        let f3 = MaybeUnknown::<
+            GameType,
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f4 = codec::get_bool(buf)?;
-        let f5 = MaybeUnknown::<Difficulty>::from_raw(codec::get_i32_var(buf)? as i64);
+        let f5 = MaybeUnknown::<
+            Difficulty,
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f6 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f7 = codec::get_bool(buf)?;
         let f8 = MaybeUnknown::<
             EditorWorldType,
-        >::from_raw(codec::get_i32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f9 = codec::get_bool(buf)?;
         let f10 = codec::get_bool(buf)?;
         let f11 = <EditorLevelMigrationVersion as ProtocolEnum>::from_wire(
-            codec::get_i8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i8_var(buf)?)?,
         )?;
         let f12 = codec::get_i32_var(buf)?;
         let f13 = MaybeUnknown::<
             EducationEditionOffer,
-        >::from_raw(codec::get_u32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_u32_var(buf)?)?);
         let f14 = codec::get_bool(buf)?;
         let f15 = codec::get_string(buf)?;
         let f16 = codec::get_f32_le(buf)?;
@@ -13593,10 +14009,10 @@ impl BedrockCodec for LevelSettings {
         let f20 = codec::get_bool(buf)?;
         let f21 = MaybeUnknown::<
             GamePublishSetting,
-        >::from_raw(codec::get_i32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f22 = MaybeUnknown::<
             GamePublishSetting,
-        >::from_raw(codec::get_i32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f23 = codec::get_bool(buf)?;
         let f24 = codec::get_bool(buf)?;
         let f25 = <GameRulesChangedPacketData as BedrockCodec>::deserialize(buf)?;
@@ -13605,7 +14021,7 @@ impl BedrockCodec for LevelSettings {
         let f28 = codec::get_bool(buf)?;
         let f29 = MaybeUnknown::<
             PlayerPermissionLevel,
-        >::from_raw(codec::get_i8_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i8_var(buf)?)?);
         let f30 = codec::get_i32_le(buf)?;
         let f31 = codec::get_bool(buf)?;
         let f32 = codec::get_bool(buf)?;
@@ -13625,11 +14041,11 @@ impl BedrockCodec for LevelSettings {
         let f46 = if codec::get_bool(buf)? { Some(codec::get_bool(buf)?) } else { None };
         let f47 = MaybeUnknown::<
             ChatRestrictionLevel,
-        >::from_raw(codec::get_u8(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_u8(buf)?)?);
         let f48 = codec::get_bool(buf)?;
         let f49 = MaybeUnknown::<
             ServerEditorConnectionPolicy,
-        >::from_raw(codec::get_i32_var(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f50 = codec::get_bool(buf)?;
         Ok(Self {
             seed: f0,
@@ -13777,8 +14193,8 @@ pub struct LocatorBarPacketPayload {
 }
 impl BedrockCodec for LocatorBarPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.waypoints).len())?;
-        for v0 in (&self.waypoints).iter() {
+        codec::put_len_var(buf, self.waypoints.len())?;
+        for v0 in self.waypoints.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -13789,7 +14205,7 @@ impl BedrockCodec for LocatorBarPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<LocatorBarWaypointPayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <LocatorBarWaypointPayload as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { waypoints: f0 })
@@ -13815,14 +14231,20 @@ impl BedrockCodec for LocatorBarWaypointPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.group_handle, buf)?;
         BedrockCodec::serialize(&self.server_waypoint_payload, buf)?;
-        codec::put_u8_var(buf, (self.action_flag).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.action_flag).to_raw(),
+                "ServerWaypointGroupAction",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <WaypointGroupWaypointHandle as BedrockCodec>::deserialize(buf)?;
         let f1 = <ServerWaypointPayload as BedrockCodec>::deserialize(buf)?;
         let f2 = <ServerWaypointGroupAction as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         Ok(Self {
             group_handle: f0,
@@ -13927,7 +14349,10 @@ pub struct MapDecoration {
 }
 impl BedrockCodec for MapDecoration {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i8(buf, (self.image_type).to_raw() as i8);
+        codec::put_i8(
+            buf,
+            codec::enum_to_wire((self.image_type).to_raw(), "MapDecorationType")?,
+        );
         codec::put_u8(buf, self.rotation);
         codec::put_u8(buf, self.x);
         codec::put_u8(buf, self.y);
@@ -13937,7 +14362,7 @@ impl BedrockCodec for MapDecoration {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MapDecorationType as ProtocolEnum>::from_wire(
-            codec::get_i8(buf)? as i64,
+            codec::enum_from_wire(codec::get_i8(buf)?)?,
         )?;
         let f1 = codec::get_u8(buf)?;
         let f2 = codec::get_u8(buf)?;
@@ -13969,8 +14394,8 @@ pub struct MapInfoRequestPacketPayload {
 impl BedrockCodec for MapInfoRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.map_unique_id, buf)?;
-        codec::put_len_u32_le(buf, (&self.client_pixels_list).len())?;
-        for v0 in (&self.client_pixels_list).iter() {
+        codec::put_len_u32_le(buf, self.client_pixels_list.len())?;
+        for v0 in self.client_pixels_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -13982,10 +14407,8 @@ impl BedrockCodec for MapInfoRequestPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AnonymousNamespaceMapInfoRequestPacketAnonClientPixelsProxy as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <AnonymousNamespaceMapInfoRequestPacketAnonClientPixelsProxy as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -14013,7 +14436,10 @@ pub struct MapItemTrackedActorUniqueId {
 }
 impl BedrockCodec for MapItemTrackedActorUniqueId {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_le(buf, (self.r#type).to_raw() as i32);
+        codec::put_i32_le(
+            buf,
+            codec::enum_to_wire((self.r#type).to_raw(), "MapItemTrackedActorType")?,
+        );
         match &self.entity_id {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -14032,7 +14458,7 @@ impl BedrockCodec for MapItemTrackedActorUniqueId {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MapItemTrackedActorType as ProtocolEnum>::from_wire(
-            codec::get_i32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_le(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(<ActorUniqueID as BedrockCodec>::deserialize(buf)?)
@@ -14105,8 +14531,8 @@ pub struct MaterialReducerDataEntry {
 impl BedrockCodec for MaterialReducerDataEntry {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i32_var(buf, self.from_item_key);
-        codec::put_len_var(buf, (&self.item_ids_and_counts).len())?;
-        for v0 in (&self.item_ids_and_counts).iter() {
+        codec::put_len_var(buf, self.item_ids_and_counts.len())?;
+        for v0 in self.item_ids_and_counts.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -14118,7 +14544,7 @@ impl BedrockCodec for MaterialReducerDataEntry {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MaterialReducerEntryOutput as BedrockCodec>::deserialize(buf)?),
+                |buf| <MaterialReducerEntryOutput as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -14187,13 +14613,16 @@ pub struct MemoryCategoryCounter {
 }
 impl BedrockCodec for MemoryCategoryCounter {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.category).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.category).to_raw(), "MemoryMemoryCategory")?,
+        );
         codec::put_u64_le(buf, self.current_bytes);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MemoryMemoryCategory as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = codec::get_u64_le(buf)?;
         Ok(Self {
@@ -14216,7 +14645,13 @@ pub struct MessageAndParams {
 }
 impl BedrockCodec for MessageAndParams {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.message_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.message_type).to_raw(),
+                "MessageAndParamsMessageType",
+            )?,
+        );
         match &self.message {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -14227,8 +14662,8 @@ impl BedrockCodec for MessageAndParams {
         match &self.parameter_list {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     codec::put_string(buf, v1)?;
                 }
             }
@@ -14245,7 +14680,7 @@ impl BedrockCodec for MessageAndParams {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MessageAndParamsMessageType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_string(buf)?)
@@ -14255,7 +14690,7 @@ impl BedrockCodec for MessageAndParams {
         let f2 = if codec::get_bool(buf)? {
             Some({
                 let len = codec::get_len_var(buf)?;
-                codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                codec::get_vec(buf, len, |buf| codec::get_string(buf))?
             })
         } else {
             None
@@ -14279,7 +14714,10 @@ pub struct MessageOnly {
 }
 impl BedrockCodec for MessageOnly {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.message_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire((self.message_type).to_raw(), "MessageOnlyMessageType")?,
+        );
         match &self.message {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -14291,7 +14729,7 @@ impl BedrockCodec for MessageOnly {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MessageOnlyMessageType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_string(buf)?)
@@ -14309,7 +14747,7 @@ impl BedrockCodec for MessageOnly {
 pub struct MissingBlobData {
     /// Documented as "Blob Id".
     pub blob_id: u64,
-    /// Subchunk data (see https://gist.github.com/Tomcc/a96af509e275b1af483b25c543cfbf37) plus biome data
+    /// Subchunk data (see <https://gist.github.com/Tomcc/a96af509e275b1af483b25c543cfbf37>) plus biome data
     ///
     /// Documented as "Blob Data".
     pub blob_data: String,
@@ -14434,7 +14872,10 @@ pub struct MobEffectPacketPayload {
 impl BedrockCodec for MobEffectPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_runtime_id, buf)?;
-        codec::put_u8(buf, (self.event_id).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.event_id).to_raw(), "MobEffectPacketPayloadEvent")?,
+        );
         codec::put_i32_var(buf, self.effect_id);
         codec::put_i32_var(buf, self.effect_amplifier);
         codec::put_bool(buf, self.show_particles);
@@ -14446,7 +14887,7 @@ impl BedrockCodec for MobEffectPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f1 = <MobEffectPacketPayloadEvent as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = codec::get_i32_var(buf)?;
@@ -14540,7 +14981,13 @@ impl BedrockCodec for MobKilled {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i64_var(buf, self.instigator_actor_id);
         codec::put_i64_var(buf, self.target_actor_id);
-        codec::put_i32_var(buf, (self.instigator_s_child_actor_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.instigator_s_child_actor_type).to_raw(),
+                "ActorType",
+            )?,
+        );
         codec::put_i32_var(buf, self.damage_source);
         codec::put_i32_var(buf, self.trade_tier);
         codec::put_string(buf, &self.trader_name)?;
@@ -14550,7 +14997,7 @@ impl BedrockCodec for MobKilled {
         let f0 = codec::get_i64_var(buf)?;
         let f1 = codec::get_i64_var(buf)?;
         let f2 = <ActorType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f3 = codec::get_i32_var(buf)?;
         let f4 = codec::get_i32_var(buf)?;
@@ -14613,7 +15060,10 @@ impl BedrockCodec for ModalFormResponsePacketPayload {
         match &self.form_cancel_reason {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(
+                    buf,
+                    codec::enum_to_wire((*v0).to_raw(), "ModalFormCancelReason")?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -14629,7 +15079,7 @@ impl BedrockCodec for ModalFormResponsePacketPayload {
         let f2 = if codec::get_bool(buf)? {
             Some(
                 <ModalFormCancelReason as ProtocolEnum>::from_wire(
-                    codec::get_u8(buf)? as i64,
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
                 )?,
             )
         } else {
@@ -14656,14 +15106,17 @@ impl MolangItemDescriptor {
     /// Writes the fields that follow the leading discriminator.
     pub fn serialize_body<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.tag_expression)?;
-        codec::put_i16_le(buf, (self.molang_version).to_raw() as i16);
+        codec::put_i16_le(
+            buf,
+            codec::enum_to_wire((self.molang_version).to_raw(), "MolangVersion")?,
+        );
         Ok(())
     }
     /// Reads the fields that follow the leading discriminator.
     pub fn deserialize_body<B: Buf>(buf: &mut B) -> Result<Self> {
         let f1 = codec::get_string(buf)?;
         let f2 = <MolangVersion as ProtocolEnum>::from_wire(
-            codec::get_i16_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i16_le(buf)?)?,
         )?;
         Ok(Self {
             tag_expression: f1,
@@ -14673,13 +15126,16 @@ impl MolangItemDescriptor {
 }
 impl BedrockCodec for MolangItemDescriptor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::DESCRIPTOR_TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::DESCRIPTOR_TYPE).to_raw(), "ItemDescriptorType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <ItemDescriptorType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::DESCRIPTOR_TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -15008,7 +15464,13 @@ impl BedrockCodec for MovePlayerPacketPayload {
         BedrockCodec::serialize(&self.position, buf)?;
         BedrockCodec::serialize(&self.rotation, buf)?;
         codec::put_f32_le(buf, self.y_head_rotation);
-        codec::put_u8(buf, (self.position_mode).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.position_mode).to_raw(),
+                "MovePlayerPacketPayloadPositionMode",
+            )?,
+        );
         codec::put_bool(buf, self.on_ground);
         BedrockCodec::serialize(&self.riding_runtime_id, buf)?;
         match &self.teleport_data {
@@ -15027,7 +15489,7 @@ impl BedrockCodec for MovePlayerPacketPayload {
         let f2 = <Vec2 as BedrockCodec>::deserialize(buf)?;
         let f3 = codec::get_f32_le(buf)?;
         let f4 = <MovePlayerPacketPayloadPositionMode as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f5 = codec::get_bool(buf)?;
         let f6 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
@@ -15094,7 +15556,10 @@ pub struct MovementEffectPacketPayload {
 impl BedrockCodec for MovementEffectPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_runtime_id, buf)?;
-        codec::put_i32_var(buf, (self.effect_id).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.effect_id).to_raw(), "MovementEffectType")?,
+        );
         codec::put_i32_var(buf, self.effect_duration);
         BedrockCodec::serialize(&self.tick, buf)?;
         Ok(())
@@ -15102,7 +15567,7 @@ impl BedrockCodec for MovementEffectPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f1 = <MovementEffectType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = <PlayerInputTick as BedrockCodec>::deserialize(buf)?;
@@ -15149,12 +15614,18 @@ pub struct MultiplayerSettingsPacketPayload {
 }
 impl BedrockCodec for MultiplayerSettingsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.packet_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.packet_type).to_raw(),
+                "MultiplayerSettingsPacketType",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MultiplayerSettingsPacketType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self { packet_type: f0 })
     }
@@ -15169,7 +15640,7 @@ pub struct MusicPlaybackFailureEntry {
 }
 impl BedrockCodec for MusicPlaybackFailureEntry {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(self.state).wire_name())?;
+        codec::put_string(buf, (self.state).wire_name())?;
         codec::put_string(buf, &self.description)?;
         Ok(())
     }
@@ -15195,8 +15666,8 @@ impl BedrockCodec for NetworkChunkPublisherUpdatePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.new_position_for_view, buf)?;
         codec::put_u32_var(buf, self.new_radius_for_view);
-        codec::put_len_u32_le(buf, (&self.server_built_chunks_list).len())?;
-        for v0 in (&self.server_built_chunks_list).iter() {
+        codec::put_len_u32_le(buf, self.server_built_chunks_list.len())?;
+        for v0 in self.server_built_chunks_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -15206,11 +15677,7 @@ impl BedrockCodec for NetworkChunkPublisherUpdatePacketPayload {
         let f1 = codec::get_u32_var(buf)?;
         let f2 = {
             let len = codec::get_len_u32_le(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| Ok(<ChunkPos as BedrockCodec>::deserialize(buf)?),
-            )?
+            codec::get_vec(buf, len, |buf| <ChunkPos as BedrockCodec>::deserialize(buf))?
         };
         Ok(Self {
             new_position_for_view: f0,
@@ -15307,23 +15774,35 @@ pub struct NetworkSettingsPacketPayload {
 impl BedrockCodec for NetworkSettingsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u16_le(buf, self.compression_threshold);
-        codec::put_u16_le(buf, (self.compression_algorithm).to_raw() as u16);
+        codec::put_u16_le(
+            buf,
+            codec::enum_to_wire(
+                (self.compression_algorithm).to_raw(),
+                "PacketCompressionAlgorithm",
+            )?,
+        );
         codec::put_bool(buf, self.client_throttle_enabled);
         codec::put_u8(buf, self.client_throttle_threshold);
         codec::put_f32_le(buf, self.client_throttle_scalar);
-        codec::put_u8(buf, (self.sctp_recovery_profile).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.sctp_recovery_profile).to_raw(),
+                "SctpRecoveryProfile",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_u16_le(buf)?;
         let f1 = <PacketCompressionAlgorithm as ProtocolEnum>::from_wire(
-            codec::get_u16_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_u16_le(buf)?)?,
         )?;
         let f2 = codec::get_bool(buf)?;
         let f3 = codec::get_u8(buf)?;
         let f4 = codec::get_f32_le(buf)?;
         let f5 = <SctpRecoveryProfile as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             compression_threshold: f0,
@@ -15368,13 +15847,16 @@ pub struct NoiseAlignment {
 }
 impl BedrockCodec for NoiseAlignment {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.r#type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.r#type).to_raw(), "NoiseAlignmentType")?,
+        );
         codec::put_u32_var(buf, self.value);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <NoiseAlignmentType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = codec::get_u32_var(buf)?;
         Ok(Self { r#type: f0, value: f1 })
@@ -15400,8 +15882,8 @@ impl BedrockCodec for NoiseDescriptor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.name)?;
         codec::put_i32_le(buf, self.first_octave);
-        codec::put_len_var(buf, (&self.amplitudes).len())?;
-        for v0 in (&self.amplitudes).iter() {
+        codec::put_len_var(buf, self.amplitudes.len())?;
+        for v0 in self.amplitudes.iter() {
             codec::put_f32_le(buf, *v0);
         }
         Ok(())
@@ -15411,7 +15893,7 @@ impl BedrockCodec for NoiseDescriptor {
         let f1 = codec::get_i32_le(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_f32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_f32_le(buf))?
         };
         Ok(Self {
             name: f0,
@@ -15474,7 +15956,10 @@ impl BedrockCodec for NoiseTransitionSettingsData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_var(buf, self.total_transition_ticks);
         codec::put_u32_var(buf, self.current_transition_ticks);
-        codec::put_i32_var(buf, (self.easing).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.easing).to_raw(), "EasingFunction")?,
+        );
         codec::put_string(buf, &self.clock_name)?;
         codec::put_u32_var(buf, self.local_transition_ticks);
         codec::put_string(buf, &self.noise_name)?;
@@ -15485,7 +15970,7 @@ impl BedrockCodec for NoiseTransitionSettingsData {
         let f0 = codec::get_u32_var(buf)?;
         let f1 = codec::get_u32_var(buf)?;
         let f2 = <EasingFunction as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f3 = codec::get_string(buf)?;
         let f4 = codec::get_u32_var(buf)?;
@@ -15551,7 +16036,13 @@ pub struct NpcDialoguePacketPayload {
 impl BedrockCodec for NpcDialoguePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u64_le(buf, self.npc_id_raw_id);
-        codec::put_i32_var(buf, (self.npc_dialogue_action_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.npc_dialogue_action_type).to_raw(),
+                "NpcDialogueActionType",
+            )?,
+        );
         codec::put_string(buf, &self.dialogue)?;
         codec::put_string(buf, &self.scene_name)?;
         codec::put_string(buf, &self.npc_name)?;
@@ -15561,7 +16052,7 @@ impl BedrockCodec for NpcDialoguePacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_u64_le(buf)?;
         let f1 = <NpcDialogueActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_string(buf)?;
         let f3 = codec::get_string(buf)?;
@@ -15594,7 +16085,13 @@ pub struct NpcRequestPacketPayload {
 impl BedrockCodec for NpcRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.npc_runtime_id, buf)?;
-        codec::put_u8(buf, (self.request_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.request_type).to_raw(),
+                "NpcRequestPacketPayloadRequestType",
+            )?,
+        );
         codec::put_string(buf, &self.actions)?;
         codec::put_u8(buf, self.action_index);
         codec::put_string(buf, &self.scene_name)?;
@@ -15603,7 +16100,7 @@ impl BedrockCodec for NpcRequestPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f1 = <NpcRequestPacketPayloadRequestType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = codec::get_string(buf)?;
         let f3 = codec::get_u8(buf)?;
@@ -15665,13 +16162,19 @@ pub struct POICauldronUsed {
 }
 impl BedrockCodec for POICauldronUsed {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8_var(buf, (self.block_interaction_type).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.block_interaction_type).to_raw(),
+                "MinecraftEventingPOIBlockInteractionType",
+            )?,
+        );
         codec::put_i16_var(buf, self.item_id);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MinecraftEventingPOIBlockInteractionType as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         let f1 = codec::get_i16_var(buf)?;
         Ok(Self {
@@ -15837,8 +16340,8 @@ impl BedrockCodec for PackedItemUseLegacyInventoryTransaction {
         match &self.legacy_set_item_slots {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -15855,7 +16358,7 @@ impl BedrockCodec for PackedItemUseLegacyInventoryTransaction {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<LegacySetSlot as BedrockCodec>::deserialize(buf)?),
+                    |buf| <LegacySetSlot as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -15883,18 +16386,27 @@ pub struct PacketViolationWarningPacketPayload {
 }
 impl BedrockCodec for PacketViolationWarningPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.violation_type).to_raw() as i32);
-        codec::put_i32_var(buf, (self.violation_severity).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.violation_type).to_raw(), "PacketViolationType")?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.violation_severity).to_raw(),
+                "PacketViolationSeverity",
+            )?,
+        );
         codec::put_i32_var(buf, self.violation_packet_id);
         codec::put_string(buf, &self.violation_context)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PacketViolationType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <PacketViolationSeverity as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = codec::get_i32_var(buf)?;
         let f3 = codec::get_string(buf)?;
@@ -15976,7 +16488,13 @@ impl BedrockCodec for PassengerOfBlockArguments {
         BedrockCodec::serialize(&self.offset, buf)?;
         codec::put_f32_le(buf, self.rotation);
         codec::put_f32_le(buf, self.rotation_limit);
-        codec::put_u8(buf, (self.emote_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.emote_type).to_raw(),
+                "PassengerOfBlockArgumentsEmoteType",
+            )?,
+        );
         codec::put_u64_le(buf, self.block_type);
         BedrockCodec::serialize(&self.pack_uuid, buf)?;
         Ok(())
@@ -15987,7 +16505,7 @@ impl BedrockCodec for PassengerOfBlockArguments {
         let f2 = codec::get_f32_le(buf)?;
         let f3 = codec::get_f32_le(buf)?;
         let f4 = <PassengerOfBlockArgumentsEmoteType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f5 = codec::get_u64_le(buf)?;
         let f6 = <MceUuid as BedrockCodec>::deserialize(buf)?;
@@ -16019,13 +16537,16 @@ impl Pause {
 }
 impl BedrockCodec for Pause {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -16061,8 +16582,11 @@ impl BedrockCodec for PhotoTransferPacketPayload {
         codec::put_string(buf, &self.photo_name)?;
         codec::put_string(buf, &self.photo_data)?;
         codec::put_string(buf, &self.book_id)?;
-        codec::put_u8(buf, (self.r#type).to_raw() as u8);
-        codec::put_u8(buf, (self.source_type).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((self.r#type).to_raw(), "PhotoType")?);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.source_type).to_raw(), "PhotoType")?,
+        );
         codec::put_i64_le(buf, self.owner_id);
         codec::put_string(buf, &self.new_photo_name)?;
         Ok(())
@@ -16071,8 +16595,12 @@ impl BedrockCodec for PhotoTransferPacketPayload {
         let f0 = codec::get_string(buf)?;
         let f1 = codec::get_string(buf)?;
         let f2 = codec::get_string(buf)?;
-        let f3 = <PhotoType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
-        let f4 = <PhotoType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f3 = <PhotoType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
+        let f4 = <PhotoType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f5 = codec::get_i64_le(buf)?;
         let f6 = codec::get_string(buf)?;
         Ok(Self {
@@ -16222,12 +16750,15 @@ pub struct PlayStatusPacketPayload {
 }
 impl BedrockCodec for PlayStatusPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_be(buf, (self.status).to_raw() as i32);
+        codec::put_i32_be(
+            buf,
+            codec::enum_to_wire((self.status).to_raw(), "PlayStatus")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PlayStatus as ProtocolEnum>::from_wire(
-            codec::get_i32_be(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_be(buf)?)?,
         )?;
         Ok(Self { status: f0 })
     }
@@ -16249,7 +16780,10 @@ pub struct PlayerActionPacketPayload {
 impl BedrockCodec for PlayerActionPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.player_runtime_id, buf)?;
-        codec::put_i32_var(buf, (self.action).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "PlayerActionType")?,
+        );
         BedrockCodec::serialize(&self.block_position, buf)?;
         BedrockCodec::serialize(&self.result_pos, buf)?;
         codec::put_i32_var(buf, self.face);
@@ -16258,7 +16792,7 @@ impl BedrockCodec for PlayerActionPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         let f1 = <PlayerActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f2 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f3 = <BlockPos as BedrockCodec>::deserialize(buf)?;
@@ -16280,8 +16814,8 @@ pub struct PlayerArmorDamagePacketPayload {
 }
 impl BedrockCodec for PlayerArmorDamagePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.armor_slot_and_damage_pairs).len())?;
-        for v0 in (&self.armor_slot_and_damage_pairs).iter() {
+        codec::put_len_var(buf, self.armor_slot_and_damage_pairs.len())?;
+        for v0 in self.armor_slot_and_damage_pairs.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -16292,7 +16826,7 @@ impl BedrockCodec for PlayerArmorDamagePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ArmorSlotAndDamagePair as BedrockCodec>::deserialize(buf)?),
+                |buf| <ArmorSlotAndDamagePair as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -16386,13 +16920,28 @@ impl BedrockCodec for PlayerAuthInputPacketPayload {
         BedrockCodec::serialize(&self.position, buf)?;
         BedrockCodec::serialize(&self.move_vector, buf)?;
         codec::put_f32_le(buf, self.player_head_rotation);
-        codec::put_len_var(buf, (&self.input_data).len())?;
-        for v0 in (&self.input_data).iter() {
-            codec::put_i32_var(buf, (*v0).to_raw() as i32);
+        codec::put_len_var(buf, self.input_data.len())?;
+        for v0 in self.input_data.iter() {
+            codec::put_i32_var(
+                buf,
+                codec::enum_to_wire((*v0).to_raw(), "PlayerAuthInputData")?,
+            );
         }
-        codec::put_u32_var(buf, (self.input_mode).to_raw() as u32);
-        codec::put_u32_var(buf, (self.play_mode).to_raw() as u32);
-        codec::put_i32_var(buf, (self.new_interaction_model).to_raw() as i32);
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire((self.input_mode).to_raw(), "InputMode")?,
+        );
+        codec::put_u32_var(
+            buf,
+            codec::enum_to_wire((self.play_mode).to_raw(), "ClientPlayMode")?,
+        );
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.new_interaction_model).to_raw(),
+                "NewInteractionModel",
+            )?,
+        );
         BedrockCodec::serialize(&self.interact_rotation, buf)?;
         BedrockCodec::serialize(&self.client_tick, buf)?;
         BedrockCodec::serialize(&self.pos_delta, buf)?;
@@ -16413,8 +16962,8 @@ impl BedrockCodec for PlayerAuthInputPacketPayload {
         match &self.player_block_actions {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -16449,21 +16998,19 @@ impl BedrockCodec for PlayerAuthInputPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <PlayerAuthInputData as ProtocolEnum>::from_wire(
-                        codec::get_i32_var(buf)? as i64,
-                    )?,
+                |buf| <PlayerAuthInputData as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_i32_var(buf)?)?,
                 ),
             )?
         };
         let f5 = <InputMode as ProtocolEnum>::from_wire(
-            codec::get_u32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_var(buf)?)?,
         )?;
         let f6 = <ClientPlayMode as ProtocolEnum>::from_wire(
-            codec::get_u32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_var(buf)?)?,
         )?;
         let f7 = <NewInteractionModel as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f8 = <Vec2 as BedrockCodec>::deserialize(buf)?;
         let f9 = <PlayerInputTick as BedrockCodec>::deserialize(buf)?;
@@ -16488,7 +17035,7 @@ impl BedrockCodec for PlayerAuthInputPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<PlayerBlockActionData as BedrockCodec>::deserialize(buf)?),
+                    |buf| <PlayerBlockActionData as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -16548,14 +17095,17 @@ pub struct PlayerBlockActionData {
 }
 impl BedrockCodec for PlayerBlockActionData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.player_action_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.player_action_type).to_raw(), "PlayerActionType")?,
+        );
         BedrockCodec::serialize(&self.position, buf)?;
         codec::put_i32_var(buf, self.facing);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PlayerActionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f2 = codec::get_i32_var(buf)?;
@@ -16609,8 +17159,8 @@ pub struct PlayerEnchantOptionsPacketPayload {
 }
 impl BedrockCodec for PlayerEnchantOptionsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.options).len())?;
-        for v0 in (&self.options).iter() {
+        codec::put_len_var(buf, self.options.len())?;
+        for v0 in self.options.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -16621,7 +17171,7 @@ impl BedrockCodec for PlayerEnchantOptionsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ItemEnchantOption as BedrockCodec>::deserialize(buf)?),
+                |buf| <ItemEnchantOption as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { options: f0 })
@@ -16637,8 +17187,8 @@ pub struct PlayerFogPacketPayload {
 }
 impl BedrockCodec for PlayerFogPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.fog_stack).len())?;
-        for v0 in (&self.fog_stack).iter() {
+        codec::put_len_var(buf, self.fog_stack.len())?;
+        for v0 in self.fog_stack.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -16646,7 +17196,7 @@ impl BedrockCodec for PlayerFogPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self { fog_stack: f0 })
     }
@@ -16759,14 +17309,20 @@ pub struct PlayerListAddEntry {
 }
 impl BedrockCodec for PlayerListAddEntry {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "PlayerListAddEntryAction")?,
+        );
         BedrockCodec::serialize(&self.uuid, buf)?;
         BedrockCodec::serialize(&self.actor_unique_id, buf)?;
         codec::put_string(buf, &self.player_name)?;
         codec::put_string(buf, &self.xbl_xuid)?;
         codec::put_string(buf, &self.play_fab_id)?;
         codec::put_string(buf, &self.platform_online_id)?;
-        codec::put_i32_le(buf, (self.build_platform).to_raw() as i32);
+        codec::put_i32_le(
+            buf,
+            codec::enum_to_wire((self.build_platform).to_raw(), "BuildPlatform")?,
+        );
         BedrockCodec::serialize(&self.serialized_skin, buf)?;
         codec::put_bool(buf, self.is_teacher);
         codec::put_bool(buf, self.is_host);
@@ -16776,7 +17332,7 @@ impl BedrockCodec for PlayerListAddEntry {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PlayerListAddEntryAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <MceUuid as BedrockCodec>::deserialize(buf)?;
         let f2 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
@@ -16785,7 +17341,7 @@ impl BedrockCodec for PlayerListAddEntry {
         let f5 = codec::get_string(buf)?;
         let f6 = codec::get_string(buf)?;
         let f7 = <BuildPlatform as ProtocolEnum>::from_wire(
-            codec::get_i32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_le(buf)?)?,
         )?;
         let f8 = <SerializedSkin as BedrockCodec>::deserialize(buf)?;
         let f9 = codec::get_bool(buf)?;
@@ -16822,8 +17378,8 @@ impl BedrockCodec for PlayerListPacketPayload {
         match &self.entries {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -16838,10 +17394,8 @@ impl BedrockCodec for PlayerListPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(
-                        <PlayerListPacketPayloadEntries as BedrockCodec>::deserialize(
-                            buf,
-                        )?,
+                    |buf| <PlayerListPacketPayloadEntries as BedrockCodec>::deserialize(
+                        buf,
                     ),
                 )?
             })
@@ -16865,13 +17419,16 @@ pub struct PlayerListRemoveEntry {
 }
 impl BedrockCodec for PlayerListRemoveEntry {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.action).to_raw(), "PlayerListRemoveEntryAction")?,
+        );
         BedrockCodec::serialize(&self.uuid, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PlayerListRemoveEntryAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <MceUuid as BedrockCodec>::deserialize(buf)?;
         Ok(Self { action: f0, uuid: f1 })
@@ -17225,13 +17782,19 @@ pub struct PositionTrackingDBClientRequestPacketPayload {
 }
 impl BedrockCodec for PositionTrackingDBClientRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.action).to_raw(),
+                "PositionTrackingDBClientRequestPacketPayloadAction",
+            )?,
+        );
         BedrockCodec::serialize(&self.id, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PositionTrackingDBClientRequestPacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <PositionTrackingId as BedrockCodec>::deserialize(buf)?;
         Ok(Self { action: f0, id: f1 })
@@ -17256,14 +17819,20 @@ pub struct PositionTrackingDBServerBroadcastPacketPayload {
 }
 impl BedrockCodec for PositionTrackingDBServerBroadcastPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.action).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.action).to_raw(),
+                "PositionTrackingDBServerBroadcastPacketPayloadAction",
+            )?,
+        );
         BedrockCodec::serialize(&self.id, buf)?;
         BedrockCodec::serialize(&self.position_tracking_data, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <PositionTrackingDBServerBroadcastPacketPayloadAction as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <PositionTrackingId as BedrockCodec>::deserialize(buf)?;
         let f2 = <NetworkNbt as BedrockCodec>::deserialize(buf)?;
@@ -17427,7 +17996,13 @@ impl BedrockCodec for PrimitiveShapeDataPayload {
         match &self.shape_type {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(
+                    buf,
+                    codec::enum_to_wire(
+                        (*v0).to_raw(),
+                        "ScriptModuleMinecraftScriptPrimitiveShapeType",
+                    )?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -17501,7 +18076,7 @@ impl BedrockCodec for PrimitiveShapeDataPayload {
         let f1 = if codec::get_bool(buf)? {
             Some(
                 <ScriptModuleMinecraftScriptPrimitiveShapeType as ProtocolEnum>::from_wire(
-                    codec::get_u8(buf)? as i64,
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
                 )?,
             )
         } else {
@@ -17585,11 +18160,10 @@ impl BedrockCodec for PrimitiveShapesPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_len_var(
             buf,
-            (&self.array_of_primitive_shapes_can_be_a_mix_of_new_updated_or_removed)
-                .len(),
+            self.array_of_primitive_shapes_can_be_a_mix_of_new_updated_or_removed.len(),
         )?;
-        for v0 in (&self
-            .array_of_primitive_shapes_can_be_a_mix_of_new_updated_or_removed)
+        for v0 in self
+            .array_of_primitive_shapes_can_be_a_mix_of_new_updated_or_removed
             .iter()
         {
             BedrockCodec::serialize(v0, buf)?;
@@ -17602,7 +18176,7 @@ impl BedrockCodec for PrimitiveShapesPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<PrimitiveShapeDataPayload as BedrockCodec>::deserialize(buf)?),
+                |buf| <PrimitiveShapeDataPayload as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -17620,12 +18194,12 @@ pub struct PropertySyncData {
 }
 impl BedrockCodec for PropertySyncData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.int_entries_list).len())?;
-        for v0 in (&self.int_entries_list).iter() {
+        codec::put_len_var(buf, self.int_entries_list.len())?;
+        for v0 in self.int_entries_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.float_entries_list).len())?;
-        for v0 in (&self.float_entries_list).iter() {
+        codec::put_len_var(buf, self.float_entries_list.len())?;
+        for v0 in self.float_entries_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -17636,10 +18210,8 @@ impl BedrockCodec for PropertySyncData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <PropertySyncDataPropertySyncIntEntry as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <PropertySyncDataPropertySyncIntEntry as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -17648,10 +18220,8 @@ impl BedrockCodec for PropertySyncData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <PropertySyncDataPropertySyncFloatEntry as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <PropertySyncDataPropertySyncFloatEntry as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -17717,8 +18287,8 @@ pub struct PurchaseReceiptPacketPayload {
 }
 impl BedrockCodec for PurchaseReceiptPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.purchase_receipts).len())?;
-        for v0 in (&self.purchase_receipts).iter() {
+        codec::put_len_var(buf, self.purchase_receipts.len())?;
+        for v0 in self.purchase_receipts.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -17726,7 +18296,7 @@ impl BedrockCodec for PurchaseReceiptPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self { purchase_receipts: f0 })
     }
@@ -17854,12 +18424,18 @@ pub struct RecipeUnlockingRequirement {
 }
 impl BedrockCodec for RecipeUnlockingRequirement {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.unlocking_context).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.unlocking_context).to_raw(),
+                "RecipeUnlockingContext",
+            )?,
+        );
         match &self.unlocking_ingredients {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -17869,7 +18445,7 @@ impl BedrockCodec for RecipeUnlockingRequirement {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <RecipeUnlockingContext as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some({
@@ -17877,7 +18453,7 @@ impl BedrockCodec for RecipeUnlockingRequirement {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<RecipeIngredient as BedrockCodec>::deserialize(buf)?),
+                    |buf| <RecipeIngredient as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -17953,8 +18529,8 @@ impl BedrockCodec for RemoveEnvironmentAttributesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.attribute_layer_name)?;
         BedrockCodec::serialize(&self.attribute_layer_dimension, buf)?;
-        codec::put_len_var(buf, (&self.attributes).len())?;
-        for v0 in (&self.attributes).iter() {
+        codec::put_len_var(buf, self.attributes.len())?;
+        for v0 in self.attributes.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -17964,7 +18540,7 @@ impl BedrockCodec for RemoveEnvironmentAttributesData {
         let f1 = <DimensionType as BedrockCodec>::deserialize(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self {
             attribute_layer_name: f0,
@@ -18006,7 +18582,7 @@ impl RemoveOverride {
 }
 impl BedrockCodec for RemoveOverride {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::TYPE).wire_name())?;
+        codec::put_string(buf, (Self::TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18068,7 +18644,7 @@ impl RemoveScore {
 }
 impl BedrockCodec for RemoveScore {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::ACTION).wire_name())?;
+        codec::put_string(buf, (Self::ACTION).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18098,8 +18674,8 @@ pub struct RemoveTimeMarkerData {
 impl BedrockCodec for RemoveTimeMarkerData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u64_var(buf, self.clock_id);
-        codec::put_len_var(buf, (&self.time_marker_ids).len())?;
-        for v0 in (&self.time_marker_ids).iter() {
+        codec::put_len_var(buf, self.time_marker_ids.len())?;
+        for v0 in self.time_marker_ids.iter() {
             codec::put_u64_var(buf, *v0);
         }
         Ok(())
@@ -18108,7 +18684,7 @@ impl BedrockCodec for RemoveTimeMarkerData {
         let f0 = codec::get_u64_var(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u64_var(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u64_var(buf))?
         };
         Ok(Self {
             clock_id: f0,
@@ -18131,7 +18707,13 @@ pub struct RequestAbilityPacketPayload {
 impl BedrockCodec for RequestAbilityPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i32_var(buf, self.ability);
-        codec::put_u8(buf, (self.value_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.value_type).to_raw(),
+                "RequestAbilityPacketPayloadType",
+            )?,
+        );
         codec::put_bool(buf, self.bool);
         codec::put_f32_le(buf, self.float);
         Ok(())
@@ -18139,7 +18721,7 @@ impl BedrockCodec for RequestAbilityPacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_i32_var(buf)?;
         let f1 = <RequestAbilityPacketPayloadType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = codec::get_bool(buf)?;
         let f3 = codec::get_f32_le(buf)?;
@@ -18295,7 +18877,7 @@ impl ResourcePackClientResponseCancel {
 }
 impl BedrockCodec for ResourcePackClientResponseCancel {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::RESPONSE_TYPE).wire_name())?;
+        codec::put_string(buf, (Self::RESPONSE_TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18327,8 +18909,8 @@ impl ResourcePackClientResponseDownloading {
     pub const RESPONSE_TYPE: ResourcePackResponse = ResourcePackResponse::Downloading;
     /// Writes the fields that follow the leading discriminator.
     pub fn serialize_body<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.downloading_packs).len())?;
-        for v0 in (&self.downloading_packs).iter() {
+        codec::put_len_var(buf, self.downloading_packs.len())?;
+        for v0 in self.downloading_packs.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
@@ -18337,14 +18919,14 @@ impl ResourcePackClientResponseDownloading {
     pub fn deserialize_body<B: Buf>(buf: &mut B) -> Result<Self> {
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self { downloading_packs: f1 })
     }
 }
 impl BedrockCodec for ResourcePackClientResponseDownloading {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::RESPONSE_TYPE).wire_name())?;
+        codec::put_string(buf, (Self::RESPONSE_TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18382,7 +18964,7 @@ impl ResourcePackClientResponseDownloadingFinished {
 }
 impl BedrockCodec for ResourcePackClientResponseDownloadingFinished {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::RESPONSE_TYPE).wire_name())?;
+        codec::put_string(buf, (Self::RESPONSE_TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18440,7 +19022,7 @@ impl ResourcePackClientResponseResourcePackStackFinished {
 }
 impl BedrockCodec for ResourcePackClientResponseResourcePackStackFinished {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, &(Self::RESPONSE_TYPE).wire_name())?;
+        codec::put_string(buf, (Self::RESPONSE_TYPE).wire_name())?;
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18534,13 +19116,16 @@ pub struct ResourcePackStackPacketPayload {
 impl BedrockCodec for ResourcePackStackPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_bool(buf, self.texture_pack_required);
-        codec::put_len_var(buf, (&self.texture_pack_list).len())?;
-        for v0 in (&self.texture_pack_list).iter() {
+        codec::put_len_var(buf, self.texture_pack_list.len())?;
+        for v0 in self.texture_pack_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_string(buf, &self.base_game_version)?;
         BedrockCodec::serialize(&self.experiments, buf)?;
-        codec::put_u8(buf, (self.editor_pack_types).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.editor_pack_types).to_raw(), "EditorPackType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18550,12 +19135,14 @@ impl BedrockCodec for ResourcePackStackPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<PackInstanceId as BedrockCodec>::deserialize(buf)?),
+                |buf| <PackInstanceId as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = codec::get_string(buf)?;
         let f3 = <Experiments as BedrockCodec>::deserialize(buf)?;
-        let f4 = MaybeUnknown::<EditorPackType>::from_raw(codec::get_u8(buf)? as i64);
+        let f4 = MaybeUnknown::<
+            EditorPackType,
+        >::from_raw(codec::enum_from_wire(codec::get_u8(buf)?)?);
         Ok(Self {
             texture_pack_required: f0,
             texture_pack_list: f1,
@@ -18600,8 +19187,8 @@ impl BedrockCodec for ResourcePacksInfoPacketPayload {
         codec::put_bool(buf, self.has_scripts);
         codec::put_bool(buf, self.force_disable_vibrant_visuals);
         BedrockCodec::serialize(&self.world_template_id_and_version, buf)?;
-        codec::put_len_var(buf, (&self.resource_packs).len())?;
-        for v0 in (&self.resource_packs).iter() {
+        codec::put_len_var(buf, self.resource_packs.len())?;
+        for v0 in self.resource_packs.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -18617,7 +19204,7 @@ impl BedrockCodec for ResourcePacksInfoPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<PackInfoData as BedrockCodec>::deserialize(buf)?),
+                |buf| <PackInfoData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -18654,14 +19241,17 @@ pub struct RespawnPacketPayload {
 impl BedrockCodec for RespawnPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.position, buf)?;
-        codec::put_u8(buf, (self.state).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.state).to_raw(), "PlayerRespawnState")?,
+        );
         BedrockCodec::serialize(&self.player_runtime_id, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         let f1 = <PlayerRespawnState as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -18688,13 +19278,16 @@ impl Resume {
 }
 impl BedrockCodec for Resume {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -18807,13 +19400,16 @@ impl SeekTo {
 }
 impl BedrockCodec for SeekTo {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -18857,7 +19453,7 @@ pub struct SendPartyDestinationCookiePacketPayload {
 impl BedrockCodec for SendPartyDestinationCookiePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.cookie)?;
-        codec::put_string(buf, &(self.intent).wire_name())?;
+        codec::put_string(buf, (self.intent).wire_name())?;
         codec::put_string(buf, &self.destination_name)?;
         Ok(())
     }
@@ -18889,10 +19485,22 @@ pub struct SerializedAbilitiesData {
 impl BedrockCodec for SerializedAbilitiesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_i64_le(buf, self.target_player_raw_id);
-        codec::put_i8(buf, (self.player_permissions).to_raw() as i8);
-        codec::put_u8(buf, (self.command_permissions).to_raw() as u8);
-        codec::put_len_var(buf, (&self.layers).len())?;
-        for v0 in (&self.layers).iter() {
+        codec::put_i8(
+            buf,
+            codec::enum_to_wire(
+                (self.player_permissions).to_raw(),
+                "PlayerPermissionLevel",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.command_permissions).to_raw(),
+                "CommandPermissionLevel",
+            )?,
+        );
+        codec::put_len_var(buf, self.layers.len())?;
+        for v0 in self.layers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -18900,20 +19508,18 @@ impl BedrockCodec for SerializedAbilitiesData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_i64_le(buf)?;
         let f1 = <PlayerPermissionLevel as ProtocolEnum>::from_wire(
-            codec::get_i8(buf)? as i64,
+            codec::enum_from_wire(codec::get_i8(buf)?)?,
         )?;
         let f2 = <CommandPermissionLevel as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f3 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <SerializedAbilitiesDataSerializedLayer as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <SerializedAbilitiesDataSerializedLayer as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -19058,7 +19664,10 @@ pub struct SerializedPersonaPieceHandle {
 impl BedrockCodec for SerializedPersonaPieceHandle {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.piece_id)?;
-        codec::put_u32_le(buf, (self.piece_type).to_raw() as u32);
+        codec::put_u32_le(
+            buf,
+            codec::enum_to_wire((self.piece_type).to_raw(), "PersonaPieceType")?,
+        );
         BedrockCodec::serialize(&self.pack_id, buf)?;
         codec::put_bool(buf, self.is_default_piece);
         codec::put_string(buf, &self.product_id)?;
@@ -19067,7 +19676,7 @@ impl BedrockCodec for SerializedPersonaPieceHandle {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_string(buf)?;
         let f1 = <PersonaPieceType as ProtocolEnum>::from_wire(
-            codec::get_u32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_le(buf)?)?,
         )?;
         let f2 = <MceUuid as BedrockCodec>::deserialize(buf)?;
         let f3 = codec::get_bool(buf)?;
@@ -19136,8 +19745,8 @@ impl BedrockCodec for SerializedSkin {
         codec::put_string(buf, &self.id)?;
         codec::put_string(buf, &self.resource_patch)?;
         BedrockCodec::serialize(&self.image_data, buf)?;
-        codec::put_len_var(buf, (&self.animated_image_data).len())?;
-        for v0 in (&self.animated_image_data).iter() {
+        codec::put_len_var(buf, self.animated_image_data.len())?;
+        for v0 in self.animated_image_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.cape_image_data, buf)?;
@@ -19146,15 +19755,18 @@ impl BedrockCodec for SerializedSkin {
         codec::put_string(buf, &self.animation_data)?;
         codec::put_string(buf, &self.cape_id)?;
         codec::put_string(buf, &self.full_id)?;
-        codec::put_u8(buf, (self.arm_size).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.arm_size).to_raw(), "PersonaArmSizeType")?,
+        );
         BedrockCodec::serialize(&self.skin_color, buf)?;
-        codec::put_len_var(buf, (&self.persona_pieces).len())?;
-        for v0 in (&self.persona_pieces).iter() {
+        codec::put_len_var(buf, self.persona_pieces.len())?;
+        for v0 in self.persona_pieces.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.piece_tint_colors).len())?;
-        for (k0, v0) in (&self.piece_tint_colors).iter() {
-            codec::put_string(buf, &(*k0).wire_name())?;
+        codec::put_len_var(buf, self.piece_tint_colors.len())?;
+        for (k0, v0) in self.piece_tint_colors.iter() {
+            codec::put_string(buf, (*k0).wire_name())?;
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_bool(buf, self.is_premium);
@@ -19162,7 +19774,7 @@ impl BedrockCodec for SerializedSkin {
         codec::put_bool(buf, self.is_persona_cape_on_classic_skin);
         codec::put_bool(buf, self.is_primary_user);
         codec::put_bool(buf, self.overrides_player_appearance);
-        codec::put_string(buf, &(self.trusted_skin_flag).wire_name())?;
+        codec::put_string(buf, (self.trusted_skin_flag).wire_name())?;
         codec::put_string(buf, &self.profile_hash)?;
         Ok(())
     }
@@ -19175,7 +19787,7 @@ impl BedrockCodec for SerializedSkin {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<AnimatedImageData as BedrockCodec>::deserialize(buf)?),
+                |buf| <AnimatedImageData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = <SkinImage as BedrockCodec>::deserialize(buf)?;
@@ -19185,7 +19797,7 @@ impl BedrockCodec for SerializedSkin {
         let f8 = codec::get_string(buf)?;
         let f9 = codec::get_string(buf)?;
         let f10 = <PersonaArmSizeType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f11 = <Color as BedrockCodec>::deserialize(buf)?;
         let f12 = {
@@ -19193,9 +19805,7 @@ impl BedrockCodec for SerializedSkin {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <SerializedPersonaPieceHandle as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <SerializedPersonaPieceHandle as BedrockCodec>::deserialize(buf),
             )?
         };
         let f13 = {
@@ -19684,12 +20294,18 @@ pub struct ServerboundCursorItemDragPacketPayload {
 }
 impl BedrockCodec for ServerboundCursorItemDragPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.state).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.state).to_raw(),
+                "ServerboundCursorItemDragPacketPayloadState",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ServerboundCursorItemDragPacketPayloadState as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self { state: f0 })
     }
@@ -19715,7 +20331,7 @@ impl BedrockCodec for ServerboundDataDrivenScreenClosedPacketPayload {
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_string(buf, &(self.close_reason).wire_name())?;
+        codec::put_string(buf, (self.close_reason).wire_name())?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -19794,30 +20410,30 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
         codec::put_f32_le(buf, self.avg_end_frame_time_ms);
         codec::put_f32_le(buf, self.avg_remainder_time_percent);
         codec::put_f32_le(buf, self.avg_unaccounted_time_percent);
-        codec::put_len_var(buf, (&self.memory_category_values).len())?;
-        for v0 in (&self.memory_category_values).iter() {
+        codec::put_len_var(buf, self.memory_category_values.len())?;
+        for v0 in self.memory_category_values.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.entity_diagnostics).len())?;
-        for v0 in (&self.entity_diagnostics).iter() {
+        codec::put_len_var(buf, self.entity_diagnostics.len())?;
+        for v0 in self.entity_diagnostics.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.system_diagnostics).len())?;
-        for v0 in (&self.system_diagnostics).iter() {
+        codec::put_len_var(buf, self.system_diagnostics.len())?;
+        for v0 in self.system_diagnostics.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         match &self.system_categories {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_len_var(buf, (&self.whisker_scopes).len())?;
-        for v0 in (&self.whisker_scopes).iter() {
+        codec::put_len_var(buf, self.whisker_scopes.len())?;
+        for v0 in self.whisker_scopes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -19837,7 +20453,7 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<MemoryCategoryCounter as BedrockCodec>::deserialize(buf)?),
+                |buf| <MemoryCategoryCounter as BedrockCodec>::deserialize(buf),
             )?
         };
         let f10 = {
@@ -19845,7 +20461,7 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<EntityDiagnosticTimingInfo as BedrockCodec>::deserialize(buf)?),
+                |buf| <EntityDiagnosticTimingInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         let f11 = {
@@ -19853,7 +20469,7 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SystemDiagnosticTimingInfo as BedrockCodec>::deserialize(buf)?),
+                |buf| <SystemDiagnosticTimingInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         let f12 = if codec::get_bool(buf)? {
@@ -19862,7 +20478,7 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(<SystemCategory as BedrockCodec>::deserialize(buf)?),
+                    |buf| <SystemCategory as BedrockCodec>::deserialize(buf),
                 )?
             })
         } else {
@@ -19873,7 +20489,7 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<WhiskerScopeDataSummary as BedrockCodec>::deserialize(buf)?),
+                |buf| <WhiskerScopeDataSummary as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -19906,7 +20522,13 @@ pub struct ServerboundLoadingScreenPacketPayload {
 }
 impl BedrockCodec for ServerboundLoadingScreenPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.loading_screen_packet_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.loading_screen_packet_type).to_raw(),
+                "ServerboundLoadingScreenPacketPayloadLoadingScreenPacketType",
+            )?,
+        );
         match &self.loading_screen_id {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -19918,7 +20540,7 @@ impl BedrockCodec for ServerboundLoadingScreenPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ServerboundLoadingScreenPacketPayloadLoadingScreenPacketType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(codec::get_u32_le(buf)?)
@@ -19986,8 +20608,8 @@ pub struct ServerboundRegisterAudioContentPacketPayload {
 }
 impl BedrockCodec for ServerboundRegisterAudioContentPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.registrations).len())?;
-        for v0 in (&self.registrations).iter() {
+        codec::put_len_var(buf, self.registrations.len())?;
+        for v0 in self.registrations.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -19998,9 +20620,7 @@ impl BedrockCodec for ServerboundRegisterAudioContentPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <AudioContentRegistrationEntry as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <AudioContentRegistrationEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { registrations: f0 })
@@ -20155,12 +20775,18 @@ pub struct SetDefaultGameTypePacketPayload {
 }
 impl BedrockCodec for SetDefaultGameTypePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.default_game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.default_game_type).to_raw(),
+                "SetDefaultGameTypePacketPayloadDefaultGameType",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SetDefaultGameTypePacketPayloadDefaultGameType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self { default_game_type: f0 })
     }
@@ -20245,11 +20871,14 @@ pub struct SetHudPacketPayload {
 }
 impl BedrockCodec for SetHudPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.hud_element).len())?;
-        for v0 in (&self.hud_element).iter() {
-            codec::put_i32_var(buf, (*v0).to_raw() as i32);
+        codec::put_len_var(buf, self.hud_element.len())?;
+        for v0 in self.hud_element.iter() {
+            codec::put_i32_var(buf, codec::enum_to_wire((*v0).to_raw(), "HudElement")?);
         }
-        codec::put_i32_var(buf, (self.hud_visible).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.hud_visible).to_raw(), "HudVisibility")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -20258,15 +20887,13 @@ impl BedrockCodec for SetHudPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <HudElement as ProtocolEnum>::from_wire(
-                        codec::get_i32_var(buf)? as i64,
-                    )?,
+                |buf| <HudElement as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_i32_var(buf)?)?,
                 ),
             )?
         };
         let f1 = <HudVisibility as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self {
             hud_element: f0,
@@ -20282,12 +20909,15 @@ pub struct SetLastHurtByPacketPayload {
 }
 impl BedrockCodec for SetLastHurtByPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.last_hurt_by).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.last_hurt_by).to_raw(), "ActorType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         Ok(Self { last_hurt_by: f0 })
     }
@@ -20365,13 +20995,16 @@ impl SetPitch {
 }
 impl BedrockCodec for SetPitch {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -20394,13 +21027,19 @@ pub struct SetPlayerFurnaceOptionsPacketPayload {
 }
 impl BedrockCodec for SetPlayerFurnaceOptionsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.furnace_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.furnace_type).to_raw(),
+                "SetPlayerFurnaceOptionsPacketPayloadFurnaceType",
+            )?,
+        );
         BedrockCodec::serialize(&self.furnace_options, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SetPlayerFurnaceOptionsPacketPayloadFurnaceType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = <FurnaceOptions as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -20417,11 +21056,16 @@ pub struct SetPlayerGameTypePacketPayload {
 }
 impl BedrockCodec for SetPlayerGameTypePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.player_game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.player_game_type).to_raw(), "GameType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <GameType as ProtocolEnum>::from_wire(codec::get_i32_var(buf)? as i64)?;
+        let f0 = <GameType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
+        )?;
         Ok(Self { player_game_type: f0 })
     }
 }
@@ -20454,8 +21098,8 @@ impl BedrockCodec for SetScorePacketPayload {
         match &self.score_info {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_len_var(buf, (v0).len())?;
-                for v1 in (v0).iter() {
+                codec::put_len_var(buf, v0.len())?;
+                for v1 in v0.iter() {
                     BedrockCodec::serialize(v1, buf)?;
                 }
             }
@@ -20470,10 +21114,8 @@ impl BedrockCodec for SetScorePacketPayload {
                 codec::get_vec(
                     buf,
                     len,
-                    |buf| Ok(
-                        <SetScorePacketPayloadScoreInfo as BedrockCodec>::deserialize(
-                            buf,
-                        )?,
+                    |buf| <SetScorePacketPayloadScoreInfo as BedrockCodec>::deserialize(
+                        buf,
                     ),
                 )?
             })
@@ -20497,25 +21139,29 @@ pub struct SetScoreboardIdentityPacketPayload {
 }
 impl BedrockCodec for SetScoreboardIdentityPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.scoreboard_identity_packet_type).to_raw() as u8);
-        codec::put_len_var(buf, (&self.scoreboard_identity_info).len())?;
-        for v0 in (&self.scoreboard_identity_info).iter() {
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.scoreboard_identity_packet_type).to_raw(),
+                "SetScoreboardIdentityPacketPayloadScoreboardIdentityPacketType",
+            )?,
+        );
+        codec::put_len_var(buf, self.scoreboard_identity_info.len())?;
+        for v0 in self.scoreboard_identity_info.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SetScoreboardIdentityPacketPayloadScoreboardIdentityPacketType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <ScoreboardIdentityPacketInfo as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <ScoreboardIdentityPacketInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -20538,7 +21184,13 @@ pub struct SetSpawnPositionPacketPayload {
 }
 impl BedrockCodec for SetSpawnPositionPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.spawn_position_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.spawn_position_type).to_raw(),
+                "SpawnPositionType",
+            )?,
+        );
         BedrockCodec::serialize(&self.block_position, buf)?;
         BedrockCodec::serialize(&self.dimension_type, buf)?;
         BedrockCodec::serialize(&self.spawn_block_pos, buf)?;
@@ -20546,7 +21198,7 @@ impl BedrockCodec for SetSpawnPositionPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SpawnPositionType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f2 = <DimensionType as BedrockCodec>::deserialize(buf)?;
@@ -20597,7 +21249,10 @@ pub struct SetTitlePacketPayload {
 }
 impl BedrockCodec for SetTitlePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.title_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.title_type).to_raw(), "SetTitlePacketTitleType")?,
+        );
         codec::put_string(buf, &self.title_text)?;
         codec::put_i32_var(buf, self.fade_in_time);
         codec::put_i32_var(buf, self.stay_time);
@@ -20609,7 +21264,7 @@ impl BedrockCodec for SetTitlePacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SetTitlePacketTitleType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f1 = codec::get_string(buf)?;
         let f2 = codec::get_i32_var(buf)?;
@@ -20654,13 +21309,16 @@ impl SetVolume {
 }
 impl BedrockCodec for SetVolume {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -20751,12 +21409,12 @@ impl BedrockCodec for ShapedRecipePayload {
         codec::put_string(buf, &self.recipe_id)?;
         codec::put_i32_var(buf, self.width);
         codec::put_i32_var(buf, self.height);
-        codec::put_len_var(buf, (&self.ingredients).len())?;
-        for v0 in (&self.ingredients).iter() {
+        codec::put_len_var(buf, self.ingredients.len())?;
+        for v0 in self.ingredients.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.results).len())?;
-        for v0 in (&self.results).iter() {
+        codec::put_len_var(buf, self.results.len())?;
+        for v0 in self.results.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.uuid, buf)?;
@@ -20782,7 +21440,7 @@ impl BedrockCodec for ShapedRecipePayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<RecipeIngredient as BedrockCodec>::deserialize(buf)?),
+                |buf| <RecipeIngredient as BedrockCodec>::deserialize(buf),
             )?
         };
         let f4 = {
@@ -20790,10 +21448,8 @@ impl BedrockCodec for ShapedRecipePayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <NetworkItemInstanceDescriptorData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <NetworkItemInstanceDescriptorData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -20861,12 +21517,12 @@ pub struct ShapelessRecipePayload {
 impl BedrockCodec for ShapelessRecipePayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.recipe_id)?;
-        codec::put_len_var(buf, (&self.ingredients).len())?;
-        for v0 in (&self.ingredients).iter() {
+        codec::put_len_var(buf, self.ingredients.len())?;
+        for v0 in self.ingredients.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.results).len())?;
-        for v0 in (&self.results).iter() {
+        codec::put_len_var(buf, self.results.len())?;
+        for v0 in self.results.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.uuid, buf)?;
@@ -20889,7 +21545,7 @@ impl BedrockCodec for ShapelessRecipePayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<RecipeIngredient as BedrockCodec>::deserialize(buf)?),
+                |buf| <RecipeIngredient as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = {
@@ -20897,10 +21553,8 @@ impl BedrockCodec for ShapelessRecipePayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <NetworkItemInstanceDescriptorData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <NetworkItemInstanceDescriptorData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -20949,7 +21603,10 @@ impl BedrockCodec for SharedTypesComprehensiveCameraAimAssistCommandDefinition {
         match &self.target_mode {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(
+                    buf,
+                    codec::enum_to_wire((*v0).to_raw(), "AimAssistTargetMode")?,
+                );
             }
             None => codec::put_bool(buf, false),
         }
@@ -20978,7 +21635,7 @@ impl BedrockCodec for SharedTypesComprehensiveCameraAimAssistCommandDefinition {
         let f1 = if codec::get_bool(buf)? {
             Some(
                 <AimAssistTargetMode as ProtocolEnum>::from_wire(
-                    codec::get_u8(buf)? as i64,
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
                 )?,
             )
         } else {
@@ -21072,13 +21729,19 @@ pub struct ShowStoreOfferPacketPayload {
 impl BedrockCodec for ShowStoreOfferPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.offer_id, buf)?;
-        codec::put_u8(buf, (self.redirect_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.redirect_type).to_raw(),
+                "ShowStoreOfferRedirectType",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <MceUuid as BedrockCodec>::deserialize(buf)?;
         let f1 = <ShowStoreOfferRedirectType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             offer_id: f0,
@@ -21172,11 +21835,13 @@ pub struct SimpleEventPacketPayload {
 }
 impl BedrockCodec for SimpleEventPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u16_le(buf, (self.r#type).to_raw() as u16);
+        codec::put_u16_le(buf, codec::enum_to_wire((self.r#type).to_raw(), "Subtype")?);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <Subtype as ProtocolEnum>::from_wire(codec::get_u16_le(buf)? as i64)?;
+        let f0 = <Subtype as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u16_le(buf)?)?,
+        )?;
         Ok(Self { r#type: f0 })
     }
 }
@@ -21188,12 +21853,15 @@ pub struct SimulationTypePacketPayload {
 }
 impl BedrockCodec for SimulationTypePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.sim_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.sim_type).to_raw(), "SimulationType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SimulationType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self { sim_type: f0 })
     }
@@ -21212,8 +21880,8 @@ impl BedrockCodec for SkinImage {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_le(buf, self.width);
         codec::put_u32_le(buf, self.height);
-        codec::put_len_var(buf, (&self.image_bytes).len())?;
-        for v0 in (&self.image_bytes).iter() {
+        codec::put_len_var(buf, self.image_bytes.len())?;
+        for v0 in self.image_bytes.iter() {
             codec::put_u8(buf, *v0);
         }
         Ok(())
@@ -21223,7 +21891,7 @@ impl BedrockCodec for SkinImage {
         let f1 = codec::get_u32_le(buf)?;
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u8(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u8(buf))?
         };
         Ok(Self {
             width: f0,
@@ -21480,7 +22148,10 @@ pub struct SpawnSettings {
 }
 impl BedrockCodec for SpawnSettings {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i16_le(buf, (self.spawn_biome_type).to_raw() as i16);
+        codec::put_i16_le(
+            buf,
+            codec::enum_to_wire((self.spawn_biome_type).to_raw(), "SpawnBiomeType")?,
+        );
         codec::put_string(buf, &self.user_defined_biome_name)?;
         codec::put_i32_var(buf, self.dimension);
         Ok(())
@@ -21488,7 +22159,7 @@ impl BedrockCodec for SpawnSettings {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = MaybeUnknown::<
             SpawnBiomeType,
-        >::from_raw(codec::get_i16_le(buf)? as i64);
+        >::from_raw(codec::enum_from_wire(codec::get_i16_le(buf)?)?);
         let f1 = codec::get_string(buf)?;
         let f2 = codec::get_i32_var(buf)?;
         Ok(Self {
@@ -21586,7 +22257,10 @@ impl BedrockCodec for StartGamePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.entity_id, buf)?;
         BedrockCodec::serialize(&self.runtime_id, buf)?;
-        codec::put_i32_var(buf, (self.game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.game_type).to_raw(), "GameType")?,
+        );
         BedrockCodec::serialize(&self.position, buf)?;
         BedrockCodec::serialize(&self.rotation, buf)?;
         BedrockCodec::serialize(&self.settings, buf)?;
@@ -21597,8 +22271,8 @@ impl BedrockCodec for StartGamePacketPayload {
         BedrockCodec::serialize(&self.movement_settings, buf)?;
         codec::put_u64_le(buf, self.level_current_time);
         codec::put_i32_var(buf, self.enchantment_seed);
-        codec::put_len_var(buf, (&self.block_properties).len())?;
-        for v0 in (&self.block_properties).iter() {
+        codec::put_len_var(buf, self.block_properties.len())?;
+        for v0 in self.block_properties.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         codec::put_string(buf, &self.multiplayer_correlation_id)?;
@@ -21623,7 +22297,9 @@ impl BedrockCodec for StartGamePacketPayload {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f1 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
-        let f2 = MaybeUnknown::<GameType>::from_raw(codec::get_i32_var(buf)? as i64);
+        let f2 = MaybeUnknown::<
+            GameType,
+        >::from_raw(codec::enum_from_wire(codec::get_i32_var(buf)?)?);
         let f3 = <Vec3 as BedrockCodec>::deserialize(buf)?;
         let f4 = <Vec2 as BedrockCodec>::deserialize(buf)?;
         let f5 = <LevelSettings as BedrockCodec>::deserialize(buf)?;
@@ -21639,7 +22315,7 @@ impl BedrockCodec for StartGamePacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<ServerBlockProperty as BedrockCodec>::deserialize(buf)?),
+                |buf| <ServerBlockProperty as BedrockCodec>::deserialize(buf),
             )?
         };
         let f14 = codec::get_string(buf)?;
@@ -21726,13 +22402,16 @@ impl Stop {
 }
 impl BedrockCodec for Stop {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (Self::TYPE).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((Self::TYPE).to_raw(), "SoundDataEventType")?,
+        );
         self.serialize_body(buf)
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         {
             let found = <SoundDataEventType as ProtocolEnum>::from_wire(
-                codec::get_u8(buf)? as i64,
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
             )?;
             if found != Self::TYPE {
                 return Err(ProtocolError::UnexpectedTag {
@@ -21798,7 +22477,7 @@ impl BedrockCodec for StringAttributeData {
         match &self.operation {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_string(buf, &(*v0).wire_name())?;
+                codec::put_string(buf, (*v0).wire_name())?;
             }
             None => codec::put_bool(buf, false),
         }
@@ -21896,9 +22575,21 @@ impl BedrockCodec for StructureEditorData {
         codec::put_string(buf, &self.data_field)?;
         codec::put_bool(buf, self.should_include_players);
         codec::put_bool(buf, self.should_show_bounding_box);
-        codec::put_i32_var(buf, (self.structure_block_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire(
+                (self.structure_block_type).to_raw(),
+                "StructureBlockType",
+            )?,
+        );
         BedrockCodec::serialize(&self.structure_settings, buf)?;
-        codec::put_u8_var(buf, (self.redstone_save_mode).to_raw() as u8);
+        codec::put_u8_var(
+            buf,
+            codec::enum_to_wire(
+                (self.redstone_save_mode).to_raw(),
+                "StructureRedstoneSaveMode",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -21907,11 +22598,11 @@ impl BedrockCodec for StructureEditorData {
         let f2 = codec::get_bool(buf)?;
         let f3 = codec::get_bool(buf)?;
         let f4 = <StructureBlockType as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f5 = <StructureSettings as BedrockCodec>::deserialize(buf)?;
         let f6 = <StructureRedstoneSaveMode as ProtocolEnum>::from_wire(
-            codec::get_u8_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8_var(buf)?)?,
         )?;
         Ok(Self {
             structure_name: f0,
@@ -21972,9 +22663,12 @@ impl BedrockCodec for StructureSettings {
         BedrockCodec::serialize(&self.structure_size, buf)?;
         BedrockCodec::serialize(&self.structure_offset, buf)?;
         BedrockCodec::serialize(&self.last_edit_player, buf)?;
-        codec::put_u8(buf, (self.rotation).to_raw() as u8);
-        codec::put_u8(buf, (self.mirror).to_raw() as u8);
-        codec::put_u8(buf, (self.animation_mode).to_raw() as u8);
+        codec::put_u8(buf, codec::enum_to_wire((self.rotation).to_raw(), "Rotation")?);
+        codec::put_u8(buf, codec::enum_to_wire((self.mirror).to_raw(), "Mirror")?);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.animation_mode).to_raw(), "AnimationMode")?,
+        );
         codec::put_f32_le(buf, self.animation_seconds);
         codec::put_f32_le(buf, self.integrity_value);
         codec::put_u32_le(buf, self.integrity_seed);
@@ -21989,9 +22683,15 @@ impl BedrockCodec for StructureSettings {
         let f4 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f5 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f6 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
-        let f7 = <Rotation as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
-        let f8 = <Mirror as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
-        let f9 = <AnimationMode as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let f7 = <Rotation as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
+        let f8 = <Mirror as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
+        let f9 = <AnimationMode as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         let f10 = codec::get_f32_le(buf)?;
         let f11 = codec::get_f32_le(buf)?;
         let f12 = codec::get_u32_le(buf)?;
@@ -22031,7 +22731,13 @@ impl BedrockCodec for StructureTemplateDataRequestPacketPayload {
         codec::put_string(buf, &self.structure_name)?;
         BedrockCodec::serialize(&self.structure_position, buf)?;
         BedrockCodec::serialize(&self.structure_settings, buf)?;
-        codec::put_u8(buf, (self.requested_operation).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.requested_operation).to_raw(),
+                "StructureTemplateRequestOperation",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -22039,7 +22745,7 @@ impl BedrockCodec for StructureTemplateDataRequestPacketPayload {
         let f1 = <BlockPos as BedrockCodec>::deserialize(buf)?;
         let f2 = <StructureSettings as BedrockCodec>::deserialize(buf)?;
         let f3 = <StructureTemplateRequestOperation as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             structure_name: f0,
@@ -22063,14 +22769,20 @@ impl BedrockCodec for StructureTemplateDataResponsePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.structure_name)?;
         BedrockCodec::serialize(&self.structure_s_nbt, buf)?;
-        codec::put_u8(buf, (self.response_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.response_type).to_raw(),
+                "StructureTemplateResponseType",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_string(buf)?;
         let f1 = <NetworkNbt as BedrockCodec>::deserialize(buf)?;
         let f2 = <StructureTemplateResponseType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             structure_name: f0,
@@ -22101,24 +22813,36 @@ pub struct SubChunkHeightmapData {
 }
 impl BedrockCodec for SubChunkHeightmapData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, (self.height_map_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.height_map_type).to_raw(),
+                "SubChunkHeightmapDataHeightMapType",
+            )?,
+        );
         match &self.subchunk_height_map {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                for v1 in (v0).iter() {
-                    for v2 in (v1).iter() {
+                for v1 in v0.iter() {
+                    for v2 in v1.iter() {
                         codec::put_i8(buf, *v2);
                     }
                 }
             }
             None => codec::put_bool(buf, false),
         }
-        codec::put_u8(buf, (self.render_height_map_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.render_height_map_type).to_raw(),
+                "SubChunkHeightmapDataRenderHeightMapType",
+            )?,
+        );
         match &self.subchunk_render_height_map {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                for v1 in (v0).iter() {
-                    for v2 in (v1).iter() {
+                for v1 in v0.iter() {
+                    for v2 in v1.iter() {
                         codec::put_i8(buf, *v2);
                     }
                 }
@@ -22129,26 +22853,26 @@ impl BedrockCodec for SubChunkHeightmapData {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SubChunkHeightmapDataHeightMapType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f1 = if codec::get_bool(buf)? {
             Some(
                 codec::get_array(
                     buf,
-                    |buf| Ok(codec::get_array(buf, |buf| Ok(codec::get_i8(buf)?))?),
+                    |buf| codec::get_array(buf, |buf| codec::get_i8(buf)),
                 )?,
             )
         } else {
             None
         };
         let f2 = <SubChunkHeightmapDataRenderHeightMapType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f3 = if codec::get_bool(buf)? {
             Some(
                 codec::get_array(
                     buf,
-                    |buf| Ok(codec::get_array(buf, |buf| Ok(codec::get_i8(buf)?))?),
+                    |buf| codec::get_array(buf, |buf| codec::get_i8(buf)),
                 )?,
             )
         } else {
@@ -22189,7 +22913,13 @@ pub struct SubChunkPacketData {
 impl BedrockCodec for SubChunkPacketData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.sub_chunk_pos_offset, buf)?;
-        codec::put_u8(buf, (self.sub_chunk_request_result).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.sub_chunk_request_result).to_raw(),
+                "SubChunkPacketDataSubChunkRequestResult",
+            )?,
+        );
         match &self.serialized_sub_chunk {
             Some(v0) => {
                 codec::put_bool(buf, true);
@@ -22210,7 +22940,7 @@ impl BedrockCodec for SubChunkPacketData {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <SubChunkPosOffset as BedrockCodec>::deserialize(buf)?;
         let f1 = <SubChunkPacketDataSubChunkRequestResult as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = if codec::get_bool(buf)? {
             Some(codec::get_string(buf)?)
@@ -22257,8 +22987,8 @@ impl BedrockCodec for SubChunkPacketPayload {
         codec::put_bool(buf, self.cache_enabled);
         BedrockCodec::serialize(&self.dimension_type, buf)?;
         BedrockCodec::serialize(&self.center_pos, buf)?;
-        codec::put_len_var(buf, (&self.sub_chunk_data).len())?;
-        for v0 in (&self.sub_chunk_data).iter() {
+        codec::put_len_var(buf, self.sub_chunk_data.len())?;
+        for v0 in self.sub_chunk_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -22272,7 +23002,7 @@ impl BedrockCodec for SubChunkPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SubChunkPacketData as BedrockCodec>::deserialize(buf)?),
+                |buf| <SubChunkPacketData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -22358,8 +23088,8 @@ pub struct SubChunkRequestPacketPayload {
 impl BedrockCodec for SubChunkRequestPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.dimension_type, buf)?;
-        codec::put_len_var(buf, (&self.sub_chunk_position_offset_list).len())?;
-        for v0 in (&self.sub_chunk_position_offset_list).iter() {
+        codec::put_len_var(buf, self.sub_chunk_position_offset_list.len())?;
+        for v0 in self.sub_chunk_position_offset_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.center_pos, buf)?;
@@ -22372,7 +23102,7 @@ impl BedrockCodec for SubChunkRequestPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SubChunkPosOffset as BedrockCodec>::deserialize(buf)?),
+                |buf| <SubChunkPosOffset as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = <SubChunkPos as BedrockCodec>::deserialize(buf)?;
@@ -22429,8 +23159,8 @@ pub struct SyncStateData {
 }
 impl BedrockCodec for SyncStateData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.clock_data).len())?;
-        for v0 in (&self.clock_data).iter() {
+        codec::put_len_var(buf, self.clock_data.len())?;
+        for v0 in self.clock_data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -22441,7 +23171,7 @@ impl BedrockCodec for SyncStateData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<SyncWorldClockStateData as BedrockCodec>::deserialize(buf)?),
+                |buf| <SyncWorldClockStateData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { clock_data: f0 })
@@ -22559,8 +23289,8 @@ pub struct SynchedActorDataList {
 }
 impl BedrockCodec for SynchedActorDataList {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.data).len())?;
-        for v0 in (&self.data).iter() {
+        codec::put_len_var(buf, self.data.len())?;
+        for v0 in self.data.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -22571,7 +23301,7 @@ impl BedrockCodec for SynchedActorDataList {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<DataItemEntry as BedrockCodec>::deserialize(buf)?),
+                |buf| <DataItemEntry as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { data: f0 })
@@ -22921,16 +23651,13 @@ pub struct TintMapColor {
 }
 impl BedrockCodec for TintMapColor {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        for v0 in (&self.colors).iter() {
+        for v0 in self.colors.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_array(
-            buf,
-            |buf| Ok(<Color as BedrockCodec>::deserialize(buf)?),
-        )?;
+        let f0 = codec::get_array(buf, |buf| <Color as BedrockCodec>::deserialize(buf))?;
         Ok(Self { colors: f0 })
     }
 }
@@ -23168,7 +23895,10 @@ impl BedrockCodec for TransitionSettingsData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u32_var(buf, self.total_transition_ticks);
         codec::put_u32_var(buf, self.current_transition_ticks);
-        codec::put_i32_var(buf, (self.easing).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.easing).to_raw(), "EasingFunction")?,
+        );
         codec::put_string(buf, &self.clock_name)?;
         Ok(())
     }
@@ -23176,7 +23906,7 @@ impl BedrockCodec for TransitionSettingsData {
         let f0 = codec::get_u32_var(buf)?;
         let f1 = codec::get_u32_var(buf)?;
         let f2 = <EasingFunction as ProtocolEnum>::from_wire(
-            codec::get_i32_var(buf)? as i64,
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
         )?;
         let f3 = codec::get_string(buf)?;
         Ok(Self {
@@ -23197,12 +23927,12 @@ pub struct TrimDataPacketPayload {
 }
 impl BedrockCodec for TrimDataPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.trim_pattern_list).len())?;
-        for v0 in (&self.trim_pattern_list).iter() {
+        codec::put_len_var(buf, self.trim_pattern_list.len())?;
+        for v0 in self.trim_pattern_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.trim_material_list).len())?;
-        for v0 in (&self.trim_material_list).iter() {
+        codec::put_len_var(buf, self.trim_material_list.len())?;
+        for v0 in self.trim_material_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -23213,7 +23943,7 @@ impl BedrockCodec for TrimDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<TrimPattern as BedrockCodec>::deserialize(buf)?),
+                |buf| <TrimPattern as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = {
@@ -23221,7 +23951,7 @@ impl BedrockCodec for TrimDataPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<TrimMaterial as BedrockCodec>::deserialize(buf)?),
+                |buf| <TrimMaterial as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -23291,20 +24021,26 @@ pub struct UnlockedRecipesPacketPayload {
 }
 impl BedrockCodec for UnlockedRecipesPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u32_le(buf, (self.packet_type).to_raw() as u32);
-        codec::put_len_var(buf, (&self.unlocked_recipes_list).len())?;
-        for v0 in (&self.unlocked_recipes_list).iter() {
+        codec::put_u32_le(
+            buf,
+            codec::enum_to_wire(
+                (self.packet_type).to_raw(),
+                "UnlockedRecipesPacketPayloadPacketType",
+            )?,
+        );
+        codec::put_len_var(buf, self.unlocked_recipes_list.len())?;
+        for v0 in self.unlocked_recipes_list.iter() {
             codec::put_string(buf, v0)?;
         }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <UnlockedRecipesPacketPayloadPacketType as ProtocolEnum>::from_wire(
-            codec::get_u32_le(buf)? as i64,
+            codec::enum_from_wire(codec::get_u32_le(buf)?)?,
         )?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         Ok(Self {
             packet_type: f0,
@@ -23380,8 +24116,8 @@ pub struct UpdateAttributeLayersData {
 }
 impl BedrockCodec for UpdateAttributeLayersData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.attribute_layers).len())?;
-        for v0 in (&self.attribute_layers).iter() {
+        codec::put_len_var(buf, self.attribute_layers.len())?;
+        for v0 in self.attribute_layers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -23392,7 +24128,7 @@ impl BedrockCodec for UpdateAttributeLayersData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<AttributeLayerData as BedrockCodec>::deserialize(buf)?),
+                |buf| <AttributeLayerData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self { attribute_layers: f0 })
@@ -23411,8 +24147,8 @@ pub struct UpdateAttributesPacketPayload {
 impl BedrockCodec for UpdateAttributesPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.target_runtime_id, buf)?;
-        codec::put_len_var(buf, (&self.attribute_list).len())?;
-        for v0 in (&self.attribute_list).iter() {
+        codec::put_len_var(buf, self.attribute_list.len())?;
+        for v0 in self.attribute_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         BedrockCodec::serialize(&self.tick, buf)?;
@@ -23425,7 +24161,7 @@ impl BedrockCodec for UpdateAttributesPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<AttributeData as BedrockCodec>::deserialize(buf)?),
+                |buf| <AttributeData as BedrockCodec>::deserialize(buf),
             )?
         };
         let f2 = <PlayerInputTick as BedrockCodec>::deserialize(buf)?;
@@ -23549,7 +24285,7 @@ impl BedrockCodec for UpdateClientOptionsPacketPayload {
         match &self.graphics_mode_change {
             Some(v0) => {
                 codec::put_bool(buf, true);
-                codec::put_u8(buf, (*v0).to_raw() as u8);
+                codec::put_u8(buf, codec::enum_to_wire((*v0).to_raw(), "GraphicsMode")?);
             }
             None => codec::put_bool(buf, false),
         }
@@ -23564,7 +24300,11 @@ impl BedrockCodec for UpdateClientOptionsPacketPayload {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = if codec::get_bool(buf)? {
-            Some(<GraphicsMode as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?)
+            Some(
+                <GraphicsMode as ProtocolEnum>::from_wire(
+                    codec::enum_from_wire(codec::get_u8(buf)?)?,
+                )?,
+            )
         } else {
             None
         };
@@ -23589,8 +24329,8 @@ impl BedrockCodec for UpdateEnvironmentAttributesData {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.attribute_layer_name)?;
         BedrockCodec::serialize(&self.attribute_layer_dimension, buf)?;
-        codec::put_len_var(buf, (&self.attributes).len())?;
-        for v0 in (&self.attributes).iter() {
+        codec::put_len_var(buf, self.attributes.len())?;
+        for v0 in self.attributes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -23603,7 +24343,7 @@ impl BedrockCodec for UpdateEnvironmentAttributesData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<EnvironmentAttributeData as BedrockCodec>::deserialize(buf)?),
+                |buf| <EnvironmentAttributeData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -23665,13 +24405,18 @@ pub struct UpdatePlayerGameTypePacketPayload {
 }
 impl BedrockCodec for UpdatePlayerGameTypePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_i32_var(buf, (self.player_game_type).to_raw() as i32);
+        codec::put_i32_var(
+            buf,
+            codec::enum_to_wire((self.player_game_type).to_raw(), "GameType")?,
+        );
         BedrockCodec::serialize(&self.target_player, buf)?;
         BedrockCodec::serialize(&self.tick, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <GameType as ProtocolEnum>::from_wire(codec::get_i32_var(buf)? as i64)?;
+        let f0 = <GameType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_i32_var(buf)?)?,
+        )?;
         let f1 = <ActorUniqueID as BedrockCodec>::deserialize(buf)?;
         let f2 = <PlayerInputTick as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
@@ -23694,21 +24439,24 @@ pub struct UpdateSoftEnumPacketPayload {
 impl BedrockCodec for UpdateSoftEnumPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_string(buf, &self.enum_name)?;
-        codec::put_len_var(buf, (&self.values).len())?;
-        for v0 in (&self.values).iter() {
+        codec::put_len_var(buf, self.values.len())?;
+        for v0 in self.values.iter() {
             codec::put_string(buf, v0)?;
         }
-        codec::put_u8(buf, (self.update_type).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire((self.update_type).to_raw(), "SoftEnumUpdateType")?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_string(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_string(buf))?
         };
         let f2 = <SoftEnumUpdateType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             enum_name: f0,
@@ -23727,12 +24475,12 @@ pub struct UpdateSubChunkBlocksChangedInfo {
 }
 impl BedrockCodec for UpdateSubChunkBlocksChangedInfo {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.blocks_changed_standards).len())?;
-        for v0 in (&self.blocks_changed_standards).iter() {
+        codec::put_len_var(buf, self.blocks_changed_standards.len())?;
+        for v0 in self.blocks_changed_standards.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.blocks_changed_extras).len())?;
-        for v0 in (&self.blocks_changed_extras).iter() {
+        codec::put_len_var(buf, self.blocks_changed_extras.len())?;
+        for v0 in self.blocks_changed_extras.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -23743,9 +24491,7 @@ impl BedrockCodec for UpdateSubChunkBlocksChangedInfo {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <UpdateSubChunkNetworkBlockInfo as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <UpdateSubChunkNetworkBlockInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         let f1 = {
@@ -23753,9 +24499,7 @@ impl BedrockCodec for UpdateSubChunkBlocksChangedInfo {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <UpdateSubChunkNetworkBlockInfo as BedrockCodec>::deserialize(buf)?,
-                ),
+                |buf| <UpdateSubChunkNetworkBlockInfo as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -23955,17 +24699,29 @@ pub struct VirtualContainerClosePacketPayload {
 impl BedrockCodec for VirtualContainerClosePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         codec::put_u64_var(buf, self.session_id);
-        codec::put_u8(buf, (self.kind).to_raw() as u8);
-        codec::put_u8(buf, (self.cause).to_raw() as u8);
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.kind).to_raw(),
+                "VirtualContainerClosePacketPayloadKind",
+            )?,
+        );
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (self.cause).to_raw(),
+                "VirtualContainerClosePacketPayloadCause",
+            )?,
+        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = codec::get_u64_var(buf)?;
         let f1 = <VirtualContainerClosePacketPayloadKind as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         let f2 = <VirtualContainerClosePacketPayloadCause as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         Ok(Self {
             session_id: f0,
@@ -23999,8 +24755,8 @@ impl BedrockCodec for VirtualContainerOpenPacketPayload {
         codec::put_u8(buf, self.container_id);
         codec::put_u64_var(buf, self.session_id);
         codec::put_string(buf, &self.title)?;
-        codec::put_len_var(buf, (&self.slots).len())?;
-        for v0 in (&self.slots).iter() {
+        codec::put_len_var(buf, self.slots.len())?;
+        for v0 in self.slots.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -24014,10 +24770,8 @@ impl BedrockCodec for VirtualContainerOpenPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -24047,12 +24801,12 @@ pub struct VoxelShapesPacketPayload {
 }
 impl BedrockCodec for VoxelShapesPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, (&self.shapes).len())?;
-        for v0 in (&self.shapes).iter() {
+        codec::put_len_var(buf, self.shapes.len())?;
+        for v0 in self.shapes.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_len_var(buf, (&self.name_map).len())?;
-        for (k0, v0) in (&self.name_map).iter() {
+        codec::put_len_var(buf, self.name_map.len())?;
+        for (k0, v0) in self.name_map.iter() {
             codec::put_string(buf, k0)?;
             BedrockCodec::serialize(v0, buf)?;
         }
@@ -24065,10 +24819,8 @@ impl BedrockCodec for VoxelShapesPacketPayload {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(
-                    <VoxelShapesSerializableVoxelShape as BedrockCodec>::deserialize(
-                        buf,
-                    )?,
+                |buf| <VoxelShapesSerializableVoxelShape as BedrockCodec>::deserialize(
+                    buf,
                 ),
             )?
         };
@@ -24132,8 +24884,8 @@ impl BedrockCodec for VoxelShapesSerializableCells {
         codec::put_u8(buf, self.x_size);
         codec::put_u8(buf, self.y_size);
         codec::put_u8(buf, self.z_size);
-        codec::put_len_var(buf, (&self.storage).len())?;
-        for v0 in (&self.storage).iter() {
+        codec::put_len_var(buf, self.storage.len())?;
+        for v0 in self.storage.iter() {
             codec::put_u8(buf, *v0);
         }
         Ok(())
@@ -24144,7 +24896,7 @@ impl BedrockCodec for VoxelShapesSerializableCells {
         let f2 = codec::get_u8(buf)?;
         let f3 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_u8(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_u8(buf))?
         };
         Ok(Self {
             x_size: f0,
@@ -24177,16 +24929,16 @@ pub struct VoxelShapesSerializableVoxelShape {
 impl BedrockCodec for VoxelShapesSerializableVoxelShape {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
         BedrockCodec::serialize(&self.cells, buf)?;
-        codec::put_len_var(buf, (&self.x_coordinates).len())?;
-        for v0 in (&self.x_coordinates).iter() {
+        codec::put_len_var(buf, self.x_coordinates.len())?;
+        for v0 in self.x_coordinates.iter() {
             codec::put_f32_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.y_coordinates).len())?;
-        for v0 in (&self.y_coordinates).iter() {
+        codec::put_len_var(buf, self.y_coordinates.len())?;
+        for v0 in self.y_coordinates.iter() {
             codec::put_f32_le(buf, *v0);
         }
-        codec::put_len_var(buf, (&self.z_coordinates).len())?;
-        for v0 in (&self.z_coordinates).iter() {
+        codec::put_len_var(buf, self.z_coordinates.len())?;
+        for v0 in self.z_coordinates.iter() {
             codec::put_f32_le(buf, *v0);
         }
         Ok(())
@@ -24195,15 +24947,15 @@ impl BedrockCodec for VoxelShapesSerializableVoxelShape {
         let f0 = <VoxelShapesSerializableCells as BedrockCodec>::deserialize(buf)?;
         let f1 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_f32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_f32_le(buf))?
         };
         let f2 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_f32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_f32_le(buf))?
         };
         let f3 = {
             let len = codec::get_len_var(buf)?;
-            codec::get_vec(buf, len, |buf| Ok(codec::get_f32_le(buf)?))?
+            codec::get_vec(buf, len, |buf| codec::get_f32_le(buf))?
         };
         Ok(Self {
             cells: f0,
@@ -24305,8 +25057,8 @@ impl BedrockCodec for WorldClockData {
         codec::put_string(buf, &self.name)?;
         codec::put_i32_var(buf, self.time);
         codec::put_bool(buf, self.is_paused);
-        codec::put_len_var(buf, (&self.time_markers).len())?;
-        for v0 in (&self.time_markers).iter() {
+        codec::put_len_var(buf, self.time_markers.len())?;
+        for v0 in self.time_markers.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
         Ok(())
@@ -24321,7 +25073,7 @@ impl BedrockCodec for WorldClockData {
             codec::get_vec(
                 buf,
                 len,
-                |buf| Ok(<TimeMarkerData as BedrockCodec>::deserialize(buf)?),
+                |buf| <TimeMarkerData as BedrockCodec>::deserialize(buf),
             )?
         };
         Ok(Self {
@@ -24627,7 +25379,7 @@ impl BedrockCodec for ClientboundUpdateSoundDataPacketPayloadEvent {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let tag = <SoundDataEventType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         if tag == SoundDataEventType::Stop {
             return Ok(Self::Stop(Stop::deserialize_body(buf)?));
@@ -24678,7 +25430,7 @@ impl BedrockCodec for Color255RGB {
             }
             Self::List(v) => {
                 codec::put_u32_var(buf, 1);
-                for v0 in (v).iter() {
+                for v0 in v.iter() {
                     codec::put_i32_le(buf, *v0);
                 }
             }
@@ -24688,9 +25440,7 @@ impl BedrockCodec for Color255RGB {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         match codec::get_u32_var(buf)? {
             0 => Ok(Self::String(codec::get_string(buf)?)),
-            1 => {
-                Ok(Self::List(codec::get_array(buf, |buf| Ok(codec::get_i32_le(buf)?))?))
-            }
+            1 => Ok(Self::List(codec::get_array(buf, |buf| codec::get_i32_le(buf))?)),
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "Color255RGB",
@@ -24722,7 +25472,7 @@ impl BedrockCodec for Color255RGBA {
             }
             Self::List(v) => {
                 codec::put_u32_var(buf, 1);
-                for v0 in (v).iter() {
+                for v0 in v.iter() {
                     codec::put_i32_le(buf, *v0);
                 }
             }
@@ -24732,9 +25482,7 @@ impl BedrockCodec for Color255RGBA {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         match codec::get_u32_var(buf)? {
             0 => Ok(Self::String(codec::get_string(buf)?)),
-            1 => {
-                Ok(Self::List(codec::get_array(buf, |buf| Ok(codec::get_i32_le(buf)?))?))
-            }
+            1 => Ok(Self::List(codec::get_array(buf, |buf| codec::get_i32_le(buf))?)),
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "Color255RGBA",
@@ -24766,7 +25514,7 @@ impl BedrockCodec for ColorNormRGB {
             }
             Self::List(v) => {
                 codec::put_u32_var(buf, 1);
-                for v0 in (v).iter() {
+                for v0 in v.iter() {
                     codec::put_f32_le(buf, *v0);
                 }
             }
@@ -24776,9 +25524,7 @@ impl BedrockCodec for ColorNormRGB {
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         match codec::get_u32_var(buf)? {
             0 => Ok(Self::String(codec::get_string(buf)?)),
-            1 => {
-                Ok(Self::List(codec::get_array(buf, |buf| Ok(codec::get_f32_le(buf)?))?))
-            }
+            1 => Ok(Self::List(codec::get_array(buf, |buf| codec::get_f32_le(buf))?)),
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "ColorNormRGB",
@@ -24954,7 +25700,9 @@ impl BedrockCodec for DataItemEntryPayload {
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let tag = <DataItemType as ProtocolEnum>::from_wire(codec::get_u8(buf)? as i64)?;
+        let tag = <DataItemType as ProtocolEnum>::from_wire(
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
+        )?;
         if tag == DataItemType::Byte {
             return Ok(Self::Byte(DataItemBytePayload::deserialize_body(buf)?));
         }
@@ -25433,7 +26181,7 @@ impl BedrockCodec for ItemStackRequestActions {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let tag = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         if tag == ItemStackRequestActionType::Take {
             return Ok(Self::Take(ItemStackRequestTakeAction::deserialize_body(buf)?));
@@ -25587,7 +26335,7 @@ impl BedrockCodec for ItemStackRequestNetworkItemInstanceDescriptorItemDescripto
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let tag = <ItemDescriptorType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         if tag == ItemDescriptorType::Empty {
             return Ok(Self::EmptyItem(EmptyItemDescriptor::deserialize_body(buf)?));
@@ -26312,7 +27060,7 @@ impl BedrockCodec for RecipeIngredientItemDescriptor {
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let tag = <ItemDescriptorType as ProtocolEnum>::from_wire(
-            codec::get_u8(buf)? as i64,
+            codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
         if tag == ItemDescriptorType::Empty {
             return Ok(Self::EmptyItem(EmptyItemDescriptor::deserialize_body(buf)?));
@@ -26439,8 +27187,8 @@ impl BedrockCodec for ServerboundPackSettingChangePacketPayloadPackSettingValue 
             }
             Self::List(v) => {
                 codec::put_u32_var(buf, 3);
-                codec::put_len_var(buf, (v).len())?;
-                for v0 in (v).iter() {
+                codec::put_len_var(buf, v.len())?;
+                for v0 in v.iter() {
                     codec::put_string(buf, v0)?;
                 }
             }
@@ -26456,7 +27204,7 @@ impl BedrockCodec for ServerboundPackSettingChangePacketPayloadPackSettingValue 
                 Ok(
                     Self::List({
                         let len = codec::get_len_var(buf)?;
-                        codec::get_vec(buf, len, |buf| Ok(codec::get_string(buf)?))?
+                        codec::get_vec(buf, len, |buf| codec::get_string(buf))?
                     }),
                 )
             }

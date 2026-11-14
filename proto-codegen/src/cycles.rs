@@ -189,6 +189,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::field_reassign_with_default)]
     fn boxes_direct_indirect_and_self_recursion() {
         let mut model = Model::default();
         model.structs = vec![

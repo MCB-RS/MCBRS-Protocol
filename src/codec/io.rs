@@ -64,7 +64,8 @@ pub fn get_bool<B: Buf>(buf: &mut B) -> Result<bool> {
     Ok(get_u8(buf)? != 0)
 }
 
-/// Unsigned LEB128, at most 5 bytes.
+/// Unsigned LEB128, at most 5 bytes. Decoding rejects encodings whose
+/// payload does not fit in 32 bits instead of silently dropping bits.
 pub fn put_u32_var<B: BufMut>(buf: &mut B, mut value: u32) {
     while value >= 0x80 {
         buf.put_u8((value as u8) | 0x80);
@@ -77,7 +78,12 @@ pub fn get_u32_var<B: Buf>(buf: &mut B) -> Result<u32> {
     let mut value = 0u32;
     for shift in (0..35).step_by(7) {
         let byte = get_u8(buf)?;
-        value |= ((byte & 0x7f) as u32) << shift;
+        let bits = (byte & 0x7f) as u32;
+        // The fifth byte only has room for the 4 highest bits.
+        if shift == 28 && bits > 0x0f {
+            return Err(ProtocolError::IntegerOutOfRange { type_name: "u32", value: (bits as i128) << shift });
+        }
+        value |= bits << shift;
         if byte & 0x80 == 0 {
             return Ok(value);
         }
@@ -98,7 +104,12 @@ pub fn get_u64_var<B: Buf>(buf: &mut B) -> Result<u64> {
     let mut value = 0u64;
     for shift in (0..70).step_by(7) {
         let byte = get_u8(buf)?;
-        value |= ((byte & 0x7f) as u64) << shift;
+        let bits = (byte & 0x7f) as u64;
+        // The tenth byte only has room for the highest bit.
+        if shift == 63 && bits > 1 {
+            return Err(ProtocolError::IntegerOutOfRange { type_name: "u64", value: (bits as i128) << shift });
+        }
+        value |= bits << shift;
         if byte & 0x80 == 0 {
             return Ok(value);
         }
@@ -210,6 +221,24 @@ pub fn get_string<B: Buf>(buf: &mut B) -> Result<String> {
 /// Upper bound, in bytes, of what a length prefix may reserve up front.
 const MAX_PREALLOCATION: usize = 64 * 1024;
 
+/// Capacity to reserve for `len` announced elements of type `T`: never more
+/// than the input could hold, never more than 64 KiB.
+pub fn bounded_capacity<T>(len: usize, remaining: usize) -> usize {
+    let element_size = std::mem::size_of::<T>().max(1);
+    len.min(remaining).min(MAX_PREALLOCATION / element_size)
+}
+
+/// Numeric value of an enum, converted to the integer type used on the wire.
+/// Fails instead of truncating when the value does not fit.
+pub fn enum_to_wire<T: TryFrom<i64>>(raw: i64, enum_name: &'static str) -> Result<T> {
+    T::try_from(raw).map_err(|_| ProtocolError::InvalidEnumValue { enum_name, value: raw })
+}
+
+/// Integer read from the wire, widened to the `i64` enums are looked up with.
+pub fn enum_from_wire<T: TryInto<i64> + Into<i128> + Copy>(value: T) -> Result<i64> {
+    value.try_into().map_err(|_| ProtocolError::IntegerOutOfRange { type_name: "i64", value: value.into() })
+}
+
 /// Largest collection of elements that occupy no byte at all on the wire.
 const MAX_EMPTY_ELEMENTS: usize = 1 << 16;
 
@@ -220,8 +249,7 @@ const MAX_EMPTY_ELEMENTS: usize = 1 << 16;
 /// actually decoded), and a huge count of elements that consume no input is
 /// rejected instead of spinning.
 pub fn get_vec<B: Buf, T>(buf: &mut B, len: usize, mut read: impl FnMut(&mut B) -> Result<T>) -> Result<Vec<T>> {
-    let element_size = std::mem::size_of::<T>().max(1);
-    let mut out = Vec::with_capacity(len.min(buf.remaining()).min(MAX_PREALLOCATION / element_size));
+    let mut out = Vec::with_capacity(bounded_capacity::<T>(len, buf.remaining()));
     for _ in 0..len {
         let before = buf.remaining();
         out.push(read(buf)?);

@@ -342,9 +342,13 @@ impl BedrockCodec for PacketHeader {
         if self.packet_id > 0x3ff {
             return Err(ProtocolError::IntegerOutOfRange { type_name: "packet id", value: self.packet_id as i128 });
         }
-        let raw = self.packet_id
-            | ((self.sender_sub_client as u32 & 0x3) << 10)
-            | ((self.target_sub_client as u32 & 0x3) << 12);
+        // Sub-client ids are 2 bits wide; refuse to truncate anything larger.
+        for sub_client in [self.sender_sub_client, self.target_sub_client] {
+            if sub_client > 0x3 {
+                return Err(ProtocolError::IntegerOutOfRange { type_name: "sub-client id", value: sub_client as i128 });
+            }
+        }
+        let raw = self.packet_id | ((self.sender_sub_client as u32) << 10) | ((self.target_sub_client as u32) << 12);
         put_u32_var(buf, raw);
         Ok(())
     }
@@ -377,9 +381,7 @@ pub trait ProtocolEnum: Copy + Sized + 'static {
 
     /// Name of the variant as written on the wire when the enum is
     /// serialized as a string: the documented name in lower case.
-    fn wire_name(self) -> String {
-        self.name().to_ascii_lowercase()
-    }
+    fn wire_name(self) -> &'static str;
 
     /// Like [`ProtocolEnum::from_raw`] but with a protocol error.
     fn from_wire(raw: i64) -> Result<Self> {
@@ -502,6 +504,19 @@ mod tests {
         assert_eq!(VarUInt32::from_bytes(&[0x80]), Err(ProtocolError::UnexpectedEof { needed: 1, remaining: 0 }));
         assert!(matches!(get_u8_var(&mut [0x80u8, 0x02].as_slice()), Err(ProtocolError::IntegerOutOfRange { .. })));
         assert_eq!(get_i8_var(&mut [0x01u8].as_slice()), Ok(-1));
+        // Bits that do not fit are an error, not silently dropped.
+        assert!(matches!(
+            VarUInt32::from_bytes(&[0xff, 0xff, 0xff, 0xff, 0x1f]),
+            Err(ProtocolError::IntegerOutOfRange { .. })
+        ));
+        assert!(matches!(
+            VarUInt64::from_bytes(&[0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x02]),
+            Err(ProtocolError::IntegerOutOfRange { .. })
+        ));
+        assert_eq!(enum_to_wire::<u8>(300, "E"), Err(ProtocolError::InvalidEnumValue { enum_name: "E", value: 300 }));
+        assert_eq!(enum_to_wire::<i8>(-1, "E"), Ok(-1));
+        assert!(enum_from_wire(u64::MAX).is_err());
+        assert_eq!(enum_from_wire(-5i8), Ok(-5));
     }
 
     #[test]
@@ -549,5 +564,6 @@ mod tests {
         roundtrip(PacketHeader::new(0x8f), &[0x8f, 0x01]);
         roundtrip(PacketHeader { packet_id: 1, sender_sub_client: 1, target_sub_client: 2 }, &[0x81, 0x48]);
         assert!(PacketHeader::new(0x400).to_bytes().is_err());
+        assert!(PacketHeader { packet_id: 1, sender_sub_client: 4, target_sub_client: 0 }.to_bytes().is_err());
     }
 }

@@ -7,6 +7,7 @@ pub type Result<T, E = ProtocolError> = std::result::Result<T, E>;
 
 /// Everything that can go wrong while encoding or decoding protocol data.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum ProtocolError {
     /// The buffer ended before the value was fully read.
     UnexpectedEof { needed: usize, remaining: usize },
@@ -34,6 +35,19 @@ pub enum ProtocolError {
     NbtTooDeep,
     /// Bytes were left in the buffer after a complete value was decoded.
     TrailingBytes { remaining: usize },
+    /// A packet could not be encoded or decoded; `source` says why.
+    Packet { name: &'static str, source: Box<ProtocolError> },
+}
+
+impl ProtocolError {
+    /// Attaches the name of the packet being processed to the error.
+    pub fn in_packet(self, name: &'static str) -> Self {
+        match self {
+            // Already attributed (nested call): keep the innermost packet.
+            Self::Packet { .. } => self,
+            source => Self::Packet { name, source: Box::new(source) },
+        }
+    }
 }
 
 impl fmt::Display for ProtocolError {
@@ -58,8 +72,16 @@ impl fmt::Display for ProtocolError {
             Self::InvalidNbtTagType(id) => write!(f, "invalid NBT tag type {id}"),
             Self::NbtTooDeep => f.write_str("NBT data is nested too deeply"),
             Self::TrailingBytes { remaining } => write!(f, "{remaining} trailing byte(s) after value"),
+            Self::Packet { name, source } => write!(f, "{name}: {source}"),
         }
     }
 }
 
-impl std::error::Error for ProtocolError {}
+impl std::error::Error for ProtocolError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Packet { source, .. } => Some(source.as_ref()),
+            _ => None,
+        }
+    }
+}
