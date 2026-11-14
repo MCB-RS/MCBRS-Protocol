@@ -140,7 +140,14 @@ pub struct Node {
     pub min_items: Option<u64>,
     pub max_items: Option<u64>,
     pub max_length: Option<u64>,
+    pub min_length: Option<u64>,
+    pub max_properties: Option<u64>,
+    pub minimum: Option<f64>,
+    pub maximum: Option<f64>,
     pub runtime_constraint: Option<String>,
+    /// The property documents a `default`: the C++ member is a plain value
+    /// with an initializer, not a `std::optional`.
+    pub has_default: bool,
 }
 
 #[derive(Debug)]
@@ -291,20 +298,26 @@ fn parse_node(location: &str, object: &Map<String, Value>, is_root: bool) -> Res
             "x-runtime-constraint-description" => {
                 node.runtime_constraint = Some(as_str(location, key, value)?.to_owned())
             }
-            // Validation-only keywords: they constrain values, not the layout.
+            // Value limits: they do not change the layout, but they are kept
+            // so the generated code can check them (`Validate`).
             "minimum" | "maximum" => {
-                if !value.is_number() {
-                    return err(location, format!("{key} must be a number"));
+                let number = value.as_f64().ok_or_else(|| SchemaError {
+                    location: location.to_owned(),
+                    message: format!("{key} must be a number"),
+                })?;
+                if key == "minimum" {
+                    node.minimum = Some(number);
+                } else {
+                    node.maximum = Some(number);
                 }
             }
-            "minLength" | "maxProperties" => {
-                as_u64(location, key, value)?;
-            }
+            "minLength" => node.min_length = Some(as_u64(location, key, value)?),
+            "maxProperties" => node.max_properties = Some(as_u64(location, key, value)?),
             "pattern" => {
                 as_str(location, key, value)?;
             }
-            // Documentation of the C++ default value; any JSON value.
-            "default" => {}
+            // The C++ default value; any JSON value. Only its presence matters.
+            "default" => node.has_default = true,
             other => return err(location, format!("unknown schema key {other:?}")),
         }
     }

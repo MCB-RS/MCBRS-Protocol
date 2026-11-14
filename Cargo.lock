@@ -47,6 +47,7 @@ name = "mcbrs-protocol"
 version = "0.1.0"
 dependencies = [
  "bytes",
+ "serde_json",
 ]
 
 [[package]]

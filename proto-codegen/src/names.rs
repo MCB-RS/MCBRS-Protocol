@@ -19,7 +19,7 @@ pub const RESERVED_TYPE_NAMES: &[&str] = &[
     "Self", "Option", "Some", "None", "Result", "Ok", "Err", "Vec", "String", "Box", "Default", "Clone", "Copy",
     "Debug", "PartialEq", "Eq", "Hash", "From", "Into", "TryFrom", "TryInto", "Iterator", "Sized", "Send", "Sync",
     "BedrockCodec", "Buf", "BufMut", "ProtocolError", "ProtocolEnum", "MaybeUnknown", "NetworkNbt", "Packet", "Sample",
-    "Gen",
+    "Gen", "BedrockString", "Validate",
 ];
 
 /// Splits on everything that is not an ASCII letter or digit.

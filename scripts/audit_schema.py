@@ -7,7 +7,11 @@ Walks every JSON file under vendor/bedrock-protocol-docs/json and reports:
   * every structural "shape" (sorted key-set) of a schema node,
   * the JSON value kinds seen for each key.
 
-Usage: python scripts/audit_schema.py [json_dir] [--shapes]
+  * with --optional: every property missing from `required`, split by whether
+    it documents a `default` (a plain member) or not (a `std::optional`), and
+    every `x-runtime-constraint-description`.
+
+Usage: python scripts/audit_schema.py [json_dir] [--shapes] [--optional]
 """
 import json, os, sys, collections
 
@@ -92,3 +96,46 @@ for k in sorted(values):
 print("\n== node shapes: %d ==" % len(shapes))
 if show_shapes:
     for s, c in shapes.most_common(): print("%6d  %s   e.g. %s" % (c, list(s), shape_example[s]))
+
+
+if "--optional" in sys.argv:
+    # A property missing from `required` is one of two things on the wire:
+    #   * with a `default`: a plain C++ member with an initializer, always written;
+    #   * without: a std::optional, written as a bool followed by the value.
+    # Presence conditions that Mojang only states in prose ("Present only
+    # when...") are std::optional too: the flag is on the wire either way.
+    defaulted, optional, constraints = [], [], []
+
+    def visit(doc, node, path):
+        if not isinstance(node, dict):
+            return
+        if "x-runtime-constraint-description" in node:
+            constraints.append((doc, path or "<root>", node["x-runtime-constraint-description"]))
+        required = set(node.get("required", []))
+        for name, prop in node.get("properties", {}).items():
+            where = path + "/" + name
+            if isinstance(prop, dict) and name not in required and "const" not in prop:
+                # Map entries are spelled {key, value} without `required`.
+                if not path.endswith("<additionalProperties>"):
+                    text = " ".join((prop.get("description") or "").split())
+                    target = defaulted if "default" in prop else optional
+                    target.append((doc, where, json.dumps(prop.get("default"))[:30] if "default" in prop else "", text[:110]))
+            visit(doc, prop, where)
+        for key in ("items", "additionalProperties"):
+            visit(doc, node.get(key), path + "/<" + key + ">")
+        for index, branch in enumerate(node.get("oneOf", [])):
+            visit(doc, branch, path + "/oneOf[%d]" % index)
+
+    for f in files:
+        with open(os.path.join(root, f), encoding="utf-8") as fh:
+            visit(f[:-5], json.load(fh), "")
+
+    print("\n== not required, no default -> std::optional (%d) ==" % len(optional))
+    for doc, where, _, text in optional:
+        print("  %s%s%s" % (doc, where, ("  # " + text) if text else ""))
+    print("\n== not required, with default -> plain member (%d) ==" % len(defaulted))
+    for doc, where, default, text in defaulted:
+        print("  %s%s = %s" % (doc, where, default))
+    print("\n== x-runtime-constraint-description (%d) ==" % len(constraints))
+    for doc, where, text in constraints:
+        print("  %s%s: %s" % (doc, where, text))

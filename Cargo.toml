@@ -15,3 +15,5 @@ exclude = ["vendor/", "proto-codegen/", "scripts/", ".github/"]
 
 [dependencies]
 bytes = "1"
+# Only used to read the JSON documents of the login connection request.
+serde_json = "1"

@@ -1,7 +1,7 @@
 //! Test-only helpers: a tiny deterministic generator used by the generated
 //! round-trip tests to fill every packet with non-trivial data.
 
-use crate::codec::{NbtTag, NetworkNbt};
+use crate::codec::{BedrockString, ConnectionRequest, NbtTag, NetworkNbt};
 
 /// Deterministic pseudo-random generator (xorshift64*), with a budget that
 /// bounds the amount of optional / repeated data so samples stay small even
@@ -116,5 +116,25 @@ impl Sample for NetworkNbt {
             _ => NbtTag::Compound(vec![("flag".to_owned(), NbtTag::Byte(Sample::sample(g)))]),
         };
         NetworkNbt::new(root)
+    }
+}
+
+impl Sample for BedrockString {
+    fn sample(g: &mut Gen) -> Self {
+        // Text most of the time, raw bytes (not UTF-8) now and then: both
+        // must survive a round trip untouched.
+        match g.below(4) {
+            0 => BedrockString::from(vec![0xff, 0x00, 0xc8, 0x80]),
+            _ => BedrockString::from(String::sample(g)),
+        }
+    }
+}
+
+impl Sample for ConnectionRequest {
+    fn sample(g: &mut Gen) -> Self {
+        match g.below(2) {
+            0 => ConnectionRequest::default(),
+            _ => ConnectionRequest::from_chain(&["aaa.bbb.ccc", "ddd.eee.fff"], "hhh.ppp.sss"),
+        }
     }
 }
