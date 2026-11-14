@@ -1,2 +1,6 @@
 /target
 **/*.rs.bk
+
+# Mojang's schemas: downloaded on demand by scripts/fetch-mojang-protocol.sh,
+# never committed (they are (c) Mojang AB, all rights reserved).
+/vendor/

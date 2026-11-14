@@ -30,8 +30,13 @@ jobs:
 
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
 
-      # src/generated/ must be exactly what the generator produces from the
-      # vendored schemas: catches hand edits and forgotten regenerations.
+      # Mojang's schemas are not stored in the repository: download exactly
+      # the version src/generated/ was built from.
+      - name: Download Mojang's schemas
+        run: bash scripts/fetch-mojang-protocol.sh "$(tr -d '[:space:]' < .mojang-protocol-sha)"
+
+      # src/generated/ must be exactly what the generator produces from those
+      # schemas: catches hand edits and forgotten regenerations.
       - name: Generated code is up to date
         run: cargo run --locked --bin proto-codegen -- --check
 

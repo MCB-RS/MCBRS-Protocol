@@ -1,3 +1,2 @@
 * text=auto eol=lf
 src/generated/** linguist-generated=true
-vendor/** linguist-vendored=true
