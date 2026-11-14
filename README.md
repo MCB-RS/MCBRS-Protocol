@@ -28,9 +28,9 @@ encode_batch(&[reply], &mut out)?;
 | `src/codec/` | Hand-written: `BedrockCodec`, `ProtocolError`, wire primitives, NBT, framing, login envelope |
 | `src/generated/` | Generated: `enums.rs`, `types.rs`, `packets.rs`, `mod.rs` (+ test-only `samples.rs`) |
 | `proto-codegen/` | The generator (`cargo run --bin proto-codegen`) |
-| `vendor/bedrock-protocol-docs/json/` | Mojang's schemas, as downloaded |
-| `.mojang-protocol-sha` | Commit of Mojang's `main` the schemas come from |
-| `scripts/fetch-mojang-protocol.sh` | Downloads `json/` and records the commit |
+| `vendor/bedrock-protocol-docs/json/` | Mojang's schemas. **Not in the repository**: downloaded locally on demand, git-ignored |
+| `.mojang-protocol-sha` | Commit of Mojang's `main` that `src/generated/` was built from |
+| `scripts/fetch-mojang-protocol.sh` | Downloads the schemas into `vendor/` and records the commit |
 | `scripts/audit_schema.py` | Exhaustive inventory of the meta-schema |
 | `tests/wire_vectors.rs` | Byte-exact vectors for the handshake packets and the framing |
 | `.github/workflows/sync-mojang-protocol.yml` | Checks Mojang's `main` every 6 hours and opens a PR |
@@ -38,14 +38,26 @@ encode_batch(&[reply], &mut out)?;
 
 ## Updating the protocol
 
+Using the crate needs nothing from Mojang: `src/generated/` is committed. Only regenerating it needs
+the schemas, which are downloaded into the git-ignored `vendor/` and never committed.
+
 ```sh
-scripts/fetch-mojang-protocol.sh      # json/ + .mojang-protocol-sha
-cargo run --bin proto-codegen         # rewrites src/generated/
+bash scripts/fetch-mojang-protocol.sh            # latest Mojang `main` + .mojang-protocol-sha
+cargo run --bin proto-codegen                    # rewrites src/generated/
 cargo check && cargo test
 ```
 
-`cargo run --bin proto-codegen -- --check` verifies that `src/generated/` matches the schemas without
-writing anything. The GitHub workflow runs the three commands above whenever Mojang's `main` moves.
+| Command | Fetches |
+| --- | --- |
+| `fetch-mojang-protocol.sh` or `--latest` | the latest commit of Mojang's `main`; updates `.mojang-protocol-sha` |
+| `fetch-mojang-protocol.sh --locked` | the commit recorded in `.mojang-protocol-sha` |
+| `fetch-mojang-protocol.sh <sha>` | that exact commit (full 40-character SHA) |
+
+`--locked` is the reproducible mode: it downloads exactly the schemas the committed code was built
+from. With them in place, `cargo run --bin proto-codegen -- --check` verifies that `src/generated/`
+matches without writing anything; CI does both on every pull request. The sync workflow fetches the
+latest version, regenerates, and opens a pull request containing only `.mojang-protocol-sha` and
+`src/generated/`.
 
 ## Codec
 
@@ -208,7 +220,24 @@ gophertunnel's code. They are **not** captures of a live session, and gophertunn
 release behind the schemas. Rules marked "not checked" above, and every packet not named in the
 table, rest on the schema alone. Confirm against real traffic before relying on a given packet.
 
-## Licensing
+## Licensing & Legal Disclaimer
 
-The crate is MIT licensed. The files under `vendor/bedrock-protocol-docs/` are (c) Mojang AB and remain
-subject to their own license (see `vendor/bedrock-protocol-docs/LICENSE`).
+**NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**
+
+**PAS UN PRODUIT MINECRAFT OFFICIEL. NON APPROUVÉ OU ASSOCIÉ À MOJANG OU MICROSOFT.**
+
+- **License.** `mcbrs-protocol` and `proto-codegen` are an independent implementation, released under
+  the [MIT license](LICENSE).
+- **Mojang's files.** The current tree of this repository and the published crate contain no file
+  owned by Mojang AB or Microsoft Corporation. The schemas of
+  [`Mojang/bedrock-protocol-docs`](https://github.com/Mojang/bedrock-protocol-docs) are downloaded
+  from Mojang onto your machine when you run the generator; they stay subject to Mojang's license and
+  to the [Minecraft EULA](https://www.minecraft.net/en-us/eula).
+- **Generated code.** `src/generated/` is produced from those schemas and reuses the names and field
+  descriptions they document.
+- **Publisher / Owner:** MCB-RS, solely responsible for this software. Mojang AB and Microsoft
+  Corporation are not responsible for this product.
+- **Contact:** [GitHub Issues](https://github.com/MCB-RS/MCBRS-Protocol/issues), or the security
+  contact of the MCB-RS organization.
+
+Minecraft is a trademark of Mojang AB.

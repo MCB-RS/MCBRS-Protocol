@@ -110,9 +110,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: chore/sync-mojang-protocol
           delete-branch: true
+          # Mojang's schemas themselves are never committed (vendor/ is ignored).
           add-paths: |
             .mojang-protocol-sha
-            vendor/bedrock-protocol-docs
             src/generated
           commit-message: "chore(protocol): sync with Mojang/bedrock-protocol-docs@${{ steps.upstream.outputs.short }}"
           title: "Sync protocol with Mojang/bedrock-protocol-docs@${{ steps.upstream.outputs.short }}"

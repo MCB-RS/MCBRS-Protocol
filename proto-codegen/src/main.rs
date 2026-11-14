@@ -77,6 +77,19 @@ fn parse_args() -> Result<Option<Args>, String> {
 }
 
 fn run(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
+    // The schemas are not part of the repository (they are Mojang's): they
+    // have to be downloaded before the generator can run.
+    if !args.input.is_dir() {
+        return Err(format!(
+            "schema directory {} does not exist.\n\
+             Mojang's schemas are not stored in this repository; download them first:\n\
+             \n    bash scripts/fetch-mojang-protocol.sh --locked\n\n\
+             (`--locked` fetches the version recorded in .mojang-protocol-sha; \
+             without it, the latest version of Mojang's `main`.)",
+            args.input.display()
+        )
+        .into());
+    }
     let documents = schema::load_dir(&args.input)?;
     let mut model = lower::Lowerer::new(&documents).run()?;
     let boxed = cycles::break_cycles(&mut model);
