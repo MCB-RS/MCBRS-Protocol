@@ -9,3 +9,12 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    groups:
+      # prettyplease takes a `syn::File` built by the generator: both must use
+      # the same major version of syn, so they can only be updated together.
+      # Separate pull requests would each fail to compile.
+      syn-ecosystem:
+        patterns:
+          - "syn"
+          - "prettyplease"
+          - "proc-macro2"
