@@ -12,6 +12,6 @@ path = "src/main.rs"
 
 [dependencies]
 serde_json = { version = "1", features = ["preserve_order"] }
-syn = { version = "2", default-features = false, features = ["full", "parsing"] }
-prettyplease = "0.2"
+syn = { version = "3", default-features = false, features = ["full", "parsing"] }
+prettyplease = "0.3"
 proc-macro2 = { version = "1", features = ["span-locations"] }
