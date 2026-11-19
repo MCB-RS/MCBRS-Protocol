@@ -1,7 +1,13 @@
 name: Sync Mojang protocol
 
-# Keeps the generated protocol in sync with the `main` branch of
-# https://github.com/Mojang/bedrock-protocol-docs.
+# Keeps the generated protocol in sync with the latest release of
+# https://github.com/Mojang/bedrock-protocol-docs on one channel.
+#
+# Mojang's `main` alternates between stable releases (tags like v1.26.66) and
+# previews (v1.26.70-preview.26), which speak different protocol versions.
+# Following the head of `main` flipped the generated code between the two and
+# broke the build whenever a field existed on one line only. The channel
+# followed is the one in .mojang-protocol-channel.
 #
 # Requires "Allow GitHub Actions to create and approve pull requests"
 # (Settings > Actions > General) so the last step can open the PR.
@@ -38,18 +44,19 @@ jobs:
         with:
           persist-credentials: false
 
-      # Cheap check: one `git ls-remote`, no clone, no toolchain. When Mojang's
-      # `main` has not moved every following step is skipped and the run ends
-      # successfully within seconds.
-      - name: Compare Mojang main with .mojang-protocol-sha
+      # Cheap check: one `git ls-remote`, no clone, no toolchain. When no new
+      # release of the channel exists every following step is skipped and the
+      # run ends successfully within seconds.
+      - name: Compare latest Mojang release with .mojang-protocol-sha
         id: upstream
         run: |
           set -euo pipefail
-          remote="$(git ls-remote "$MOJANG_REPO" refs/heads/main | cut -f1)"
+          channel="$(tr -d '[:space:]' < .mojang-protocol-channel)"
+          remote="$(bash scripts/fetch-mojang-protocol.sh --resolve)"
           # The value comes from a third party and is reused by later steps:
           # accept nothing but a full SHA-1.
           if ! [[ "$remote" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::unexpected answer for refs/heads/main of $MOJANG_REPO"
+            echo "::error::unexpected answer for the latest $channel release of $MOJANG_REPO"
             exit 1
           fi
           local_sha="$(tr -d '[:space:]' < .mojang-protocol-sha 2>/dev/null || true)"
@@ -57,10 +64,10 @@ jobs:
           echo "short=${remote:0:7}" >> "$GITHUB_OUTPUT"
           if [ "$remote" = "$local_sha" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Up to date with Mojang main ($remote)." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Up to date with the latest $channel release ($remote)." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Mojang main moved: ${local_sha:-<none>} -> $remote" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "New $channel release: ${local_sha:-<none>} -> $remote" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Download Mojang's json/ and update .mojang-protocol-sha

@@ -11,7 +11,7 @@ use mcbrs_protocol::codec::{
     decode_batch, decode_framed, encode_batch, encode_framed, frames, BedrockCodec, BedrockString, ConnectionRequest,
     PacketHeader, ProtocolError, Uuid, Validate,
 };
-use mcbrs_protocol::enums::{DisconnectFailReason, PacketCompressionAlgorithm, PlayStatus, SctpRecoveryProfile};
+use mcbrs_protocol::enums::{DisconnectFailReason, PacketCompressionAlgorithm, PlayStatus};
 use mcbrs_protocol::generated::PROTOCOL_VERSION;
 use mcbrs_protocol::packets::*;
 use mcbrs_protocol::types::*;
@@ -42,8 +42,8 @@ fn play_status(status: PlayStatus) -> Packet {
 #[test]
 fn request_network_settings_is_big_endian() {
     assert_eq!(RequestNetworkSettingsPacket::ID, 193);
-    // 2259 = 0x000008d3, most significant byte first.
-    check(request_network_settings(2259), &[0x00, 0x00, 0x08, 0xd3]);
+    // 2225 = 0x000008b1, most significant byte first.
+    check(request_network_settings(2225), &[0x00, 0x00, 0x08, 0xb1]);
 }
 
 #[test]
@@ -56,7 +56,6 @@ fn network_settings() {
             client_throttle_enabled: true,
             client_throttle_threshold: 8,
             client_throttle_scalar: 0.5,
-            sctp_recovery_profile: SctpRecoveryProfile::Default,
         },
     });
     check(
@@ -67,7 +66,6 @@ fn network_settings() {
             0x01, // throttle enabled
             0x08, // throttle threshold: u8
             0x00, 0x00, 0x00, 0x3f, // throttle scalar: f32 LE
-            0x00, // SCTP recovery profile: enum as u8
         ],
     );
 }
@@ -81,10 +79,10 @@ fn login_carries_the_connection_request_envelope() {
     assert_eq!(request.auth_info, chain_json);
 
     let packet = Packet::Login(LoginPacket {
-        payload: LoginPacketPayload { client_network_version: 2259, connection_request: request },
+        payload: LoginPacketPayload { client_network_version: 2225, connection_request: request },
     });
     let expected = [
-        &[0x00, 0x00, 0x08, 0xd3][..], // protocol version: i32 BE
+        &[0x00, 0x00, 0x08, 0xb1][..], // protocol version: i32 BE
         &[32],                         // envelope length: VarUInt32 (4 + 19 + 4 + 5)
         &[19, 0, 0, 0],                // authentication document length: u32 LE
         chain_json.as_bytes(),
@@ -108,7 +106,7 @@ fn login_survives_length_prefixes_that_are_not_utf8() {
     // valid UTF-8. Decoding the envelope as text would fail here.
     let request = ConnectionRequest::new("x".repeat(200), "y".repeat(300));
     let packet = Packet::Login(LoginPacket {
-        payload: LoginPacketPayload { client_network_version: 2259, connection_request: request },
+        payload: LoginPacketPayload { client_network_version: 2225, connection_request: request },
     });
     let mut bytes = Vec::new();
     packet.encode(&mut bytes).unwrap();
@@ -216,26 +214,26 @@ fn strings_carry_arbitrary_bytes() {
 #[test]
 fn framed_packet() {
     let mut bytes = Vec::new();
-    encode_framed(&request_network_settings(2259), &mut bytes).unwrap();
+    encode_framed(&request_network_settings(2225), &mut bytes).unwrap();
     assert_eq!(
         bytes,
         [
             6, // frame length
             0xc1, 0x01, // header: packet id 193 as VarUInt32
-            0x00, 0x00, 0x08, 0xd3, // body
+            0x00, 0x00, 0x08, 0xb1, // body
         ]
     );
     let mut input = bytes.as_slice();
     let (header, packet) = decode_framed(&mut input).unwrap();
     assert!(input.is_empty());
     assert_eq!(header, PacketHeader::new(193));
-    assert_eq!(packet, request_network_settings(2259));
+    assert_eq!(packet, request_network_settings(2225));
 }
 
 #[test]
 fn batch_of_consecutive_packets() {
     let packets = [
-        request_network_settings(2259),
+        request_network_settings(2225),
         play_status(PlayStatus::PlayerSpawn),
         Packet::Disconnect(DisconnectPacket {
             payload: DisconnectPacketPayload {
@@ -249,7 +247,7 @@ fn batch_of_consecutive_packets() {
     assert_eq!(
         batch,
         [
-            6, 0xc1, 0x01, 0x00, 0x00, 0x08, 0xd3, // RequestNetworkSettings
+            6, 0xc1, 0x01, 0x00, 0x00, 0x08, 0xb1, // RequestNetworkSettings
             5, 0x02, 0x00, 0x00, 0x00, 0x03, // PlayStatus
             3, 0x05, 0x04, 0x01, // Disconnect
         ]
@@ -261,7 +259,7 @@ fn batch_of_consecutive_packets() {
 
     // Frames can also be walked without decoding the bodies.
     let bodies: Vec<&[u8]> = frames(&batch).map(|frame| frame.unwrap().body).collect();
-    assert_eq!(bodies, [&[0x00, 0x00, 0x08, 0xd3][..], &[0x00, 0x00, 0x00, 0x03], &[0x04, 0x01]]);
+    assert_eq!(bodies, [&[0x00, 0x00, 0x08, 0xb1][..], &[0x00, 0x00, 0x00, 0x03], &[0x04, 0x01]]);
 }
 
 #[test]

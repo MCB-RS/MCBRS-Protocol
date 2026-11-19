@@ -295,11 +295,6 @@ impl Sample for EditorLevelMigrationVersion {
         Self::ALL[g.below(Self::ALL.len())]
     }
 }
-impl Sample for EditorPackType {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
 impl Sample for EditorWorldType {
     fn sample(g: &mut Gen) -> Self {
         Self::ALL[g.below(Self::ALL.len())]
@@ -585,11 +580,6 @@ impl Sample for MultiplayerSettingsPacketType {
         Self::ALL[g.below(Self::ALL.len())]
     }
 }
-impl Sample for MusicPlaybackState {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
 impl Sample for NewInteractionModel {
     fn sample(g: &mut Gen) -> Self {
         Self::ALL[g.below(Self::ALL.len())]
@@ -780,11 +770,6 @@ impl Sample for ScriptModuleMinecraftScriptPrimitiveShapeType {
         Self::ALL[g.below(Self::ALL.len())]
     }
 }
-impl Sample for SctpRecoveryProfile {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
 impl Sample for ServerEditorConnectionPolicy {
     fn sample(g: &mut Gen) -> Self {
         Self::ALL[g.below(Self::ALL.len())]
@@ -880,11 +865,6 @@ impl Sample for SpawnPositionType {
         Self::ALL[g.below(Self::ALL.len())]
     }
 }
-impl Sample for StringAttributeOperation {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
 impl Sample for StructureBlockType {
     fn sample(g: &mut Gen) -> Self {
         Self::ALL[g.below(Self::ALL.len())]
@@ -961,26 +941,6 @@ impl Sample for UpdateType {
     }
 }
 impl Sample for VillageType {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
-impl Sample for VirtualContainerCloseCause {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
-impl Sample for VirtualContainerCloseKind {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
-impl Sample for VirtualContainerClosePacketPayloadCause {
-    fn sample(g: &mut Gen) -> Self {
-        Self::ALL[g.below(Self::ALL.len())]
-    }
-}
-impl Sample for VirtualContainerClosePacketPayloadKind {
     fn sample(g: &mut Gen) -> Self {
         Self::ALL[g.below(Self::ALL.len())]
     }
@@ -1136,6 +1096,20 @@ impl Sample for AddTimeMarkerData {
         Self {
             clock_id: Sample::sample(g),
             time_markers: g.vec(Sample::sample),
+        }
+    }
+}
+impl Sample for AddVolumeEntityPacketPayload {
+    fn sample(g: &mut Gen) -> Self {
+        Self {
+            entity_network_id: Sample::sample(g),
+            components: Sample::sample(g),
+            json_identifier: Sample::sample(g),
+            instance_name: Sample::sample(g),
+            min_bounds: Sample::sample(g),
+            max_bounds: Sample::sample(g),
+            dimension_type: Sample::sample(g),
+            engine_version: Sample::sample(g),
         }
     }
 }
@@ -2252,25 +2226,6 @@ impl Sample for ChangePlayerScore {
         }
     }
 }
-impl Sample for ChatFormatting {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            name_prefix: g.option(Sample::sample),
-            name_postfix: g.option(Sample::sample),
-            message_prefix: g.option(Sample::sample),
-            message_postfix: g.option(Sample::sample),
-        }
-    }
-}
-impl Sample for ChatPacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            signed_chat: Sample::sample(g),
-            room_id: g.option(Sample::sample),
-            formatting: g.option(Sample::sample),
-        }
-    }
-}
 impl Sample for ChunkPos {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -2419,23 +2374,6 @@ impl Sample for ClientboundMatchmakingStatePacketPayload {
         }
     }
 }
-impl Sample for ClientboundMusicPlaybackFailurePacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            failures: g.vec(Sample::sample),
-        }
-    }
-}
-impl Sample for ClientboundOnlineMusicPlaybackResponsePacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            request_id: Sample::sample(g),
-            state: Sample::sample(g),
-            shared_metadata: Sample::sample(g),
-            playback_content: Sample::sample(g),
-        }
-    }
-}
 impl Sample for ClientboundPlayAudioContentPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -2533,7 +2471,6 @@ impl Sample for CommandBlockUpdatePacketPayload {
             track_output: Sample::sample(g),
             tick_delay: Sample::sample(g),
             execute_on_first_tick: Sample::sample(g),
-            last_output_is_raw_message: Sample::sample(g),
         }
     }
 }
@@ -2563,7 +2500,6 @@ impl Sample for CommandOutputMessage {
             message_id: Sample::sample(g),
             successful: Sample::sample(g),
             parameters: g.vec(Sample::sample),
-            raw_message: g.option(Sample::sample),
         }
     }
 }
@@ -2820,25 +2756,29 @@ impl Sample for DataItemVec3Payload {
 impl Sample for DataStoreChange {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            variable_name: Sample::sample(g),
+            data_store_name: Sample::sample(g),
+            property: Sample::sample(g),
             update_count: Sample::sample(g),
-            the_new_variable_value: Sample::sample(g),
+            the_new_property_value: Sample::sample(g),
         }
     }
 }
 impl Sample for DataStoreRemoval {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            variable_name: Sample::sample(g),
+            data_store_name: Sample::sample(g),
         }
     }
 }
 impl Sample for DataStoreUpdate {
     fn sample(g: &mut Gen) -> Self {
         Self {
-            variable_name: Sample::sample(g),
+            data_store_name: Sample::sample(g),
+            property: Sample::sample(g),
+            path: Sample::sample(g),
             data: Sample::sample(g),
-            update_count: Sample::sample(g),
+            property_update_count: Sample::sample(g),
+            path_update_count: Sample::sample(g),
         }
     }
 }
@@ -3052,6 +2992,11 @@ impl Sample for EntityDiagnosticTimingInfo {
             position: g.option(Sample::sample),
             dimension: g.option(Sample::sample),
         }
+    }
+}
+impl Sample for EntityNetId {
+    fn sample(g: &mut Gen) -> Self {
+        Self { raw_id: Sample::sample(g) }
     }
 }
 impl Sample for EnvironmentAttributeData {
@@ -3465,14 +3410,6 @@ impl Sample for ItemStackRequestCraftCreativeAction {
         }
     }
 }
-impl Sample for ItemStackRequestCraftDiscPressAction {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            track_sound_event_id: Sample::sample(g),
-            num_crafts: Sample::sample(g),
-        }
-    }
-}
 impl Sample for ItemStackRequestCraftLoomAction {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -3594,6 +3531,14 @@ impl Sample for ItemStackRequestPlaceAction {
             amount: Sample::sample(g),
             source: Sample::sample(g),
             destination: Sample::sample(g),
+        }
+    }
+}
+impl Sample for ItemStackRequestReservedAction {
+    fn sample(g: &mut Gen) -> Self {
+        Self {
+            reserved_id: Sample::sample(g),
+            num_crafts: Sample::sample(g),
         }
     }
 }
@@ -3899,11 +3844,6 @@ impl Sample for LoginPacketPayload {
         }
     }
 }
-impl Sample for ManagedChatJoinInfo {
-    fn sample(g: &mut Gen) -> Self {
-        Self { enabled: Sample::sample(g) }
-    }
-}
 impl Sample for MapCreateLockedCopyPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -3987,7 +3927,6 @@ impl Sample for MessageAndParams {
             message_type: Sample::sample(g),
             message: Sample::sample(g),
             parameter_list: g.vec(Sample::sample),
-            queue: Sample::sample(g),
         }
     }
 }
@@ -4191,14 +4130,6 @@ impl Sample for MultiplayerSettingsPacketPayload {
         }
     }
 }
-impl Sample for MusicPlaybackFailureEntry {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            state: Sample::sample(g),
-            description: Sample::sample(g),
-        }
-    }
-}
 impl Sample for NetworkChunkPublisherUpdatePacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -4234,7 +4165,6 @@ impl Sample for NetworkSettingsPacketPayload {
             client_throttle_enabled: Sample::sample(g),
             client_throttle_threshold: Sample::sample(g),
             client_throttle_scalar: Sample::sample(g),
-            sctp_recovery_profile: Sample::sample(g),
         }
     }
 }
@@ -4410,8 +4340,6 @@ impl Sample for PassengerOfBlockArguments {
             rotation: Sample::sample(g),
             rotation_limit: Sample::sample(g),
             emote_type: Sample::sample(g),
-            block_type: Sample::sample(g),
-            pack_uuid: Sample::sample(g),
         }
     }
 }
@@ -4452,8 +4380,6 @@ impl Sample for PlaySoundPacketPayload {
             bypass_listener_range_check: Sample::sample(g),
             server_sound_handle: g.option(Sample::sample),
             playback_position_seconds: g.option(Sample::sample),
-            start_delay_seconds: g.option(Sample::sample),
-            attach_options: g.option(Sample::sample),
         }
     }
 }
@@ -4626,13 +4552,6 @@ impl Sample for PlayerStartItemCooldownPacketPayload {
         Self {
             item_category: Sample::sample(g),
             duration_ticks: Sample::sample(g),
-        }
-    }
-}
-impl Sample for PlayerToggleArmorVisibilityRequestPacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            hide_armor: Sample::sample(g),
         }
     }
 }
@@ -4879,6 +4798,14 @@ impl Sample for RemoveTimeMarkerData {
         }
     }
 }
+impl Sample for RemoveVolumeEntityPacketPayload {
+    fn sample(g: &mut Gen) -> Self {
+        Self {
+            entity_network_id: Sample::sample(g),
+            dimension_type: Sample::sample(g),
+        }
+    }
+}
 impl Sample for RequestAbilityPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -4980,7 +4907,7 @@ impl Sample for ResourcePackStackPacketPayload {
             texture_pack_list: g.vec(Sample::sample),
             base_game_version: Sample::sample(g),
             experiments: Sample::sample(g),
-            editor_pack_types: MaybeUnknown::Known(Sample::sample(g)),
+            include_editor_packs: Sample::sample(g),
         }
     }
 }
@@ -5141,7 +5068,6 @@ impl Sample for ServerConfig {
             gathering: g.option(Sample::sample),
             client_store_entry_point: g.option(Sample::sample),
             presence: g.option(Sample::sample),
-            managed_chat: g.option(Sample::sample),
         }
     }
 }
@@ -5287,14 +5213,6 @@ impl Sample for ServerboundRegisterAudioContentPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
             registrations: g.vec(Sample::sample),
-        }
-    }
-}
-impl Sample for ServerboundRequestOnlineMusicPlaybackPacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            request_id: Sample::sample(g),
-            sound_event_name: Sample::sample(g),
         }
     }
 }
@@ -5557,19 +5475,6 @@ impl Sample for SignedAudioContent {
         }
     }
 }
-impl Sample for SignedChat {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            key_id: Sample::sample(g),
-            sender_id: Sample::sample(g),
-            message_id: Sample::sample(g),
-            scan_text: Sample::sample(g),
-            redacted_text: Sample::sample(g),
-            author_name: Sample::sample(g),
-            signature: Sample::sample(g),
-        }
-    }
-}
 impl Sample for SimpleEventPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self { r#type: Sample::sample(g) }
@@ -5623,13 +5528,6 @@ impl Sample for SmithingTrimRecipePayload {
             addition_ingredient: Sample::sample(g),
             tag: Sample::sample(g),
             net_id: Sample::sample(g),
-        }
-    }
-}
-impl Sample for SoundAttachOptions {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            entity_to_attach_to_id: Sample::sample(g),
         }
     }
 }
@@ -5726,14 +5624,6 @@ impl Sample for StopVideoCapture {
         Self {}
     }
 }
-impl Sample for StringAttributeData {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            value: Sample::sample(g),
-            operation: Sample::sample(g),
-        }
-    }
-}
 impl Sample for StringTag {
     fn sample(g: &mut Gen) -> Self {
         Self { data: Sample::sample(g) }
@@ -5746,7 +5636,6 @@ impl Sample for StructureBlockUpdatePacketPayload {
             structure_data: Sample::sample(g),
             trigger: Sample::sample(g),
             is_waterlogged: Sample::sample(g),
-            keep_structure_void: Sample::sample(g),
         }
     }
 }
@@ -6022,20 +5911,6 @@ impl Sample for TransferPacketPayload {
             server_port: Sample::sample(g),
             reload_world: Sample::sample(g),
             gatherings_configuration: g.option(Sample::sample),
-            server_transfer_settings: g.option(Sample::sample),
-        }
-    }
-}
-impl Sample for TransferPlayerUIOptions {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            title_text: g.option(Sample::sample),
-            body_text: g.option(Sample::sample),
-            title_visible: g.option(Sample::sample),
-            body_visible: g.option(Sample::sample),
-            cancel_button_text: g.option(Sample::sample),
-            cancel_button_visible: g.option(Sample::sample),
-            cancel_button_delay_seconds: g.option(Sample::sample),
         }
     }
 }
@@ -6263,25 +6138,6 @@ impl Sample for Vec3 {
         }
     }
 }
-impl Sample for VirtualContainerClosePacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            session_id: Sample::sample(g),
-            kind: Sample::sample(g),
-            cause: Sample::sample(g),
-        }
-    }
-}
-impl Sample for VirtualContainerOpenPacketPayload {
-    fn sample(g: &mut Gen) -> Self {
-        Self {
-            container_id: Sample::sample(g),
-            session_id: Sample::sample(g),
-            title: Sample::sample(g),
-            slots: g.vec(Sample::sample),
-        }
-    }
-}
 impl Sample for VoxelShapesPacketPayload {
     fn sample(g: &mut Gen) -> Self {
         Self {
@@ -6435,11 +6291,10 @@ impl Sample for CommandBlockUpdatePacketPayloadTarget {
 }
 impl Sample for ConstantAttributeDataAttribute {
     fn sample(g: &mut Gen) -> Self {
-        match g.below(4) {
+        match g.below(3) {
             0 => Self::Bool(Sample::sample(g)),
             1 => Self::Float(Sample::sample(g)),
-            2 => Self::Color(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
+            _ => Self::Color(Sample::sample(g)),
         }
     }
 }
@@ -6455,15 +6310,6 @@ impl Sample for DataItemEntryPayload {
             6 => Self::Pos(Sample::sample(g)),
             7 => Self::Int64(Sample::sample(g)),
             _ => Self::Vec3(Sample::sample(g)),
-        }
-    }
-}
-impl Sample for DataStoreChangeTheNewVariableValue {
-    fn sample(g: &mut Gen) -> Self {
-        match g.below(3) {
-            0 => Self::Double(Sample::sample(g)),
-            1 => Self::Bool(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
         }
     }
 }
@@ -6533,7 +6379,7 @@ impl Sample for ItemStackRequestActions {
             13 => Self::CraftRecipeOptional(Sample::sample(g)),
             14 => Self::CraftRepairAndDisenchant(Sample::sample(g)),
             15 => Self::CraftLoom(Sample::sample(g)),
-            16 => Self::CraftDiscPress(Sample::sample(g)),
+            16 => Self::Reserved(Sample::sample(g)),
             17 => Self::CraftNonImplementedDeprecated(Sample::sample(g)),
             _ => Self::CraftResultsDeprecated(Sample::sample(g)),
         }
@@ -6579,21 +6425,19 @@ impl Sample for LegacyTelemetryEventPacketPayloadEventData {
 }
 impl Sample for NoiseTransitionAttributeDataFromAttribute {
     fn sample(g: &mut Gen) -> Self {
-        match g.below(4) {
+        match g.below(3) {
             0 => Self::Bool(Sample::sample(g)),
             1 => Self::Float(Sample::sample(g)),
-            2 => Self::Color(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
+            _ => Self::Color(Sample::sample(g)),
         }
     }
 }
 impl Sample for NoiseTransitionAttributeDataToAttribute {
     fn sample(g: &mut Gen) -> Self {
-        match g.below(4) {
+        match g.below(3) {
             0 => Self::Bool(Sample::sample(g)),
             1 => Self::Float(Sample::sample(g)),
-            2 => Self::Color(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
+            _ => Self::Color(Sample::sample(g)),
         }
     }
 }
@@ -6716,21 +6560,19 @@ impl Sample for TextPacketPayloadBody {
 }
 impl Sample for TransitionAttributeDataFromAttribute {
     fn sample(g: &mut Gen) -> Self {
-        match g.below(4) {
+        match g.below(3) {
             0 => Self::Bool(Sample::sample(g)),
             1 => Self::Float(Sample::sample(g)),
-            2 => Self::Color(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
+            _ => Self::Color(Sample::sample(g)),
         }
     }
 }
 impl Sample for TransitionAttributeDataToAttribute {
     fn sample(g: &mut Gen) -> Self {
-        match g.below(4) {
+        match g.below(3) {
             0 => Self::Bool(Sample::sample(g)),
             1 => Self::Float(Sample::sample(g)),
-            2 => Self::Color(Sample::sample(g)),
-            _ => Self::String(Sample::sample(g)),
+            _ => Self::Color(Sample::sample(g)),
         }
     }
 }
@@ -7479,6 +7321,16 @@ impl Sample for SyncActorPropertyPacket {
         Self { payload: Sample::sample(g) }
     }
 }
+impl Sample for AddVolumeEntityPacket {
+    fn sample(g: &mut Gen) -> Self {
+        Self { payload: Sample::sample(g) }
+    }
+}
+impl Sample for RemoveVolumeEntityPacket {
+    fn sample(g: &mut Gen) -> Self {
+        Self { payload: Sample::sample(g) }
+    }
+}
 impl Sample for SimulationTypePacket {
     fn sample(g: &mut Gen) -> Self {
         Self { payload: Sample::sample(g) }
@@ -7919,41 +7771,6 @@ impl Sample for ServerboundRegisterAudioContentPacket {
         Self { payload: Sample::sample(g) }
     }
 }
-impl Sample for ChatPacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for ServerboundRequestOnlineMusicPlaybackPacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for ClientboundOnlineMusicPlaybackResponsePacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for PlayerToggleArmorVisibilityRequestPacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for ClientboundMusicPlaybackFailurePacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for VirtualContainerOpenPacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
-impl Sample for VirtualContainerClosePacket {
-    fn sample(g: &mut Gen) -> Self {
-        Self { payload: Sample::sample(g) }
-    }
-}
 /// Pseudo-random packet for this identifier.
 pub fn sample_packet(packet_id: u32, g: &mut Gen) -> Option<Packet> {
     match packet_id {
@@ -8194,6 +8011,10 @@ pub fn sample_packet(packet_id: u32, g: &mut Gen) -> Option<Packet> {
             Some(Packet::ClientboundDebugRenderer(Sample::sample(g)))
         }
         SyncActorPropertyPacket::ID => Some(Packet::SyncActorProperty(Sample::sample(g))),
+        AddVolumeEntityPacket::ID => Some(Packet::AddVolumeEntity(Sample::sample(g))),
+        RemoveVolumeEntityPacket::ID => {
+            Some(Packet::RemoveVolumeEntity(Sample::sample(g)))
+        }
         SimulationTypePacket::ID => Some(Packet::SimulationType(Sample::sample(g))),
         NpcDialoguePacket::ID => Some(Packet::NpcDialogue(Sample::sample(g))),
         EduUriResourcePacket::ID => Some(Packet::EduUriResource(Sample::sample(g))),
@@ -8377,25 +8198,6 @@ pub fn sample_packet(packet_id: u32, g: &mut Gen) -> Option<Packet> {
         }
         ServerboundRegisterAudioContentPacket::ID => {
             Some(Packet::ServerboundRegisterAudioContent(Sample::sample(g)))
-        }
-        ChatPacket::ID => Some(Packet::Chat(Sample::sample(g))),
-        ServerboundRequestOnlineMusicPlaybackPacket::ID => {
-            Some(Packet::ServerboundRequestOnlineMusicPlayback(Sample::sample(g)))
-        }
-        ClientboundOnlineMusicPlaybackResponsePacket::ID => {
-            Some(Packet::ClientboundOnlineMusicPlaybackResponse(Sample::sample(g)))
-        }
-        PlayerToggleArmorVisibilityRequestPacket::ID => {
-            Some(Packet::PlayerToggleArmorVisibilityRequest(Sample::sample(g)))
-        }
-        ClientboundMusicPlaybackFailurePacket::ID => {
-            Some(Packet::ClientboundMusicPlaybackFailure(Sample::sample(g)))
-        }
-        VirtualContainerOpenPacket::ID => {
-            Some(Packet::VirtualContainerOpen(Sample::sample(g)))
-        }
-        VirtualContainerClosePacket::ID => {
-            Some(Packet::VirtualContainerClose(Sample::sample(g)))
         }
         _ => None,
     }
