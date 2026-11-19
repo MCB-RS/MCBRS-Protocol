@@ -4634,7 +4634,7 @@ impl From<CompletedUsingItemPacket> for Packet {
         Packet::CompletedUsingItem(packet)
     }
 }
-/// Sends tunable options from host to client (compression, throttling and SCTP recovery)
+/// Sends tunable options from host to client (compression threshold and algorithm)
 ///
 /// Packet NetworkSettingsPacket (id 143).
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -4983,7 +4983,6 @@ impl BedrockCodec for EmoteListPacket {
 }
 impl Validate for EmoteListPacket {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
         Ok(())
     }
 }
@@ -5280,7 +5279,6 @@ impl BedrockCodec for PlayerFogPacket {
 }
 impl Validate for PlayerFogPacket {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
         Ok(())
     }
 }
@@ -5435,6 +5433,75 @@ impl Validate for SyncActorPropertyPacket {
 impl From<SyncActorPropertyPacket> for Packet {
     fn from(packet: SyncActorPropertyPacket) -> Self {
         Packet::SyncActorProperty(packet)
+    }
+}
+/// Sends a volume entity's definition and components from server to client.
+///
+/// Packet AddVolumeEntityPacket (id 166).
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct AddVolumeEntityPacket {
+    pub payload: AddVolumeEntityPacketPayload,
+}
+impl AddVolumeEntityPacket {
+    /// Official packet identifier.
+    pub const ID: u32 = 166;
+    /// Official packet name.
+    pub const NAME: &'static str = "AddVolumeEntityPacket";
+}
+impl BedrockCodec for AddVolumeEntityPacket {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        BedrockCodec::serialize(&self.payload, buf)?;
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        Ok(Self {
+            payload: <AddVolumeEntityPacketPayload as BedrockCodec>::deserialize(buf)?,
+        })
+    }
+}
+impl Validate for AddVolumeEntityPacket {
+    fn validate(&self) -> Result<()> {
+        Validate::validate(&self.payload)?;
+        Ok(())
+    }
+}
+impl From<AddVolumeEntityPacket> for Packet {
+    fn from(packet: AddVolumeEntityPacket) -> Self {
+        Packet::AddVolumeEntity(packet)
+    }
+}
+/// Sends a volume entity to be removed from server to client.
+///
+/// Packet RemoveVolumeEntityPacket (id 167).
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct RemoveVolumeEntityPacket {
+    pub payload: RemoveVolumeEntityPacketPayload,
+}
+impl RemoveVolumeEntityPacket {
+    /// Official packet identifier.
+    pub const ID: u32 = 167;
+    /// Official packet name.
+    pub const NAME: &'static str = "RemoveVolumeEntityPacket";
+}
+impl BedrockCodec for RemoveVolumeEntityPacket {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        BedrockCodec::serialize(&self.payload, buf)?;
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        Ok(Self {
+            payload: <RemoveVolumeEntityPacketPayload as BedrockCodec>::deserialize(buf)?,
+        })
+    }
+}
+impl Validate for RemoveVolumeEntityPacket {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
+impl From<RemoveVolumeEntityPacket> for Packet {
+    fn from(packet: RemoveVolumeEntityPacket) -> Self {
+        Packet::RemoveVolumeEntity(packet)
     }
 }
 /// Sent from the server to the client when setting the simulation type for toolbox mode. (Not yet suported)
@@ -7003,7 +7070,6 @@ impl BedrockCodec for ServerboundDiagnosticsPacket {
 }
 impl Validate for ServerboundDiagnosticsPacket {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
         Ok(())
     }
 }
@@ -7079,7 +7145,6 @@ impl BedrockCodec for ContainerRegistryCleanupPacket {
 }
 impl Validate for ContainerRegistryCleanupPacket {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
         Ok(())
     }
 }
@@ -8633,270 +8698,6 @@ impl From<ServerboundRegisterAudioContentPacket> for Packet {
         Packet::ServerboundRegisterAudioContent(packet)
     }
 }
-/// Player chat routed through Mojang Managed Chat
-///
-/// Carries a Chat Service signature that receiving clients verify. The hosting server relays the signed block unmodified, may decorate around it, and chooses the room it goes to.
-///
-/// Packet ChatPacket (id 361).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ChatPacket {
-    pub payload: ChatPacketPayload,
-}
-impl ChatPacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 361;
-    /// Official packet name.
-    pub const NAME: &'static str = "ChatPacket";
-}
-impl BedrockCodec for ChatPacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <ChatPacketPayload as BedrockCodec>::deserialize(buf)?,
-        })
-    }
-}
-impl Validate for ChatPacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<ChatPacket> for Packet {
-    fn from(packet: ChatPacket) -> Self {
-        Packet::Chat(packet)
-    }
-}
-/// Requests online music playback information for a sound event.
-///
-/// Packet ServerboundRequestOnlineMusicPlaybackPacket (id 362).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ServerboundRequestOnlineMusicPlaybackPacket {
-    pub payload: ServerboundRequestOnlineMusicPlaybackPacketPayload,
-}
-impl ServerboundRequestOnlineMusicPlaybackPacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 362;
-    /// Official packet name.
-    pub const NAME: &'static str = "ServerboundRequestOnlineMusicPlaybackPacket";
-}
-impl BedrockCodec for ServerboundRequestOnlineMusicPlaybackPacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <ServerboundRequestOnlineMusicPlaybackPacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for ServerboundRequestOnlineMusicPlaybackPacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<ServerboundRequestOnlineMusicPlaybackPacket> for Packet {
-    fn from(packet: ServerboundRequestOnlineMusicPlaybackPacket) -> Self {
-        Packet::ServerboundRequestOnlineMusicPlayback(packet)
-    }
-}
-/// Provides online music playback information for a correlated request.
-///
-/// Packet ClientboundOnlineMusicPlaybackResponsePacket (id 363).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ClientboundOnlineMusicPlaybackResponsePacket {
-    pub payload: ClientboundOnlineMusicPlaybackResponsePacketPayload,
-}
-impl ClientboundOnlineMusicPlaybackResponsePacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 363;
-    /// Official packet name.
-    pub const NAME: &'static str = "ClientboundOnlineMusicPlaybackResponsePacket";
-}
-impl BedrockCodec for ClientboundOnlineMusicPlaybackResponsePacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <ClientboundOnlineMusicPlaybackResponsePacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for ClientboundOnlineMusicPlaybackResponsePacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<ClientboundOnlineMusicPlaybackResponsePacket> for Packet {
-    fn from(packet: ClientboundOnlineMusicPlaybackResponsePacket) -> Self {
-        Packet::ClientboundOnlineMusicPlaybackResponse(packet)
-    }
-}
-/// Requests that the server update the sending player's armor visibility.
-///
-/// The server derives the player identity from the connection.
-///
-/// Packet PlayerToggleArmorVisibilityRequestPacket (id 364).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct PlayerToggleArmorVisibilityRequestPacket {
-    pub payload: PlayerToggleArmorVisibilityRequestPacketPayload,
-}
-impl PlayerToggleArmorVisibilityRequestPacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 364;
-    /// Official packet name.
-    pub const NAME: &'static str = "PlayerToggleArmorVisibilityRequestPacket";
-}
-impl BedrockCodec for PlayerToggleArmorVisibilityRequestPacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <PlayerToggleArmorVisibilityRequestPacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for PlayerToggleArmorVisibilityRequestPacket {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-impl From<PlayerToggleArmorVisibilityRequestPacket> for Packet {
-    fn from(packet: PlayerToggleArmorVisibilityRequestPacket) -> Self {
-        Packet::PlayerToggleArmorVisibilityRequest(packet)
-    }
-}
-/// Reports music discs that could not play so the client can classify their failures.
-///
-/// Packet ClientboundMusicPlaybackFailurePacket (id 365).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ClientboundMusicPlaybackFailurePacket {
-    pub payload: ClientboundMusicPlaybackFailurePacketPayload,
-}
-impl ClientboundMusicPlaybackFailurePacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 365;
-    /// Official packet name.
-    pub const NAME: &'static str = "ClientboundMusicPlaybackFailurePacket";
-}
-impl BedrockCodec for ClientboundMusicPlaybackFailurePacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <ClientboundMusicPlaybackFailurePacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for ClientboundMusicPlaybackFailurePacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<ClientboundMusicPlaybackFailurePacket> for Packet {
-    fn from(packet: ClientboundMusicPlaybackFailurePacket) -> Self {
-        Packet::ClientboundMusicPlaybackFailure(packet)
-    }
-}
-/// Sent from the server to open a container screen onto a script owned virtual container, which has no block or entity.
-///
-/// Includes all initial slots and their server net IDs. The number of slots determines the container size.
-///
-/// Packet VirtualContainerOpenPacket (id 366).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct VirtualContainerOpenPacket {
-    pub payload: VirtualContainerOpenPacketPayload,
-}
-impl VirtualContainerOpenPacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 366;
-    /// Official packet name.
-    pub const NAME: &'static str = "VirtualContainerOpenPacket";
-}
-impl BedrockCodec for VirtualContainerOpenPacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <VirtualContainerOpenPacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for VirtualContainerOpenPacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<VirtualContainerOpenPacket> for Packet {
-    fn from(packet: VirtualContainerOpenPacket) -> Self {
-        Packet::VirtualContainerOpen(packet)
-    }
-}
-/// Coordinates closing a virtual container session.
-///
-/// Request is server-to-client. Closed is client-to-server for opening failure, user close, or acknowledgement of a server request. Confirmed is server-to-client after inventory work drains. Successful opening sends no acknowledgement.
-///
-/// Packet VirtualContainerClosePacket (id 367).
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct VirtualContainerClosePacket {
-    pub payload: VirtualContainerClosePacketPayload,
-}
-impl VirtualContainerClosePacket {
-    /// Official packet identifier.
-    pub const ID: u32 = 367;
-    /// Official packet name.
-    pub const NAME: &'static str = "VirtualContainerClosePacket";
-}
-impl BedrockCodec for VirtualContainerClosePacket {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.payload, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        Ok(Self {
-            payload: <VirtualContainerClosePacketPayload as BedrockCodec>::deserialize(
-                buf,
-            )?,
-        })
-    }
-}
-impl Validate for VirtualContainerClosePacket {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.payload)?;
-        Ok(())
-    }
-}
-impl From<VirtualContainerClosePacket> for Packet {
-    fn from(packet: VirtualContainerClosePacket) -> Self {
-        Packet::VirtualContainerClose(packet)
-    }
-}
 /// Every packet of the protocol, keyed by its official identifier.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Packet {
@@ -9198,6 +8999,10 @@ pub enum Packet {
     ClientboundDebugRenderer(ClientboundDebugRendererPacket),
     /// Id 165.
     SyncActorProperty(SyncActorPropertyPacket),
+    /// Id 166.
+    AddVolumeEntity(AddVolumeEntityPacket),
+    /// Id 167.
+    RemoveVolumeEntity(RemoveVolumeEntityPacket),
     /// Id 168.
     SimulationType(SimulationTypePacket),
     /// Id 169.
@@ -9374,20 +9179,6 @@ pub enum Packet {
     ClientboundPlayAudioContent(ClientboundPlayAudioContentPacket),
     /// Id 360.
     ServerboundRegisterAudioContent(ServerboundRegisterAudioContentPacket),
-    /// Id 361.
-    Chat(ChatPacket),
-    /// Id 362.
-    ServerboundRequestOnlineMusicPlayback(ServerboundRequestOnlineMusicPlaybackPacket),
-    /// Id 363.
-    ClientboundOnlineMusicPlaybackResponse(ClientboundOnlineMusicPlaybackResponsePacket),
-    /// Id 364.
-    PlayerToggleArmorVisibilityRequest(PlayerToggleArmorVisibilityRequestPacket),
-    /// Id 365.
-    ClientboundMusicPlaybackFailure(ClientboundMusicPlaybackFailurePacket),
-    /// Id 366.
-    VirtualContainerOpen(VirtualContainerOpenPacket),
-    /// Id 367.
-    VirtualContainerClose(VirtualContainerClosePacket),
 }
 impl Packet {
     /// Identifiers of every known packet, in ascending order.
@@ -9541,6 +9332,8 @@ impl Packet {
         ItemRegistryPacket::ID,
         ClientboundDebugRendererPacket::ID,
         SyncActorPropertyPacket::ID,
+        AddVolumeEntityPacket::ID,
+        RemoveVolumeEntityPacket::ID,
         SimulationTypePacket::ID,
         NpcDialoguePacket::ID,
         EduUriResourcePacket::ID,
@@ -9629,13 +9422,6 @@ impl Packet {
         ServerboundCursorItemDragPacket::ID,
         ClientboundPlayAudioContentPacket::ID,
         ServerboundRegisterAudioContentPacket::ID,
-        ChatPacket::ID,
-        ServerboundRequestOnlineMusicPlaybackPacket::ID,
-        ClientboundOnlineMusicPlaybackResponsePacket::ID,
-        PlayerToggleArmorVisibilityRequestPacket::ID,
-        ClientboundMusicPlaybackFailurePacket::ID,
-        VirtualContainerOpenPacket::ID,
-        VirtualContainerClosePacket::ID,
     ];
     /// Official identifier of the packet.
     pub fn packet_id(&self) -> u32 {
@@ -9799,6 +9585,8 @@ impl Packet {
             Self::ItemRegistry(_) => ItemRegistryPacket::ID,
             Self::ClientboundDebugRenderer(_) => ClientboundDebugRendererPacket::ID,
             Self::SyncActorProperty(_) => SyncActorPropertyPacket::ID,
+            Self::AddVolumeEntity(_) => AddVolumeEntityPacket::ID,
+            Self::RemoveVolumeEntity(_) => RemoveVolumeEntityPacket::ID,
             Self::SimulationType(_) => SimulationTypePacket::ID,
             Self::NpcDialogue(_) => NpcDialoguePacket::ID,
             Self::EduUriResource(_) => EduUriResourcePacket::ID,
@@ -9917,21 +9705,6 @@ impl Packet {
             Self::ServerboundRegisterAudioContent(_) => {
                 ServerboundRegisterAudioContentPacket::ID
             }
-            Self::Chat(_) => ChatPacket::ID,
-            Self::ServerboundRequestOnlineMusicPlayback(_) => {
-                ServerboundRequestOnlineMusicPlaybackPacket::ID
-            }
-            Self::ClientboundOnlineMusicPlaybackResponse(_) => {
-                ClientboundOnlineMusicPlaybackResponsePacket::ID
-            }
-            Self::PlayerToggleArmorVisibilityRequest(_) => {
-                PlayerToggleArmorVisibilityRequestPacket::ID
-            }
-            Self::ClientboundMusicPlaybackFailure(_) => {
-                ClientboundMusicPlaybackFailurePacket::ID
-            }
-            Self::VirtualContainerOpen(_) => VirtualContainerOpenPacket::ID,
-            Self::VirtualContainerClose(_) => VirtualContainerClosePacket::ID,
         }
     }
     /// Official name of the packet.
@@ -10102,6 +9875,8 @@ impl Packet {
             Self::ItemRegistry(_) => ItemRegistryPacket::NAME,
             Self::ClientboundDebugRenderer(_) => ClientboundDebugRendererPacket::NAME,
             Self::SyncActorProperty(_) => SyncActorPropertyPacket::NAME,
+            Self::AddVolumeEntity(_) => AddVolumeEntityPacket::NAME,
+            Self::RemoveVolumeEntity(_) => RemoveVolumeEntityPacket::NAME,
             Self::SimulationType(_) => SimulationTypePacket::NAME,
             Self::NpcDialogue(_) => NpcDialoguePacket::NAME,
             Self::EduUriResource(_) => EduUriResourcePacket::NAME,
@@ -10228,21 +10003,6 @@ impl Packet {
             Self::ServerboundRegisterAudioContent(_) => {
                 ServerboundRegisterAudioContentPacket::NAME
             }
-            Self::Chat(_) => ChatPacket::NAME,
-            Self::ServerboundRequestOnlineMusicPlayback(_) => {
-                ServerboundRequestOnlineMusicPlaybackPacket::NAME
-            }
-            Self::ClientboundOnlineMusicPlaybackResponse(_) => {
-                ClientboundOnlineMusicPlaybackResponsePacket::NAME
-            }
-            Self::PlayerToggleArmorVisibilityRequest(_) => {
-                PlayerToggleArmorVisibilityRequestPacket::NAME
-            }
-            Self::ClientboundMusicPlaybackFailure(_) => {
-                ClientboundMusicPlaybackFailurePacket::NAME
-            }
-            Self::VirtualContainerOpen(_) => VirtualContainerOpenPacket::NAME,
-            Self::VirtualContainerClose(_) => VirtualContainerClosePacket::NAME,
         }
     }
     /// Official name of the packet with this identifier, if it exists.
@@ -10431,6 +10191,8 @@ impl Packet {
                 Some(ClientboundDebugRendererPacket::NAME)
             }
             SyncActorPropertyPacket::ID => Some(SyncActorPropertyPacket::NAME),
+            AddVolumeEntityPacket::ID => Some(AddVolumeEntityPacket::NAME),
+            RemoveVolumeEntityPacket::ID => Some(RemoveVolumeEntityPacket::NAME),
             SimulationTypePacket::ID => Some(SimulationTypePacket::NAME),
             NpcDialoguePacket::ID => Some(NpcDialoguePacket::NAME),
             EduUriResourcePacket::ID => Some(EduUriResourcePacket::NAME),
@@ -10581,21 +10343,6 @@ impl Packet {
             ServerboundRegisterAudioContentPacket::ID => {
                 Some(ServerboundRegisterAudioContentPacket::NAME)
             }
-            ChatPacket::ID => Some(ChatPacket::NAME),
-            ServerboundRequestOnlineMusicPlaybackPacket::ID => {
-                Some(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
-            }
-            ClientboundOnlineMusicPlaybackResponsePacket::ID => {
-                Some(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
-            }
-            PlayerToggleArmorVisibilityRequestPacket::ID => {
-                Some(PlayerToggleArmorVisibilityRequestPacket::NAME)
-            }
-            ClientboundMusicPlaybackFailurePacket::ID => {
-                Some(ClientboundMusicPlaybackFailurePacket::NAME)
-            }
-            VirtualContainerOpenPacket::ID => Some(VirtualContainerOpenPacket::NAME),
-            VirtualContainerClosePacket::ID => Some(VirtualContainerClosePacket::NAME),
             _ => None,
         }
     }
@@ -11202,6 +10949,14 @@ impl Packet {
                 BedrockCodec::serialize(packet, buf)
                     .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
             }
+            Self::AddVolumeEntity(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(AddVolumeEntityPacket::NAME))
+            }
+            Self::RemoveVolumeEntity(packet) => {
+                BedrockCodec::serialize(packet, buf)
+                    .map_err(|e| e.in_packet(RemoveVolumeEntityPacket::NAME))
+            }
             Self::SimulationType(packet) => {
                 BedrockCodec::serialize(packet, buf)
                     .map_err(|e| e.in_packet(SimulationTypePacket::NAME))
@@ -11567,42 +11322,6 @@ impl Packet {
                     .map_err(|e| {
                         e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
                     })
-            }
-            Self::Chat(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| e.in_packet(ChatPacket::NAME))
-            }
-            Self::ServerboundRequestOnlineMusicPlayback(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| {
-                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
-                    })
-            }
-            Self::ClientboundOnlineMusicPlaybackResponse(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
-                    })
-            }
-            Self::PlayerToggleArmorVisibilityRequest(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| {
-                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
-                    })
-            }
-            Self::ClientboundMusicPlaybackFailure(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
-                    })
-            }
-            Self::VirtualContainerOpen(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
-            }
-            Self::VirtualContainerClose(packet) => {
-                BedrockCodec::serialize(packet, buf)
-                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
             }
         }
     }
@@ -12360,6 +12079,16 @@ impl Packet {
                     .map(Self::SyncActorProperty)
                     .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
             }
+            AddVolumeEntityPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::AddVolumeEntity)
+                    .map_err(|e| e.in_packet(AddVolumeEntityPacket::NAME))
+            }
+            RemoveVolumeEntityPacket::ID => {
+                BedrockCodec::deserialize(buf)
+                    .map(Self::RemoveVolumeEntity)
+                    .map_err(|e| e.in_packet(RemoveVolumeEntityPacket::NAME))
+            }
             SimulationTypePacket::ID => {
                 BedrockCodec::deserialize(buf)
                     .map(Self::SimulationType)
@@ -12814,49 +12543,6 @@ impl Packet {
                         e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
                     })
             }
-            ChatPacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::Chat)
-                    .map_err(|e| e.in_packet(ChatPacket::NAME))
-            }
-            ServerboundRequestOnlineMusicPlaybackPacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::ServerboundRequestOnlineMusicPlayback)
-                    .map_err(|e| {
-                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
-                    })
-            }
-            ClientboundOnlineMusicPlaybackResponsePacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::ClientboundOnlineMusicPlaybackResponse)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
-                    })
-            }
-            PlayerToggleArmorVisibilityRequestPacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::PlayerToggleArmorVisibilityRequest)
-                    .map_err(|e| {
-                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
-                    })
-            }
-            ClientboundMusicPlaybackFailurePacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::ClientboundMusicPlaybackFailure)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
-                    })
-            }
-            VirtualContainerOpenPacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::VirtualContainerOpen)
-                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
-            }
-            VirtualContainerClosePacket::ID => {
-                BedrockCodec::deserialize(buf)
-                    .map(Self::VirtualContainerClose)
-                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
-            }
             other => Err(ProtocolError::UnknownPacketId(other)),
         }
     }
@@ -13146,6 +12832,10 @@ impl Packet {
             SyncActorPropertyPacket::ID => {
                 Some(Self::SyncActorProperty(Default::default()))
             }
+            AddVolumeEntityPacket::ID => Some(Self::AddVolumeEntity(Default::default())),
+            RemoveVolumeEntityPacket::ID => {
+                Some(Self::RemoveVolumeEntity(Default::default()))
+            }
             SimulationTypePacket::ID => Some(Self::SimulationType(Default::default())),
             NpcDialoguePacket::ID => Some(Self::NpcDialogue(Default::default())),
             EduUriResourcePacket::ID => Some(Self::EduUriResource(Default::default())),
@@ -13339,25 +13029,6 @@ impl Packet {
             }
             ServerboundRegisterAudioContentPacket::ID => {
                 Some(Self::ServerboundRegisterAudioContent(Default::default()))
-            }
-            ChatPacket::ID => Some(Self::Chat(Default::default())),
-            ServerboundRequestOnlineMusicPlaybackPacket::ID => {
-                Some(Self::ServerboundRequestOnlineMusicPlayback(Default::default()))
-            }
-            ClientboundOnlineMusicPlaybackResponsePacket::ID => {
-                Some(Self::ClientboundOnlineMusicPlaybackResponse(Default::default()))
-            }
-            PlayerToggleArmorVisibilityRequestPacket::ID => {
-                Some(Self::PlayerToggleArmorVisibilityRequest(Default::default()))
-            }
-            ClientboundMusicPlaybackFailurePacket::ID => {
-                Some(Self::ClientboundMusicPlaybackFailure(Default::default()))
-            }
-            VirtualContainerOpenPacket::ID => {
-                Some(Self::VirtualContainerOpen(Default::default()))
-            }
-            VirtualContainerClosePacket::ID => {
-                Some(Self::VirtualContainerClose(Default::default()))
             }
             _ => None,
         }
@@ -13966,6 +13637,14 @@ impl Validate for Packet {
                 Validate::validate(packet)
                     .map_err(|e| e.in_packet(SyncActorPropertyPacket::NAME))
             }
+            Self::AddVolumeEntity(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(AddVolumeEntityPacket::NAME))
+            }
+            Self::RemoveVolumeEntity(packet) => {
+                Validate::validate(packet)
+                    .map_err(|e| e.in_packet(RemoveVolumeEntityPacket::NAME))
+            }
             Self::SimulationType(packet) => {
                 Validate::validate(packet)
                     .map_err(|e| e.in_packet(SimulationTypePacket::NAME))
@@ -14327,41 +14006,6 @@ impl Validate for Packet {
                     .map_err(|e| {
                         e.in_packet(ServerboundRegisterAudioContentPacket::NAME)
                     })
-            }
-            Self::Chat(packet) => {
-                Validate::validate(packet).map_err(|e| e.in_packet(ChatPacket::NAME))
-            }
-            Self::ServerboundRequestOnlineMusicPlayback(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| {
-                        e.in_packet(ServerboundRequestOnlineMusicPlaybackPacket::NAME)
-                    })
-            }
-            Self::ClientboundOnlineMusicPlaybackResponse(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundOnlineMusicPlaybackResponsePacket::NAME)
-                    })
-            }
-            Self::PlayerToggleArmorVisibilityRequest(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| {
-                        e.in_packet(PlayerToggleArmorVisibilityRequestPacket::NAME)
-                    })
-            }
-            Self::ClientboundMusicPlaybackFailure(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| {
-                        e.in_packet(ClientboundMusicPlaybackFailurePacket::NAME)
-                    })
-            }
-            Self::VirtualContainerOpen(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| e.in_packet(VirtualContainerOpenPacket::NAME))
-            }
-            Self::VirtualContainerClose(packet) => {
-                Validate::validate(packet)
-                    .map_err(|e| e.in_packet(VirtualContainerClosePacket::NAME))
             }
         }
     }

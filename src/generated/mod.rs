@@ -12,13 +12,13 @@ pub mod types;
 #[cfg(test)]
 mod samples;
 /// Network protocol version described by the schemas.
-pub const PROTOCOL_VERSION: i32 = 2259;
+pub const PROTOCOL_VERSION: i32 = 2225;
 /// Game version described by the schemas.
-pub const MINECRAFT_VERSION: &str = "1.26.70-beta.24";
+pub const MINECRAFT_VERSION: &str = "1.26.60-beta.0";
 /// Commit of `Mojang/bedrock-protocol-docs` the code was generated from.
-pub const MOJANG_DOCS_COMMIT: &str = "88e783accb32a41f4e756e231c060bcd7b1ec462";
+pub const MOJANG_DOCS_COMMIT: &str = "d011926b11583430de5d5c49f9c4e53eb7d1fe58";
 /// Number of packets in the protocol.
-pub const PACKET_COUNT: usize = 244;
+pub const PACKET_COUNT: usize = 239;
 #[cfg(test)]
 mod tests {
     use super::packets::Packet;

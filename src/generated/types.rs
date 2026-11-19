@@ -821,6 +821,86 @@ impl Validate for AddTimeMarkerData {
         Ok(())
     }
 }
+/// Protocol type AddVolumeEntityPacketPayload.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct AddVolumeEntityPacketPayload {
+    /// Documented as "Entity Network Id".
+    pub entity_network_id: EntityNetId,
+    /// Documented as "Components".
+    pub components: NetworkNbt,
+    /// Documented as "JSON Identifier".
+    ///
+    /// Limits: at least 1 byte(s).
+    pub json_identifier: BedrockString,
+    /// Documented as "Instance Name".
+    ///
+    /// Limits: at least 1 byte(s).
+    pub instance_name: BedrockString,
+    /// Documented as "Min Bounds".
+    pub min_bounds: BlockPos,
+    /// Documented as "Max Bounds".
+    pub max_bounds: BlockPos,
+    /// Documented as "Dimension Type".
+    pub dimension_type: DimensionType,
+    /// Semantic version string
+    ///
+    /// Runtime constraint: Ensure it is a valid MinEngineVersion
+    ///
+    /// Documented as "Engine Version".
+    pub engine_version: BedrockString,
+}
+impl BedrockCodec for AddVolumeEntityPacketPayload {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        BedrockCodec::serialize(&self.entity_network_id, buf)?;
+        BedrockCodec::serialize(&self.components, buf)?;
+        BedrockCodec::serialize(&self.json_identifier, buf)?;
+        BedrockCodec::serialize(&self.instance_name, buf)?;
+        BedrockCodec::serialize(&self.min_bounds, buf)?;
+        BedrockCodec::serialize(&self.max_bounds, buf)?;
+        BedrockCodec::serialize(&self.dimension_type, buf)?;
+        BedrockCodec::serialize(&self.engine_version, buf)?;
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        let f0 = <EntityNetId as BedrockCodec>::deserialize(buf)?;
+        let f1 = <NetworkNbt as BedrockCodec>::deserialize(buf)?;
+        let f2 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f3 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f4 = <BlockPos as BedrockCodec>::deserialize(buf)?;
+        let f5 = <BlockPos as BedrockCodec>::deserialize(buf)?;
+        let f6 = <DimensionType as BedrockCodec>::deserialize(buf)?;
+        let f7 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        Ok(Self {
+            entity_network_id: f0,
+            components: f1,
+            json_identifier: f2,
+            instance_name: f3,
+            min_bounds: f4,
+            max_bounds: f5,
+            dimension_type: f6,
+            engine_version: f7,
+        })
+    }
+}
+impl Validate for AddVolumeEntityPacketPayload {
+    fn validate(&self) -> Result<()> {
+        if self.json_identifier.is_empty() {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "AddVolumeEntityPacketPayload",
+                field: "JSON Identifier",
+                constraint: "at least 1 byte(s)",
+            });
+        }
+        if self.instance_name.is_empty() {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "AddVolumeEntityPacketPayload",
+                field: "Instance Name",
+                constraint: "at least 1 byte(s)",
+            });
+        }
+        Ok(())
+    }
+}
 /// Protocol type AdventureSettings.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct AdventureSettings {
@@ -7167,210 +7247,6 @@ impl Validate for ChangePlayerScore {
         Ok(())
     }
 }
-/// Protocol type ChatFormatting.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ChatFormatting {
-    /// Server decoration rendered before the author name
-    ///
-    /// Documented as "Name Prefix".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub name_prefix: Option<BedrockString>,
-    /// Server decoration rendered after the author name
-    ///
-    /// Documented as "Name Postfix".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub name_postfix: Option<BedrockString>,
-    /// Server decoration rendered before the message
-    ///
-    /// Documented as "Message Prefix".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub message_prefix: Option<BedrockString>,
-    /// Server decoration rendered after the message
-    ///
-    /// Documented as "Message Postfix".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub message_postfix: Option<BedrockString>,
-}
-impl BedrockCodec for ChatFormatting {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        match &self.name_prefix {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.name_postfix {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.message_prefix {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.message_postfix {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f1 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f2 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f3 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        Ok(Self {
-            name_prefix: f0,
-            name_postfix: f1,
-            message_prefix: f2,
-            message_postfix: f3,
-        })
-    }
-}
-impl Validate for ChatFormatting {
-    fn validate(&self) -> Result<()> {
-        if let Some(v0) = &self.name_prefix {
-            if v0.len() > 64 {
-                return Err(ProtocolError::ConstraintViolated {
-                    type_name: "ChatFormatting",
-                    field: "Name Prefix",
-                    constraint: "at most 64 byte(s)",
-                });
-            }
-        }
-        if let Some(v0) = &self.name_postfix {
-            if v0.len() > 64 {
-                return Err(ProtocolError::ConstraintViolated {
-                    type_name: "ChatFormatting",
-                    field: "Name Postfix",
-                    constraint: "at most 64 byte(s)",
-                });
-            }
-        }
-        if let Some(v0) = &self.message_prefix {
-            if v0.len() > 64 {
-                return Err(ProtocolError::ConstraintViolated {
-                    type_name: "ChatFormatting",
-                    field: "Message Prefix",
-                    constraint: "at most 64 byte(s)",
-                });
-            }
-        }
-        if let Some(v0) = &self.message_postfix {
-            if v0.len() > 64 {
-                return Err(ProtocolError::ConstraintViolated {
-                    type_name: "ChatFormatting",
-                    field: "Message Postfix",
-                    constraint: "at most 64 byte(s)",
-                });
-            }
-        }
-        Ok(())
-    }
-}
-/// Protocol type ChatPacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ChatPacketPayload {
-    /// Relayed unmodified by the hosting server
-    ///
-    /// Documented as "Signed Chat".
-    pub signed_chat: SignedChat,
-    /// Chat room the message is for; absent for the default chat. Not signed, so the hosting server may change it to route the message to another room
-    ///
-    /// Documented as "Room Id".
-    ///
-    /// Limits: at most 128 byte(s).
-    pub room_id: Option<BedrockString>,
-    /// Optional server decoration rendered around the signed name and message
-    ///
-    /// Documented as "Formatting".
-    pub formatting: Option<ChatFormatting>,
-}
-impl BedrockCodec for ChatPacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.signed_chat, buf)?;
-        match &self.room_id {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.formatting {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <SignedChat as BedrockCodec>::deserialize(buf)?;
-        let f1 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f2 = if codec::get_bool(buf)? {
-            Some(<ChatFormatting as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        Ok(Self {
-            signed_chat: f0,
-            room_id: f1,
-            formatting: f2,
-        })
-    }
-}
-impl Validate for ChatPacketPayload {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.signed_chat)?;
-        if let Some(v0) = &self.room_id {
-            if v0.len() > 128 {
-                return Err(ProtocolError::ConstraintViolated {
-                    type_name: "ChatPacketPayload",
-                    field: "Room Id",
-                    constraint: "at most 128 byte(s)",
-                });
-            }
-        }
-        if let Some(v0) = &self.formatting {
-            Validate::validate(v0)?;
-        }
-        Ok(())
-    }
-}
 /// Protocol type ChunkPos.
 ///
 /// Converts to and from `codec::ChunkPos`.
@@ -8254,91 +8130,6 @@ impl Validate for ClientboundMatchmakingStatePacketPayload {
         Ok(())
     }
 }
-/// Protocol type ClientboundMusicPlaybackFailurePacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ClientboundMusicPlaybackFailurePacketPayload {
-    /// Documented as "Failures".
-    ///
-    /// Limits: at most 28 element(s).
-    pub failures: Vec<MusicPlaybackFailureEntry>,
-}
-impl BedrockCodec for ClientboundMusicPlaybackFailurePacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_len_var(buf, self.failures.len())?;
-        for v0 in self.failures.iter() {
-            BedrockCodec::serialize(v0, buf)?;
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = {
-            let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| <MusicPlaybackFailureEntry as BedrockCodec>::deserialize(buf),
-            )?
-        };
-        Ok(Self { failures: f0 })
-    }
-}
-impl Validate for ClientboundMusicPlaybackFailurePacketPayload {
-    fn validate(&self) -> Result<()> {
-        if self.failures.len() > 28 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ClientboundMusicPlaybackFailurePacketPayload",
-                field: "Failures",
-                constraint: "at most 28 element(s)",
-            });
-        }
-        for v0 in self.failures.iter() {
-            Validate::validate(v0)?;
-        }
-        Ok(())
-    }
-}
-/// Protocol type ClientboundOnlineMusicPlaybackResponsePacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ClientboundOnlineMusicPlaybackResponsePacketPayload {
-    /// Documented as "Request ID".
-    pub request_id: u32,
-    /// Documented as "State".
-    pub state: MusicPlaybackState,
-    /// Documented as "Shared Metadata".
-    pub shared_metadata: SignedAudioContent,
-    /// Documented as "Playback Content".
-    pub playback_content: SignedAudioContent,
-}
-impl BedrockCodec for ClientboundOnlineMusicPlaybackResponsePacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u32_le(buf, self.request_id);
-        codec::put_string(buf, (self.state).wire_name())?;
-        BedrockCodec::serialize(&self.shared_metadata, buf)?;
-        BedrockCodec::serialize(&self.playback_content, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_u32_le(buf)?;
-        let f1 = <MusicPlaybackState as ProtocolEnum>::from_wire_name(
-            &codec::get_string(buf)?,
-        )?;
-        let f2 = <SignedAudioContent as BedrockCodec>::deserialize(buf)?;
-        let f3 = <SignedAudioContent as BedrockCodec>::deserialize(buf)?;
-        Ok(Self {
-            request_id: f0,
-            state: f1,
-            shared_metadata: f2,
-            playback_content: f3,
-        })
-    }
-}
-impl Validate for ClientboundOnlineMusicPlaybackResponsePacketPayload {
-    fn validate(&self) -> Result<()> {
-        Validate::validate(&self.shared_metadata)?;
-        Validate::validate(&self.playback_content)?;
-        Ok(())
-    }
-}
 /// Protocol type ClientboundPlayAudioContentPacketPayload.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ClientboundPlayAudioContentPacketPayload {
@@ -8745,12 +8536,10 @@ pub struct CommandBlockUpdatePacketPayload {
     pub track_output: bool,
     /// Documented as "Tick Delay".
     pub tick_delay: i32,
-    /// Documented as "Execute On First Tick".
-    pub execute_on_first_tick: bool,
     /// If a delay is set on a repeating command block, should the command execute on first tick, or on first delay?
     ///
-    /// Documented as "Last Output Is Raw Message".
-    pub last_output_is_raw_message: bool,
+    /// Documented as "Execute On First Tick".
+    pub execute_on_first_tick: bool,
 }
 impl BedrockCodec for CommandBlockUpdatePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -8762,7 +8551,6 @@ impl BedrockCodec for CommandBlockUpdatePacketPayload {
         codec::put_bool(buf, self.track_output);
         codec::put_i32_le(buf, self.tick_delay);
         codec::put_bool(buf, self.execute_on_first_tick);
-        codec::put_bool(buf, self.last_output_is_raw_message);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -8776,7 +8564,6 @@ impl BedrockCodec for CommandBlockUpdatePacketPayload {
         let f5 = codec::get_bool(buf)?;
         let f6 = codec::get_i32_le(buf)?;
         let f7 = codec::get_bool(buf)?;
-        let f8 = codec::get_bool(buf)?;
         Ok(Self {
             target: f0,
             command: f1,
@@ -8786,7 +8573,6 @@ impl BedrockCodec for CommandBlockUpdatePacketPayload {
             track_output: f5,
             tick_delay: f6,
             execute_on_first_tick: f7,
-            last_output_is_raw_message: f8,
         })
     }
 }
@@ -8935,10 +8721,6 @@ pub struct CommandOutputMessage {
     ///
     /// Documented as "Parameters".
     pub parameters: Vec<BedrockString>,
-    /// A rawtext JSON payload, to be resolved by the receiving client instead of Message ID and Parameters.
-    ///
-    /// Documented as "Raw Message".
-    pub raw_message: Option<BedrockString>,
 }
 impl BedrockCodec for CommandOutputMessage {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -8947,13 +8729,6 @@ impl BedrockCodec for CommandOutputMessage {
         codec::put_len_var(buf, self.parameters.len())?;
         for v0 in self.parameters.iter() {
             BedrockCodec::serialize(v0, buf)?;
-        }
-        match &self.raw_message {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
         }
         Ok(())
     }
@@ -8968,16 +8743,10 @@ impl BedrockCodec for CommandOutputMessage {
                 |buf| <BedrockString as BedrockCodec>::deserialize(buf),
             )?
         };
-        let f3 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
         Ok(Self {
             message_id: f0,
             successful: f1,
             parameters: f2,
-            raw_message: f3,
         })
     }
 }
@@ -9200,7 +8969,6 @@ impl BedrockCodec for ConstantAttributeData {
 }
 impl Validate for ConstantAttributeData {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.attribute)?;
         Ok(())
     }
 }
@@ -9320,8 +9088,6 @@ impl Validate for ContainerOpenPacketPayload {
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ContainerRegistryCleanupPacketPayload {
     /// Documented as "Removed Containers".
-    ///
-    /// Limits: at most 1000 element(s).
     pub removed_containers: Vec<FullContainerName>,
 }
 impl BedrockCodec for ContainerRegistryCleanupPacketPayload {
@@ -9346,13 +9112,6 @@ impl BedrockCodec for ContainerRegistryCleanupPacketPayload {
 }
 impl Validate for ContainerRegistryCleanupPacketPayload {
     fn validate(&self) -> Result<()> {
-        if self.removed_containers.len() > 1000 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ContainerRegistryCleanupPacketPayload",
-                field: "Removed Containers",
-                constraint: "at most 1000 element(s)",
-            });
-        }
         Ok(())
     }
 }
@@ -10403,51 +10162,76 @@ impl Validate for DataItemVec3Payload {
 /// Protocol type Data Store Change.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct DataStoreChange {
-    /// Documented as "Variable Name".
+    /// Documented as "Data Store Name".
     ///
-    /// Limits: at least 1 byte(s), at most 2000 byte(s).
-    pub variable_name: BedrockString,
+    /// Limits: at least 1 byte(s), at most 1000 byte(s).
+    pub data_store_name: BedrockString,
+    /// The name of the property in the data store that has changed
+    ///
+    /// Documented as "Property".
+    ///
+    /// Limits: at least 1 byte(s), at most 1000 byte(s).
+    pub property: BedrockString,
     /// The number of times this property has updated
     ///
     /// Documented as "Update Count".
     ///
     /// Limits: maximum 4294967294.
     pub update_count: u32,
-    /// Documented as "The New Variable Value".
-    pub the_new_variable_value: DataStoreChangeTheNewVariableValue,
+    /// Dynamic value
+    ///
+    /// Documented as "The New Property Value".
+    pub the_new_property_value: NetworkNbt,
 }
 impl BedrockCodec for DataStoreChange {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.variable_name, buf)?;
+        BedrockCodec::serialize(&self.data_store_name, buf)?;
+        BedrockCodec::serialize(&self.property, buf)?;
         codec::put_u32_le(buf, self.update_count);
-        BedrockCodec::serialize(&self.the_new_variable_value, buf)?;
+        BedrockCodec::serialize(&self.the_new_property_value, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f1 = codec::get_u32_le(buf)?;
-        let f2 = <DataStoreChangeTheNewVariableValue as BedrockCodec>::deserialize(buf)?;
+        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f2 = codec::get_u32_le(buf)?;
+        let f3 = <NetworkNbt as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
-            variable_name: f0,
-            update_count: f1,
-            the_new_variable_value: f2,
+            data_store_name: f0,
+            property: f1,
+            update_count: f2,
+            the_new_property_value: f3,
         })
     }
 }
 impl Validate for DataStoreChange {
     fn validate(&self) -> Result<()> {
-        if self.variable_name.is_empty() {
+        if self.data_store_name.is_empty() {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Change",
-                field: "Variable Name",
+                field: "Data Store Name",
                 constraint: "at least 1 byte(s)",
             });
         }
-        if self.variable_name.len() > 2000 {
+        if self.data_store_name.len() > 1000 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Change",
-                field: "Variable Name",
-                constraint: "at most 2000 byte(s)",
+                field: "Data Store Name",
+                constraint: "at most 1000 byte(s)",
+            });
+        }
+        if self.property.is_empty() {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Change",
+                field: "Property",
+                constraint: "at least 1 byte(s)",
+            });
+        }
+        if self.property.len() > 1000 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Change",
+                field: "Property",
+                constraint: "at most 1000 byte(s)",
             });
         }
         if (self.update_count as f64) > 4294967294.0 {
@@ -10463,35 +10247,35 @@ impl Validate for DataStoreChange {
 /// Protocol type Data Store Removal.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct DataStoreRemoval {
-    /// Documented as "Variable Name".
+    /// Documented as "Data Store Name".
     ///
-    /// Limits: at least 1 byte(s), at most 2000 byte(s).
-    pub variable_name: BedrockString,
+    /// Limits: at least 1 byte(s), at most 1000 byte(s).
+    pub data_store_name: BedrockString,
 }
 impl BedrockCodec for DataStoreRemoval {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.variable_name, buf)?;
+        BedrockCodec::serialize(&self.data_store_name, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        Ok(Self { variable_name: f0 })
+        Ok(Self { data_store_name: f0 })
     }
 }
 impl Validate for DataStoreRemoval {
     fn validate(&self) -> Result<()> {
-        if self.variable_name.is_empty() {
+        if self.data_store_name.is_empty() {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Removal",
-                field: "Variable Name",
+                field: "Data Store Name",
                 constraint: "at least 1 byte(s)",
             });
         }
-        if self.variable_name.len() > 2000 {
+        if self.data_store_name.len() > 1000 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Removal",
-                field: "Variable Name",
-                constraint: "at most 2000 byte(s)",
+                field: "Data Store Name",
+                constraint: "at most 1000 byte(s)",
             });
         }
         Ok(())
@@ -10500,60 +10284,115 @@ impl Validate for DataStoreRemoval {
 /// Protocol type Data Store Update.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct DataStoreUpdate {
-    /// Documented as "Variable Name".
+    /// Documented as "Data Store Name".
     ///
-    /// Limits: at least 1 byte(s), at most 2000 byte(s).
-    pub variable_name: BedrockString,
-    /// The variable value being updated
+    /// Limits: at least 1 byte(s), at most 1000 byte(s).
+    pub data_store_name: BedrockString,
+    /// The name of the property in the data store that has changed
+    ///
+    /// Documented as "Property".
+    ///
+    /// Limits: at least 1 byte(s), at most 1000 byte(s).
+    pub property: BedrockString,
+    /// The path through the property that needs updating
+    ///
+    /// Documented as "Path".
+    ///
+    /// Limits: at most 1000 byte(s).
+    pub path: BedrockString,
+    /// The value that is updating
     ///
     /// Documented as "Data".
     pub data: DataStoreUpdateData,
-    /// The number of times this variable has updated
+    /// The number of times this property has updated. Does not increment unless the entire property updates
     ///
-    /// Documented as "Update Count".
+    /// Documented as "Property Update Count".
     ///
     /// Limits: maximum 4294967294.
-    pub update_count: u32,
+    pub property_update_count: u32,
+    /// The number of times this path has updated. Resets if the entire property has changed.
+    ///
+    /// Documented as "Path Update Count".
+    ///
+    /// Limits: maximum 4294967294.
+    pub path_update_count: u32,
 }
 impl BedrockCodec for DataStoreUpdate {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.variable_name, buf)?;
+        BedrockCodec::serialize(&self.data_store_name, buf)?;
+        BedrockCodec::serialize(&self.property, buf)?;
+        BedrockCodec::serialize(&self.path, buf)?;
         BedrockCodec::serialize(&self.data, buf)?;
-        codec::put_u32_le(buf, self.update_count);
+        codec::put_u32_le(buf, self.property_update_count);
+        codec::put_u32_le(buf, self.path_update_count);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
         let f0 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f1 = <DataStoreUpdateData as BedrockCodec>::deserialize(buf)?;
-        let f2 = codec::get_u32_le(buf)?;
+        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f2 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f3 = <DataStoreUpdateData as BedrockCodec>::deserialize(buf)?;
+        let f4 = codec::get_u32_le(buf)?;
+        let f5 = codec::get_u32_le(buf)?;
         Ok(Self {
-            variable_name: f0,
-            data: f1,
-            update_count: f2,
+            data_store_name: f0,
+            property: f1,
+            path: f2,
+            data: f3,
+            property_update_count: f4,
+            path_update_count: f5,
         })
     }
 }
 impl Validate for DataStoreUpdate {
     fn validate(&self) -> Result<()> {
-        if self.variable_name.is_empty() {
+        if self.data_store_name.is_empty() {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Update",
-                field: "Variable Name",
+                field: "Data Store Name",
                 constraint: "at least 1 byte(s)",
             });
         }
-        if self.variable_name.len() > 2000 {
+        if self.data_store_name.len() > 1000 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Update",
-                field: "Variable Name",
-                constraint: "at most 2000 byte(s)",
+                field: "Data Store Name",
+                constraint: "at most 1000 byte(s)",
+            });
+        }
+        if self.property.is_empty() {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Update",
+                field: "Property",
+                constraint: "at least 1 byte(s)",
+            });
+        }
+        if self.property.len() > 1000 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Update",
+                field: "Property",
+                constraint: "at most 1000 byte(s)",
+            });
+        }
+        if self.path.len() > 1000 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Update",
+                field: "Path",
+                constraint: "at most 1000 byte(s)",
             });
         }
         Validate::validate(&self.data)?;
-        if (self.update_count as f64) > 4294967294.0 {
+        if (self.property_update_count as f64) > 4294967294.0 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "Data Store Update",
-                field: "Update Count",
+                field: "Property Update Count",
+                constraint: "maximum 4294967294",
+            });
+        }
+        if (self.path_update_count as f64) > 4294967294.0 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "Data Store Update",
+                field: "Path Update Count",
                 constraint: "maximum 4294967294",
             });
         }
@@ -11244,8 +11083,6 @@ pub struct EmoteListPacketPayload {
     /// Documented as "Runtime id".
     pub runtime_id: ActorRuntimeID,
     /// Documented as "Emote piece ids".
-    ///
-    /// Limits: at most 6 element(s).
     pub emote_piece_ids: Vec<MceUuid>,
 }
 impl BedrockCodec for EmoteListPacketPayload {
@@ -11271,13 +11108,6 @@ impl BedrockCodec for EmoteListPacketPayload {
 }
 impl Validate for EmoteListPacketPayload {
     fn validate(&self) -> Result<()> {
-        if self.emote_piece_ids.len() > 6 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "EmoteListPacketPayload",
-                field: "Emote piece ids",
-                constraint: "at most 6 element(s)",
-            });
-        }
         Ok(())
     }
 }
@@ -11517,6 +11347,27 @@ impl BedrockCodec for EntityDiagnosticTimingInfo {
     }
 }
 impl Validate for EntityDiagnosticTimingInfo {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
+/// Protocol type EntityNetId.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct EntityNetId {
+    /// Documented as "Raw Id".
+    pub raw_id: u32,
+}
+impl BedrockCodec for EntityNetId {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        codec::put_u32_var(buf, self.raw_id);
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        let f0 = codec::get_u32_var(buf)?;
+        Ok(Self { raw_id: f0 })
+    }
+}
+impl Validate for EntityNetId {
     fn validate(&self) -> Result<()> {
         Ok(())
     }
@@ -13994,77 +13845,6 @@ impl Validate for ItemStackRequestCraftCreativeAction {
         Ok(())
     }
 }
-/// Protocol type ItemStackRequestCraftDiscPressAction.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ItemStackRequestCraftDiscPressAction {
-    /// Documented as "Track Sound Event Id".
-    ///
-    /// Limits: at most 256 byte(s).
-    pub track_sound_event_id: BedrockString,
-    /// Documented as "Num Crafts".
-    ///
-    /// Limits: minimum 1.
-    pub num_crafts: u8,
-}
-impl ItemStackRequestCraftDiscPressAction {
-    /// The press reads its block, dye and disc from the container, so only the chosen track and the craft count are sent.
-    ///
-    /// Constant value of the Action type field: written on the wire, checked when reading.
-    pub const ACTION_TYPE: ItemStackRequestActionType = ItemStackRequestActionType::CraftDiscPress;
-}
-impl BedrockCodec for ItemStackRequestCraftDiscPressAction {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(
-            buf,
-            codec::enum_to_wire(
-                (Self::ACTION_TYPE).to_raw(),
-                "ItemStackRequestActionType",
-            )?,
-        );
-        BedrockCodec::serialize(&self.track_sound_event_id, buf)?;
-        codec::put_u8(buf, self.num_crafts);
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        {
-            let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
-                codec::enum_from_wire(codec::get_u8(buf)?)?,
-            )?;
-            if found != Self::ACTION_TYPE {
-                return Err(ProtocolError::UnexpectedTag {
-                    type_name: "ItemStackRequestCraftDiscPressAction",
-                    expected: ProtocolEnum::to_raw(Self::ACTION_TYPE),
-                    found: ProtocolEnum::to_raw(found),
-                });
-            }
-        }
-        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f2 = codec::get_u8(buf)?;
-        Ok(Self {
-            track_sound_event_id: f1,
-            num_crafts: f2,
-        })
-    }
-}
-impl Validate for ItemStackRequestCraftDiscPressAction {
-    fn validate(&self) -> Result<()> {
-        if self.track_sound_event_id.len() > 256 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ItemStackRequestCraftDiscPressAction",
-                field: "Track Sound Event Id",
-                constraint: "at most 256 byte(s)",
-            });
-        }
-        if (self.num_crafts as f64) < 1.0 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ItemStackRequestCraftDiscPressAction",
-                field: "Num Crafts",
-                constraint: "minimum 1",
-            });
-        }
-        Ok(())
-    }
-}
 /// Protocol type ItemStackRequestCraftLoomAction.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ItemStackRequestCraftLoomAction {
@@ -14988,6 +14768,75 @@ impl Validate for ItemStackRequestPlaceAction {
                 type_name: "ItemStackRequestPlaceAction",
                 field: "Amount",
                 constraint: "maximum 64",
+            });
+        }
+        Ok(())
+    }
+}
+/// Protocol type ItemStackRequestReservedAction.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct ItemStackRequestReservedAction {
+    /// Documented as "Reserved Id".
+    ///
+    /// Limits: at most 256 byte(s).
+    pub reserved_id: BedrockString,
+    /// Documented as "Num Crafts".
+    ///
+    /// Limits: minimum 1.
+    pub num_crafts: u8,
+}
+impl ItemStackRequestReservedAction {
+    /// Constant value of the Action type field: written on the wire, checked when reading.
+    pub const ACTION_TYPE: ItemStackRequestActionType = ItemStackRequestActionType::CraftReservedAction;
+}
+impl BedrockCodec for ItemStackRequestReservedAction {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        codec::put_u8(
+            buf,
+            codec::enum_to_wire(
+                (Self::ACTION_TYPE).to_raw(),
+                "ItemStackRequestActionType",
+            )?,
+        );
+        BedrockCodec::serialize(&self.reserved_id, buf)?;
+        codec::put_u8(buf, self.num_crafts);
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        {
+            let found = <ItemStackRequestActionType as ProtocolEnum>::from_wire(
+                codec::enum_from_wire(codec::get_u8(buf)?)?,
+            )?;
+            if found != Self::ACTION_TYPE {
+                return Err(ProtocolError::UnexpectedTag {
+                    type_name: "ItemStackRequestReservedAction",
+                    expected: ProtocolEnum::to_raw(Self::ACTION_TYPE),
+                    found: ProtocolEnum::to_raw(found),
+                });
+            }
+        }
+        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
+        let f2 = codec::get_u8(buf)?;
+        Ok(Self {
+            reserved_id: f1,
+            num_crafts: f2,
+        })
+    }
+}
+impl Validate for ItemStackRequestReservedAction {
+    fn validate(&self) -> Result<()> {
+        if self.reserved_id.len() > 256 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "ItemStackRequestReservedAction",
+                field: "Reserved Id",
+                constraint: "at most 256 byte(s)",
+            });
+        }
+        if (self.num_crafts as f64) < 1.0 {
+            return Err(ProtocolError::ConstraintViolated {
+                type_name: "ItemStackRequestReservedAction",
+                field: "Num Crafts",
+                constraint: "minimum 1",
             });
         }
         Ok(())
@@ -16711,29 +16560,6 @@ impl Validate for LoginPacketPayload {
         Ok(())
     }
 }
-/// Protocol type managedChatJoinInfo.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ManagedChatJoinInfo {
-    /// This server routes chat through Mojang Managed Chat
-    ///
-    /// Documented as "Enabled".
-    pub enabled: bool,
-}
-impl BedrockCodec for ManagedChatJoinInfo {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_bool(buf, self.enabled);
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_bool(buf)?;
-        Ok(Self { enabled: f0 })
-    }
-}
-impl Validate for ManagedChatJoinInfo {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
 /// Protocol type MapCreateLockedCopyPacketPayload.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct MapCreateLockedCopyPacketPayload {
@@ -17141,8 +16967,6 @@ pub struct MessageAndParams {
     ///
     /// Limits: at most 4 element(s).
     pub parameter_list: Vec<BedrockString>,
-    /// Documented as "Queue?".
-    pub queue: bool,
 }
 impl BedrockCodec for MessageAndParams {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -17158,7 +16982,6 @@ impl BedrockCodec for MessageAndParams {
         for v0 in self.parameter_list.iter() {
             BedrockCodec::serialize(v0, buf)?;
         }
-        codec::put_bool(buf, self.queue);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -17174,12 +16997,10 @@ impl BedrockCodec for MessageAndParams {
                 |buf| <BedrockString as BedrockCodec>::deserialize(buf),
             )?
         };
-        let f3 = codec::get_bool(buf)?;
         Ok(Self {
             message_type: f0,
             message: f1,
             parameter_list: f2,
-            queue: f3,
         })
     }
 }
@@ -18257,42 +18078,6 @@ impl Validate for MultiplayerSettingsPacketPayload {
         Ok(())
     }
 }
-/// Protocol type MusicPlaybackFailureEntry.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct MusicPlaybackFailureEntry {
-    /// Documented as "State".
-    pub state: MusicPlaybackState,
-    /// Documented as "Description".
-    ///
-    /// Limits: at most 65536 byte(s).
-    pub description: BedrockString,
-}
-impl BedrockCodec for MusicPlaybackFailureEntry {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_string(buf, (self.state).wire_name())?;
-        BedrockCodec::serialize(&self.description, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <MusicPlaybackState as ProtocolEnum>::from_wire_name(
-            &codec::get_string(buf)?,
-        )?;
-        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        Ok(Self { state: f0, description: f1 })
-    }
-}
-impl Validate for MusicPlaybackFailureEntry {
-    fn validate(&self) -> Result<()> {
-        if self.description.len() > 65536 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "MusicPlaybackFailureEntry",
-                field: "Description",
-                constraint: "at most 65536 byte(s)",
-            });
-        }
-        Ok(())
-    }
-}
 /// Protocol type NetworkChunkPublisherUpdatePacketPayload.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct NetworkChunkPublisherUpdatePacketPayload {
@@ -18458,8 +18243,6 @@ pub struct NetworkSettingsPacketPayload {
     pub client_throttle_threshold: u8,
     /// Documented as "Client Throttle Scalar".
     pub client_throttle_scalar: f32,
-    /// Documented as "SCTP Recovery Profile".
-    pub sctp_recovery_profile: SctpRecoveryProfile,
 }
 impl BedrockCodec for NetworkSettingsPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -18474,13 +18257,6 @@ impl BedrockCodec for NetworkSettingsPacketPayload {
         codec::put_bool(buf, self.client_throttle_enabled);
         codec::put_u8(buf, self.client_throttle_threshold);
         codec::put_f32_le(buf, self.client_throttle_scalar);
-        codec::put_u8(
-            buf,
-            codec::enum_to_wire(
-                (self.sctp_recovery_profile).to_raw(),
-                "SctpRecoveryProfile",
-            )?,
-        );
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -18491,16 +18267,12 @@ impl BedrockCodec for NetworkSettingsPacketPayload {
         let f2 = codec::get_bool(buf)?;
         let f3 = codec::get_u8(buf)?;
         let f4 = codec::get_f32_le(buf)?;
-        let f5 = <SctpRecoveryProfile as ProtocolEnum>::from_wire(
-            codec::enum_from_wire(codec::get_u8(buf)?)?,
-        )?;
         Ok(Self {
             compression_threshold: f0,
             compression_algorithm: f1,
             client_throttle_enabled: f2,
             client_throttle_threshold: f3,
             client_throttle_scalar: f4,
-            sctp_recovery_profile: f5,
         })
     }
 }
@@ -18662,8 +18434,6 @@ impl BedrockCodec for NoiseTransitionAttributeData {
 }
 impl Validate for NoiseTransitionAttributeData {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.from_attribute)?;
-        Validate::validate(&self.to_attribute)?;
         Validate::validate(&self.settings)?;
         Ok(())
     }
@@ -19317,10 +19087,6 @@ pub struct PassengerOfBlockArguments {
     pub rotation_limit: f32,
     /// Documented as "EmoteType".
     pub emote_type: PassengerOfBlockArgumentsEmoteType,
-    /// Documented as "BlockType".
-    pub block_type: u64,
-    /// Documented as "PackUUID".
-    pub pack_uuid: MceUuid,
 }
 impl BedrockCodec for PassengerOfBlockArguments {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -19335,8 +19101,6 @@ impl BedrockCodec for PassengerOfBlockArguments {
                 "PassengerOfBlockArgumentsEmoteType",
             )?,
         );
-        codec::put_u64_le(buf, self.block_type);
-        BedrockCodec::serialize(&self.pack_uuid, buf)?;
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -19347,16 +19111,12 @@ impl BedrockCodec for PassengerOfBlockArguments {
         let f4 = <PassengerOfBlockArgumentsEmoteType as ProtocolEnum>::from_wire(
             codec::enum_from_wire(codec::get_u8(buf)?)?,
         )?;
-        let f5 = codec::get_u64_le(buf)?;
-        let f6 = <MceUuid as BedrockCodec>::deserialize(buf)?;
         Ok(Self {
             block_pos: f0,
             offset: f1,
             rotation: f2,
             rotation_limit: f3,
             emote_type: f4,
-            block_type: f5,
-            pack_uuid: f6,
         })
     }
 }
@@ -19545,12 +19305,6 @@ pub struct PlaySoundPacketPayload {
     pub server_sound_handle: Option<ServerSoundHandle>,
     /// Documented as "Playback Position Seconds".
     pub playback_position_seconds: Option<f32>,
-    /// Optional delay before the playback timeline starts, in seconds. If this is empty, playback starts when ready. If specified, playback will be delayed by the given amount and if the sound isn't loaded yet, time will progress and the audio will seek to the correct position once it is ready.
-    ///
-    /// Documented as "Start Delay Seconds".
-    pub start_delay_seconds: Option<f32>,
-    /// Documented as "Attach Options".
-    pub attach_options: Option<SoundAttachOptions>,
 }
 impl BedrockCodec for PlaySoundPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -19574,20 +19328,6 @@ impl BedrockCodec for PlaySoundPacketPayload {
             }
             None => codec::put_bool(buf, false),
         }
-        match &self.start_delay_seconds {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                codec::put_f32_le(buf, *v0);
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.attach_options {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -19607,16 +19347,6 @@ impl BedrockCodec for PlaySoundPacketPayload {
         } else {
             None
         };
-        let f8 = if codec::get_bool(buf)? {
-            Some(codec::get_f32_le(buf)?)
-        } else {
-            None
-        };
-        let f9 = if codec::get_bool(buf)? {
-            Some(<SoundAttachOptions as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
         Ok(Self {
             name: f0,
             position: f1,
@@ -19626,8 +19356,6 @@ impl BedrockCodec for PlaySoundPacketPayload {
             bypass_listener_range_check: f5,
             server_sound_handle: f6,
             playback_position_seconds: f7,
-            start_delay_seconds: f8,
-            attach_options: f9,
         })
     }
 }
@@ -20150,8 +19878,6 @@ pub struct PlayerFogPacketPayload {
     /// Stack of fog effects created by /fog command.  Fog effects are strings from /fog command
     ///
     /// Documented as "Fog Stack".
-    ///
-    /// Limits: at most 16 element(s).
     pub fog_stack: Vec<BedrockString>,
 }
 impl BedrockCodec for PlayerFogPacketPayload {
@@ -20176,13 +19902,6 @@ impl BedrockCodec for PlayerFogPacketPayload {
 }
 impl Validate for PlayerFogPacketPayload {
     fn validate(&self) -> Result<()> {
-        if self.fog_stack.len() > 16 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "PlayerFogPacketPayload",
-                field: "Fog Stack",
-                constraint: "at most 16 element(s)",
-            });
-        }
         Ok(())
     }
 }
@@ -20608,29 +20327,6 @@ impl BedrockCodec for PlayerStartItemCooldownPacketPayload {
     }
 }
 impl Validate for PlayerStartItemCooldownPacketPayload {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-/// Protocol type PlayerToggleArmorVisibilityRequestPacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct PlayerToggleArmorVisibilityRequestPacketPayload {
-    /// Whether the sending player's equipped armor should be hidden.
-    ///
-    /// Documented as "Hide Armor".
-    pub hide_armor: bool,
-}
-impl BedrockCodec for PlayerToggleArmorVisibilityRequestPacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_bool(buf, self.hide_armor);
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_bool(buf)?;
-        Ok(Self { hide_armor: f0 })
-    }
-}
-impl Validate for PlayerToggleArmorVisibilityRequestPacketPayload {
     fn validate(&self) -> Result<()> {
         Ok(())
     }
@@ -21940,6 +21636,34 @@ impl Validate for RemoveTimeMarkerData {
         Ok(())
     }
 }
+/// Protocol type RemoveVolumeEntityPacketPayload.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct RemoveVolumeEntityPacketPayload {
+    /// Documented as "Entity Network Id".
+    pub entity_network_id: EntityNetId,
+    /// Documented as "Dimension Type".
+    pub dimension_type: DimensionType,
+}
+impl BedrockCodec for RemoveVolumeEntityPacketPayload {
+    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
+        BedrockCodec::serialize(&self.entity_network_id, buf)?;
+        BedrockCodec::serialize(&self.dimension_type, buf)?;
+        Ok(())
+    }
+    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
+        let f0 = <EntityNetId as BedrockCodec>::deserialize(buf)?;
+        let f1 = <DimensionType as BedrockCodec>::deserialize(buf)?;
+        Ok(Self {
+            entity_network_id: f0,
+            dimension_type: f1,
+        })
+    }
+}
+impl Validate for RemoveVolumeEntityPacketPayload {
+    fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
 /// Protocol type RequestAbilityPacketPayload.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct RequestAbilityPacketPayload {
@@ -22035,7 +21759,7 @@ impl Validate for RequestChunkRadiusPacketPayload {
 pub struct RequestNetworkSettingsPacketPayload {
     /// Documented as "ClientNetworkVersion".
     ///
-    /// Limits: minimum 2259, maximum 2259.
+    /// Limits: minimum 2225, maximum 2225.
     pub client_network_version: i32,
 }
 impl BedrockCodec for RequestNetworkSettingsPacketPayload {
@@ -22050,18 +21774,18 @@ impl BedrockCodec for RequestNetworkSettingsPacketPayload {
 }
 impl Validate for RequestNetworkSettingsPacketPayload {
     fn validate(&self) -> Result<()> {
-        if (self.client_network_version as f64) < 2259.0 {
+        if (self.client_network_version as f64) < 2225.0 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "RequestNetworkSettingsPacketPayload",
                 field: "ClientNetworkVersion",
-                constraint: "minimum 2259",
+                constraint: "minimum 2225",
             });
         }
-        if (self.client_network_version as f64) > 2259.0 {
+        if (self.client_network_version as f64) > 2225.0 {
             return Err(ProtocolError::ConstraintViolated {
                 type_name: "RequestNetworkSettingsPacketPayload",
                 field: "ClientNetworkVersion",
-                constraint: "maximum 2259",
+                constraint: "maximum 2225",
             });
         }
         Ok(())
@@ -22441,10 +22165,10 @@ pub struct ResourcePackStackPacketPayload {
     ///
     /// Documented as "Experiments".
     pub experiments: Experiments,
-    /// Bit flags for the built-in Editor packs that the client adds to its stack: 0x1 Core, 0x2 Annotation. Other bits are invalid.
+    /// When connecting to an Editor world, include the vanilla editor packs in the stack
     ///
-    /// Documented as "Editor Pack Types".
-    pub editor_pack_types: MaybeUnknown<EditorPackType>,
+    /// Documented as "Include Editor Packs".
+    pub include_editor_packs: bool,
 }
 impl BedrockCodec for ResourcePackStackPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -22455,10 +22179,7 @@ impl BedrockCodec for ResourcePackStackPacketPayload {
         }
         BedrockCodec::serialize(&self.base_game_version, buf)?;
         BedrockCodec::serialize(&self.experiments, buf)?;
-        codec::put_u8(
-            buf,
-            codec::enum_to_wire((self.editor_pack_types).to_raw(), "EditorPackType")?,
-        );
+        codec::put_bool(buf, self.include_editor_packs);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -22473,15 +22194,13 @@ impl BedrockCodec for ResourcePackStackPacketPayload {
         };
         let f2 = <BedrockString as BedrockCodec>::deserialize(buf)?;
         let f3 = <Experiments as BedrockCodec>::deserialize(buf)?;
-        let f4 = MaybeUnknown::<
-            EditorPackType,
-        >::from_raw(codec::enum_from_wire(codec::get_u8(buf)?)?);
+        let f4 = codec::get_bool(buf)?;
         Ok(Self {
             texture_pack_required: f0,
             texture_pack_list: f1,
             base_game_version: f2,
             experiments: f3,
-            editor_pack_types: f4,
+            include_editor_packs: f4,
         })
     }
 }
@@ -23290,8 +23009,6 @@ pub struct ServerConfig {
     pub client_store_entry_point: Option<ClientStoreEntryPointConfig>,
     /// Documented as "presence".
     pub presence: Option<PresenceConfig>,
-    /// Documented as "managedChat".
-    pub managed_chat: Option<ManagedChatJoinInfo>,
 }
 impl BedrockCodec for ServerConfig {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -23316,13 +23033,6 @@ impl BedrockCodec for ServerConfig {
             }
             None => codec::put_bool(buf, false),
         }
-        match &self.managed_chat {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -23341,16 +23051,10 @@ impl BedrockCodec for ServerConfig {
         } else {
             None
         };
-        let f3 = if codec::get_bool(buf)? {
-            Some(<ManagedChatJoinInfo as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
         Ok(Self {
             gathering: f0,
             client_store_entry_point: f1,
             presence: f2,
-            managed_chat: f3,
         })
     }
 }
@@ -23860,8 +23564,6 @@ pub struct ServerboundDiagnosticsPacketPayload {
     /// Documented as "AvgUnaccountedTimePercent".
     pub avg_unaccounted_time_percent: f32,
     /// Documented as "Memory Category Values".
-    ///
-    /// Limits: at most 111 element(s).
     pub memory_category_values: Vec<MemoryCategoryCounter>,
     /// Documented as "Entity Diagnostics".
     pub entity_diagnostics: Vec<EntityDiagnosticTimingInfo>,
@@ -23870,8 +23572,6 @@ pub struct ServerboundDiagnosticsPacketPayload {
     /// Documented as "System Categories".
     pub system_categories: Option<Vec<SystemCategory>>,
     /// Documented as "Whisker Scopes".
-    ///
-    /// Limits: at most 33 element(s).
     pub whisker_scopes: Vec<WhiskerScopeDataSummary>,
 }
 impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
@@ -23987,20 +23687,6 @@ impl BedrockCodec for ServerboundDiagnosticsPacketPayload {
 }
 impl Validate for ServerboundDiagnosticsPacketPayload {
     fn validate(&self) -> Result<()> {
-        if self.memory_category_values.len() > 111 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ServerboundDiagnosticsPacketPayload",
-                field: "Memory Category Values",
-                constraint: "at most 111 element(s)",
-            });
-        }
-        if self.whisker_scopes.len() > 33 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ServerboundDiagnosticsPacketPayload",
-                field: "Whisker Scopes",
-                constraint: "at most 33 element(s)",
-            });
-        }
         Ok(())
     }
 }
@@ -24157,50 +23843,6 @@ impl Validate for ServerboundRegisterAudioContentPacketPayload {
         }
         for v0 in self.registrations.iter() {
             Validate::validate(v0)?;
-        }
-        Ok(())
-    }
-}
-/// Protocol type ServerboundRequestOnlineMusicPlaybackPacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct ServerboundRequestOnlineMusicPlaybackPacketPayload {
-    /// Documented as "Request ID".
-    pub request_id: u32,
-    /// Documented as "Sound Event Name".
-    ///
-    /// Limits: at least 1 byte(s), at most 256 byte(s).
-    pub sound_event_name: BedrockString,
-}
-impl BedrockCodec for ServerboundRequestOnlineMusicPlaybackPacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u32_le(buf, self.request_id);
-        BedrockCodec::serialize(&self.sound_event_name, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_u32_le(buf)?;
-        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        Ok(Self {
-            request_id: f0,
-            sound_event_name: f1,
-        })
-    }
-}
-impl Validate for ServerboundRequestOnlineMusicPlaybackPacketPayload {
-    fn validate(&self) -> Result<()> {
-        if self.sound_event_name.is_empty() {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ServerboundRequestOnlineMusicPlaybackPacketPayload",
-                field: "Sound Event Name",
-                constraint: "at least 1 byte(s)",
-            });
-        }
-        if self.sound_event_name.len() > 256 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "ServerboundRequestOnlineMusicPlaybackPacketPayload",
-                field: "Sound Event Name",
-                constraint: "at most 256 byte(s)",
-            });
         }
         Ok(())
     }
@@ -25501,136 +25143,6 @@ impl Validate for SignedAudioContent {
         Ok(())
     }
 }
-/// Protocol type SignedChat.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct SignedChat {
-    /// Identifies which published Chat Service key signed this message; empty when unsigned
-    ///
-    /// Documented as "Key Id".
-    ///
-    /// Limits: at most 128 byte(s).
-    pub key_id: BedrockString,
-    /// The identity the Chat Service signed against; empty when unsigned
-    ///
-    /// Documented as "Sender Id".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub sender_id: BedrockString,
-    /// Client generated id for this message; empty when unsigned
-    ///
-    /// Documented as "Message Id".
-    ///
-    /// Limits: at most 64 byte(s).
-    pub message_id: BedrockString,
-    /// The message the Chat Service scanned and signed
-    ///
-    /// Documented as "Scan Text".
-    ///
-    /// Limits: at most 512 byte(s).
-    pub scan_text: BedrockString,
-    /// Redacted form of the message; empty means nothing needed redacting
-    ///
-    /// Documented as "Redacted Text".
-    ///
-    /// Limits: at most 512 byte(s).
-    pub redacted_text: BedrockString,
-    /// Name to display for the sender: the gamertag the Chat Service resolved, or for a message with no sender, the name supplied when it was signed; empty when unsigned or when no name was resolved
-    ///
-    /// Documented as "Author Name".
-    ///
-    /// Limits: at most 192 byte(s).
-    pub author_name: BedrockString,
-    /// Chat Service signature over the fields above; empty when the sender could not sign
-    ///
-    /// Documented as "Signature".
-    ///
-    /// Limits: at most 256 byte(s).
-    pub signature: BedrockString,
-}
-impl BedrockCodec for SignedChat {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.key_id, buf)?;
-        BedrockCodec::serialize(&self.sender_id, buf)?;
-        BedrockCodec::serialize(&self.message_id, buf)?;
-        BedrockCodec::serialize(&self.scan_text, buf)?;
-        BedrockCodec::serialize(&self.redacted_text, buf)?;
-        BedrockCodec::serialize(&self.author_name, buf)?;
-        BedrockCodec::serialize(&self.signature, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f1 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f2 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f3 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f4 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f5 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f6 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        Ok(Self {
-            key_id: f0,
-            sender_id: f1,
-            message_id: f2,
-            scan_text: f3,
-            redacted_text: f4,
-            author_name: f5,
-            signature: f6,
-        })
-    }
-}
-impl Validate for SignedChat {
-    fn validate(&self) -> Result<()> {
-        if self.key_id.len() > 128 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Key Id",
-                constraint: "at most 128 byte(s)",
-            });
-        }
-        if self.sender_id.len() > 64 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Sender Id",
-                constraint: "at most 64 byte(s)",
-            });
-        }
-        if self.message_id.len() > 64 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Message Id",
-                constraint: "at most 64 byte(s)",
-            });
-        }
-        if self.scan_text.len() > 512 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Scan Text",
-                constraint: "at most 512 byte(s)",
-            });
-        }
-        if self.redacted_text.len() > 512 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Redacted Text",
-                constraint: "at most 512 byte(s)",
-            });
-        }
-        if self.author_name.len() > 192 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Author Name",
-                constraint: "at most 192 byte(s)",
-            });
-        }
-        if self.signature.len() > 256 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "SignedChat",
-                field: "Signature",
-                constraint: "at most 256 byte(s)",
-            });
-        }
-        Ok(())
-    }
-}
 /// Protocol type SimpleEventPacketPayload.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct SimpleEventPacketPayload {
@@ -25933,27 +25445,6 @@ impl Validate for SmithingTrimRecipePayload {
         Validate::validate(&self.template_ingredient)?;
         Validate::validate(&self.base_ingredient)?;
         Validate::validate(&self.addition_ingredient)?;
-        Ok(())
-    }
-}
-/// Protocol type SoundAttachOptions.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct SoundAttachOptions {
-    /// Documented as "Entity To Attach To ID".
-    pub entity_to_attach_to_id: ActorRuntimeID,
-}
-impl BedrockCodec for SoundAttachOptions {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.entity_to_attach_to_id, buf)?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <ActorRuntimeID as BedrockCodec>::deserialize(buf)?;
-        Ok(Self { entity_to_attach_to_id: f0 })
-    }
-}
-impl Validate for SoundAttachOptions {
-    fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -26394,42 +25885,6 @@ impl Validate for StopVideoCapture {
         Ok(())
     }
 }
-/// Protocol type StringAttributeData.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct StringAttributeData {
-    /// Documented as "value".
-    ///
-    /// Limits: at most 128 byte(s).
-    pub value: BedrockString,
-    /// Documented as "operation".
-    pub operation: StringAttributeOperation,
-}
-impl BedrockCodec for StringAttributeData {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        BedrockCodec::serialize(&self.value, buf)?;
-        codec::put_string(buf, (self.operation).wire_name())?;
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f1 = <StringAttributeOperation as ProtocolEnum>::from_wire_name(
-            &codec::get_string(buf)?,
-        )?;
-        Ok(Self { value: f0, operation: f1 })
-    }
-}
-impl Validate for StringAttributeData {
-    fn validate(&self) -> Result<()> {
-        if self.value.len() > 128 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "StringAttributeData",
-                field: "value",
-                constraint: "at most 128 byte(s)",
-            });
-        }
-        Ok(())
-    }
-}
 /// Protocol type StringTag.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct StringTag {
@@ -26462,8 +25917,6 @@ pub struct StructureBlockUpdatePacketPayload {
     pub trigger: bool,
     /// Documented as "IsWaterlogged".
     pub is_waterlogged: bool,
-    /// Documented as "KeepStructureVoid".
-    pub keep_structure_void: bool,
 }
 impl BedrockCodec for StructureBlockUpdatePacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -26471,7 +25924,6 @@ impl BedrockCodec for StructureBlockUpdatePacketPayload {
         BedrockCodec::serialize(&self.structure_data, buf)?;
         codec::put_bool(buf, self.trigger);
         codec::put_bool(buf, self.is_waterlogged);
-        codec::put_bool(buf, self.keep_structure_void);
         Ok(())
     }
     fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
@@ -26479,13 +25931,11 @@ impl BedrockCodec for StructureBlockUpdatePacketPayload {
         let f1 = <StructureEditorData as BedrockCodec>::deserialize(buf)?;
         let f2 = codec::get_bool(buf)?;
         let f3 = codec::get_bool(buf)?;
-        let f4 = codec::get_bool(buf)?;
         Ok(Self {
             block_position: f0,
             structure_data: f1,
             trigger: f2,
             is_waterlogged: f3,
-            keep_structure_void: f4,
         })
     }
 }
@@ -27815,8 +27265,6 @@ pub struct TransferPacketPayload {
     pub reload_world: bool,
     /// Documented as "Gatherings Configuration".
     pub gatherings_configuration: Option<GatheringsConfig>,
-    /// Documented as "Server Transfer Settings".
-    pub server_transfer_settings: Option<TransferPlayerUIOptions>,
 }
 impl BedrockCodec for TransferPacketPayload {
     fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
@@ -27824,13 +27272,6 @@ impl BedrockCodec for TransferPacketPayload {
         codec::put_u16_le(buf, self.server_port);
         codec::put_bool(buf, self.reload_world);
         match &self.gatherings_configuration {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.server_transfer_settings {
             Some(v0) => {
                 codec::put_bool(buf, true);
                 BedrockCodec::serialize(v0, buf)?;
@@ -27848,17 +27289,11 @@ impl BedrockCodec for TransferPacketPayload {
         } else {
             None
         };
-        let f4 = if codec::get_bool(buf)? {
-            Some(<TransferPlayerUIOptions as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
         Ok(Self {
             server_address: f0,
             server_port: f1,
             reload_world: f2,
             gatherings_configuration: f3,
-            server_transfer_settings: f4,
         })
     }
 }
@@ -27867,117 +27302,6 @@ impl Validate for TransferPacketPayload {
         if let Some(v0) = &self.gatherings_configuration {
             Validate::validate(v0)?;
         }
-        Ok(())
-    }
-}
-/// Protocol type TransferPlayerUIOptions.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct TransferPlayerUIOptions {
-    /// Documented as "TitleText".
-    pub title_text: Option<BedrockString>,
-    /// Documented as "BodyText".
-    pub body_text: Option<BedrockString>,
-    /// Documented as "TitleVisible".
-    pub title_visible: Option<bool>,
-    /// Documented as "BodyVisible".
-    pub body_visible: Option<bool>,
-    /// Documented as "CancelButtonText".
-    pub cancel_button_text: Option<BedrockString>,
-    /// Documented as "CancelButtonVisible".
-    pub cancel_button_visible: Option<bool>,
-    /// Documented as "CancelButtonDelaySeconds".
-    pub cancel_button_delay_seconds: Option<f32>,
-}
-impl BedrockCodec for TransferPlayerUIOptions {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        match &self.title_text {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.body_text {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.title_visible {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                codec::put_bool(buf, *v0);
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.body_visible {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                codec::put_bool(buf, *v0);
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.cancel_button_text {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                BedrockCodec::serialize(v0, buf)?;
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.cancel_button_visible {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                codec::put_bool(buf, *v0);
-            }
-            None => codec::put_bool(buf, false),
-        }
-        match &self.cancel_button_delay_seconds {
-            Some(v0) => {
-                codec::put_bool(buf, true);
-                codec::put_f32_le(buf, *v0);
-            }
-            None => codec::put_bool(buf, false),
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f1 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f2 = if codec::get_bool(buf)? { Some(codec::get_bool(buf)?) } else { None };
-        let f3 = if codec::get_bool(buf)? { Some(codec::get_bool(buf)?) } else { None };
-        let f4 = if codec::get_bool(buf)? {
-            Some(<BedrockString as BedrockCodec>::deserialize(buf)?)
-        } else {
-            None
-        };
-        let f5 = if codec::get_bool(buf)? { Some(codec::get_bool(buf)?) } else { None };
-        let f6 = if codec::get_bool(buf)? {
-            Some(codec::get_f32_le(buf)?)
-        } else {
-            None
-        };
-        Ok(Self {
-            title_text: f0,
-            body_text: f1,
-            title_visible: f2,
-            body_visible: f3,
-            cancel_button_text: f4,
-            cancel_button_visible: f5,
-            cancel_button_delay_seconds: f6,
-        })
-    }
-}
-impl Validate for TransferPlayerUIOptions {
-    fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -28013,8 +27337,6 @@ impl BedrockCodec for TransitionAttributeData {
 }
 impl Validate for TransitionAttributeData {
     fn validate(&self) -> Result<()> {
-        Validate::validate(&self.from_attribute)?;
-        Validate::validate(&self.to_attribute)?;
         Validate::validate(&self.settings)?;
         Ok(())
     }
@@ -29000,165 +28322,6 @@ impl BedrockCodec for Vec3 {
 }
 impl Validate for Vec3 {
     fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-/// Protocol type VirtualContainerClosePacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct VirtualContainerClosePacketPayload {
-    /// The nonzero session ID from VirtualContainerOpenPacket.
-    ///
-    /// Documented as "Session Id".
-    ///
-    /// Limits: minimum 1.
-    pub session_id: u64,
-    /// Server close request, client closure outcome, or server confirmation after inventory work drains.
-    ///
-    /// Documented as "Kind".
-    pub kind: VirtualContainerClosePacketPayloadKind,
-    /// Why the session is closing or could not be opened. The server reports UserBusy and ClientNotReady to scripts as the player being busy. Request carries ServerRequested and Confirmed carries Unknown.
-    ///
-    /// Documented as "Cause".
-    pub cause: VirtualContainerClosePacketPayloadCause,
-}
-impl BedrockCodec for VirtualContainerClosePacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u64_var(buf, self.session_id);
-        codec::put_u8(
-            buf,
-            codec::enum_to_wire(
-                (self.kind).to_raw(),
-                "VirtualContainerClosePacketPayloadKind",
-            )?,
-        );
-        codec::put_u8(
-            buf,
-            codec::enum_to_wire(
-                (self.cause).to_raw(),
-                "VirtualContainerClosePacketPayloadCause",
-            )?,
-        );
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_u64_var(buf)?;
-        let f1 = <VirtualContainerClosePacketPayloadKind as ProtocolEnum>::from_wire(
-            codec::enum_from_wire(codec::get_u8(buf)?)?,
-        )?;
-        let f2 = <VirtualContainerClosePacketPayloadCause as ProtocolEnum>::from_wire(
-            codec::enum_from_wire(codec::get_u8(buf)?)?,
-        )?;
-        Ok(Self {
-            session_id: f0,
-            kind: f1,
-            cause: f2,
-        })
-    }
-}
-impl Validate for VirtualContainerClosePacketPayload {
-    fn validate(&self) -> Result<()> {
-        if (self.session_id as f64) < 1.0 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "VirtualContainerClosePacketPayload",
-                field: "Session Id",
-                constraint: "minimum 1",
-            });
-        }
-        Ok(())
-    }
-}
-/// Protocol type VirtualContainerOpenPacketPayload.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub struct VirtualContainerOpenPacketPayload {
-    /// The id of the screen being opened. Later inventory packets for the screen use this id.
-    ///
-    /// Documented as "Container Id".
-    pub container_id: u8,
-    /// Connection-scoped opening identity. Every VirtualContainerClosePacket for the screen refers to it.
-    ///
-    /// Documented as "Session Id".
-    ///
-    /// Limits: minimum 1.
-    pub session_id: u64,
-    /// The screen heading. Localized on the client when it names a localization key.
-    ///
-    /// Documented as "Title".
-    ///
-    /// Limits: at most 256 byte(s).
-    pub title: BedrockString,
-    /// Every initial slot, including empty slots and server net IDs. The array length is the capacity.
-    ///
-    /// Documented as "Slots".
-    ///
-    /// Limits: at least 1 element(s), at most 54 element(s).
-    pub slots: Vec<NetworkItemStackDescriptor>,
-}
-impl BedrockCodec for VirtualContainerOpenPacketPayload {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        codec::put_u8(buf, self.container_id);
-        codec::put_u64_var(buf, self.session_id);
-        BedrockCodec::serialize(&self.title, buf)?;
-        codec::put_len_var(buf, self.slots.len())?;
-        for v0 in self.slots.iter() {
-            BedrockCodec::serialize(v0, buf)?;
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        let f0 = codec::get_u8(buf)?;
-        let f1 = codec::get_u64_var(buf)?;
-        let f2 = <BedrockString as BedrockCodec>::deserialize(buf)?;
-        let f3 = {
-            let len = codec::get_len_var(buf)?;
-            codec::get_vec(
-                buf,
-                len,
-                |buf| <CerealizerNetworkItemStackDescriptorSerializedData as BedrockCodec>::deserialize(
-                    buf,
-                ),
-            )?
-        };
-        Ok(Self {
-            container_id: f0,
-            session_id: f1,
-            title: f2,
-            slots: f3,
-        })
-    }
-}
-impl Validate for VirtualContainerOpenPacketPayload {
-    fn validate(&self) -> Result<()> {
-        if (self.session_id as f64) < 1.0 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "VirtualContainerOpenPacketPayload",
-                field: "Session Id",
-                constraint: "minimum 1",
-            });
-        }
-        if self.title.len() > 256 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "VirtualContainerOpenPacketPayload",
-                field: "Title",
-                constraint: "at most 256 byte(s)",
-            });
-        }
-        if self.slots.is_empty() {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "VirtualContainerOpenPacketPayload",
-                field: "Slots",
-                constraint: "at least 1 element(s)",
-            });
-        }
-        if self.slots.len() > 54 {
-            return Err(ProtocolError::ConstraintViolated {
-                type_name: "VirtualContainerOpenPacketPayload",
-                field: "Slots",
-                constraint: "at most 54 element(s)",
-            });
-        }
-        for v0 in self.slots.iter() {
-            Validate::validate(v0)?;
-        }
         Ok(())
     }
 }
@@ -30230,8 +29393,6 @@ pub enum ConstantAttributeDataAttribute {
     Float(FloatAttributeData),
     /// Index 2.
     Color(ColorAttributeData),
-    /// Index 3.
-    String(StringAttributeData),
 }
 impl Default for ConstantAttributeDataAttribute {
     fn default() -> Self {
@@ -30253,10 +29414,6 @@ impl BedrockCodec for ConstantAttributeDataAttribute {
                 codec::put_u32_var(buf, 2);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 3);
-                BedrockCodec::serialize(v, buf)?;
-            }
         }
         Ok(())
     }
@@ -30265,13 +29422,6 @@ impl BedrockCodec for ConstantAttributeDataAttribute {
             0 => Ok(Self::Bool(<BoolAttributeData as BedrockCodec>::deserialize(buf)?)),
             1 => Ok(Self::Float(<FloatAttributeData as BedrockCodec>::deserialize(buf)?)),
             2 => Ok(Self::Color(<ColorAttributeData as BedrockCodec>::deserialize(buf)?)),
-            3 => {
-                Ok(
-                    Self::String(
-                        <StringAttributeData as BedrockCodec>::deserialize(buf)?,
-                    ),
-                )
-            }
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "ConstantAttributeData Attribute",
@@ -30283,12 +29433,6 @@ impl BedrockCodec for ConstantAttributeDataAttribute {
 }
 impl Validate for ConstantAttributeDataAttribute {
     fn validate(&self) -> Result<()> {
-        match self {
-            Self::String(v) => {
-                Validate::validate(v)?;
-            }
-            _ => {}
-        }
         Ok(())
     }
 }
@@ -30418,61 +29562,7 @@ impl Validate for DataItemEntryPayload {
         Ok(())
     }
 }
-/// Protocol variant DataStoreChange The New Variable Value.
-///
-/// Encoded as the index of the active branch (a varint) followed by the branch.
-#[derive(Debug, Clone, PartialEq)]
-pub enum DataStoreChangeTheNewVariableValue {
-    /// Index 0.
-    Double(f64),
-    /// Index 1.
-    Bool(bool),
-    /// Index 2.
-    String(BedrockString),
-}
-impl Default for DataStoreChangeTheNewVariableValue {
-    fn default() -> Self {
-        Self::Double(Default::default())
-    }
-}
-impl BedrockCodec for DataStoreChangeTheNewVariableValue {
-    fn serialize<B: BufMut>(&self, buf: &mut B) -> Result<()> {
-        match self {
-            Self::Double(v) => {
-                codec::put_u32_var(buf, 0);
-                codec::put_f64_le(buf, *v);
-            }
-            Self::Bool(v) => {
-                codec::put_u32_var(buf, 1);
-                codec::put_bool(buf, *v);
-            }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 2);
-                BedrockCodec::serialize(v, buf)?;
-            }
-        }
-        Ok(())
-    }
-    fn deserialize<B: Buf>(buf: &mut B) -> Result<Self> {
-        match codec::get_u32_var(buf)? {
-            0 => Ok(Self::Double(codec::get_f64_le(buf)?)),
-            1 => Ok(Self::Bool(codec::get_bool(buf)?)),
-            2 => Ok(Self::String(<BedrockString as BedrockCodec>::deserialize(buf)?)),
-            other => {
-                Err(ProtocolError::InvalidVariantIndex {
-                    type_name: "DataStoreChange The New Variable Value",
-                    index: i64::from(other),
-                })
-            }
-        }
-    }
-}
-impl Validate for DataStoreChangeTheNewVariableValue {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-/// The variable value being updated
+/// The value that is updating
 ///
 /// Protocol variant DataStoreUpdate Data.
 ///
@@ -30662,15 +29752,13 @@ impl BedrockCodec for EnvironmentAttributeDataPayload {
 impl Validate for EnvironmentAttributeDataPayload {
     fn validate(&self) -> Result<()> {
         match self {
-            Self::Constant(v) => {
-                Validate::validate(v)?;
-            }
             Self::Transition(v) => {
                 Validate::validate(v)?;
             }
             Self::NoiseTransition(v) => {
                 Validate::validate(v)?;
             }
+            _ => {}
         }
         Ok(())
     }
@@ -30894,7 +29982,7 @@ pub enum ItemStackRequestActions {
     /// Index 15.
     CraftLoom(ItemStackRequestCraftLoomAction),
     /// Index 16.
-    CraftDiscPress(ItemStackRequestCraftDiscPressAction),
+    Reserved(ItemStackRequestReservedAction),
     /// Index 17.
     CraftNonImplementedDeprecated(ItemStackRequestCraftNonImplementedDeprecatedAction),
     /// Index 18.
@@ -30972,7 +30060,7 @@ impl BedrockCodec for ItemStackRequestActions {
                 codec::put_u32_var(buf, 15);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::CraftDiscPress(v) => {
+            Self::Reserved(v) => {
                 codec::put_u32_var(buf, 16);
                 BedrockCodec::serialize(v, buf)?;
             }
@@ -31125,8 +30213,8 @@ impl BedrockCodec for ItemStackRequestActions {
             }
             16 => {
                 Ok(
-                    Self::CraftDiscPress(
-                        <ItemStackRequestCraftDiscPressAction as BedrockCodec>::deserialize(
+                    Self::Reserved(
+                        <ItemStackRequestReservedAction as BedrockCodec>::deserialize(
                             buf,
                         )?,
                     ),
@@ -31195,7 +30283,7 @@ impl Validate for ItemStackRequestActions {
             Self::CraftLoom(v) => {
                 Validate::validate(v)?;
             }
-            Self::CraftDiscPress(v) => {
+            Self::Reserved(v) => {
                 Validate::validate(v)?;
             }
             Self::CraftResultsDeprecated(v) => {
@@ -31571,8 +30659,6 @@ pub enum NoiseTransitionAttributeDataFromAttribute {
     Float(FloatAttributeData),
     /// Index 2.
     Color(ColorAttributeData),
-    /// Index 3.
-    String(StringAttributeData),
 }
 impl Default for NoiseTransitionAttributeDataFromAttribute {
     fn default() -> Self {
@@ -31594,10 +30680,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataFromAttribute {
                 codec::put_u32_var(buf, 2);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 3);
-                BedrockCodec::serialize(v, buf)?;
-            }
         }
         Ok(())
     }
@@ -31606,13 +30688,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataFromAttribute {
             0 => Ok(Self::Bool(<BoolAttributeData as BedrockCodec>::deserialize(buf)?)),
             1 => Ok(Self::Float(<FloatAttributeData as BedrockCodec>::deserialize(buf)?)),
             2 => Ok(Self::Color(<ColorAttributeData as BedrockCodec>::deserialize(buf)?)),
-            3 => {
-                Ok(
-                    Self::String(
-                        <StringAttributeData as BedrockCodec>::deserialize(buf)?,
-                    ),
-                )
-            }
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "NoiseTransitionAttributeData FromAttribute",
@@ -31624,12 +30699,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataFromAttribute {
 }
 impl Validate for NoiseTransitionAttributeDataFromAttribute {
     fn validate(&self) -> Result<()> {
-        match self {
-            Self::String(v) => {
-                Validate::validate(v)?;
-            }
-            _ => {}
-        }
         Ok(())
     }
 }
@@ -31644,8 +30713,6 @@ pub enum NoiseTransitionAttributeDataToAttribute {
     Float(FloatAttributeData),
     /// Index 2.
     Color(ColorAttributeData),
-    /// Index 3.
-    String(StringAttributeData),
 }
 impl Default for NoiseTransitionAttributeDataToAttribute {
     fn default() -> Self {
@@ -31667,10 +30734,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataToAttribute {
                 codec::put_u32_var(buf, 2);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 3);
-                BedrockCodec::serialize(v, buf)?;
-            }
         }
         Ok(())
     }
@@ -31679,13 +30742,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataToAttribute {
             0 => Ok(Self::Bool(<BoolAttributeData as BedrockCodec>::deserialize(buf)?)),
             1 => Ok(Self::Float(<FloatAttributeData as BedrockCodec>::deserialize(buf)?)),
             2 => Ok(Self::Color(<ColorAttributeData as BedrockCodec>::deserialize(buf)?)),
-            3 => {
-                Ok(
-                    Self::String(
-                        <StringAttributeData as BedrockCodec>::deserialize(buf)?,
-                    ),
-                )
-            }
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "NoiseTransitionAttributeData ToAttribute",
@@ -31697,12 +30753,6 @@ impl BedrockCodec for NoiseTransitionAttributeDataToAttribute {
 }
 impl Validate for NoiseTransitionAttributeDataToAttribute {
     fn validate(&self) -> Result<()> {
-        match self {
-            Self::String(v) => {
-                Validate::validate(v)?;
-            }
-            _ => {}
-        }
         Ok(())
     }
 }
@@ -32634,8 +31684,6 @@ pub enum TransitionAttributeDataFromAttribute {
     Float(FloatAttributeData),
     /// Index 2.
     Color(ColorAttributeData),
-    /// Index 3.
-    String(StringAttributeData),
 }
 impl Default for TransitionAttributeDataFromAttribute {
     fn default() -> Self {
@@ -32657,10 +31705,6 @@ impl BedrockCodec for TransitionAttributeDataFromAttribute {
                 codec::put_u32_var(buf, 2);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 3);
-                BedrockCodec::serialize(v, buf)?;
-            }
         }
         Ok(())
     }
@@ -32669,13 +31713,6 @@ impl BedrockCodec for TransitionAttributeDataFromAttribute {
             0 => Ok(Self::Bool(<BoolAttributeData as BedrockCodec>::deserialize(buf)?)),
             1 => Ok(Self::Float(<FloatAttributeData as BedrockCodec>::deserialize(buf)?)),
             2 => Ok(Self::Color(<ColorAttributeData as BedrockCodec>::deserialize(buf)?)),
-            3 => {
-                Ok(
-                    Self::String(
-                        <StringAttributeData as BedrockCodec>::deserialize(buf)?,
-                    ),
-                )
-            }
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "TransitionAttributeData FromAttribute",
@@ -32687,12 +31724,6 @@ impl BedrockCodec for TransitionAttributeDataFromAttribute {
 }
 impl Validate for TransitionAttributeDataFromAttribute {
     fn validate(&self) -> Result<()> {
-        match self {
-            Self::String(v) => {
-                Validate::validate(v)?;
-            }
-            _ => {}
-        }
         Ok(())
     }
 }
@@ -32707,8 +31738,6 @@ pub enum TransitionAttributeDataToAttribute {
     Float(FloatAttributeData),
     /// Index 2.
     Color(ColorAttributeData),
-    /// Index 3.
-    String(StringAttributeData),
 }
 impl Default for TransitionAttributeDataToAttribute {
     fn default() -> Self {
@@ -32730,10 +31759,6 @@ impl BedrockCodec for TransitionAttributeDataToAttribute {
                 codec::put_u32_var(buf, 2);
                 BedrockCodec::serialize(v, buf)?;
             }
-            Self::String(v) => {
-                codec::put_u32_var(buf, 3);
-                BedrockCodec::serialize(v, buf)?;
-            }
         }
         Ok(())
     }
@@ -32742,13 +31767,6 @@ impl BedrockCodec for TransitionAttributeDataToAttribute {
             0 => Ok(Self::Bool(<BoolAttributeData as BedrockCodec>::deserialize(buf)?)),
             1 => Ok(Self::Float(<FloatAttributeData as BedrockCodec>::deserialize(buf)?)),
             2 => Ok(Self::Color(<ColorAttributeData as BedrockCodec>::deserialize(buf)?)),
-            3 => {
-                Ok(
-                    Self::String(
-                        <StringAttributeData as BedrockCodec>::deserialize(buf)?,
-                    ),
-                )
-            }
             other => {
                 Err(ProtocolError::InvalidVariantIndex {
                     type_name: "TransitionAttributeData ToAttribute",
@@ -32760,12 +31778,6 @@ impl BedrockCodec for TransitionAttributeDataToAttribute {
 }
 impl Validate for TransitionAttributeDataToAttribute {
     fn validate(&self) -> Result<()> {
-        match self {
-            Self::String(v) => {
-                Validate::validate(v)?;
-            }
-            _ => {}
-        }
         Ok(())
     }
 }

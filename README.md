@@ -29,11 +29,12 @@ encode_batch(&[reply], &mut out)?;
 | `src/generated/` | Generated: `enums.rs`, `types.rs`, `packets.rs`, `mod.rs` (+ test-only `samples.rs`) |
 | `proto-codegen/` | The generator (`cargo run --bin proto-codegen`) |
 | `vendor/bedrock-protocol-docs/json/` | Mojang's schemas. **Not in the repository**: downloaded locally on demand, git-ignored |
-| `.mojang-protocol-sha` | Commit of Mojang's `main` that `src/generated/` was built from |
+| `.mojang-protocol-sha` | Commit of Mojang's repository that `src/generated/` was built from |
+| `.mojang-protocol-channel` | Release line followed: `stable` or `preview` |
 | `scripts/fetch-mojang-protocol.sh` | Downloads the schemas into `vendor/` and records the commit |
 | `scripts/audit_schema.py` | Exhaustive inventory of the meta-schema |
 | `tests/wire_vectors.rs` | Byte-exact vectors for the handshake packets and the framing |
-| `.github/workflows/sync-mojang-protocol.yml` | Checks Mojang's `main` every 6 hours and opens a PR |
+| `.github/workflows/sync-mojang-protocol.yml` | Checks for a new release of the channel every 6 hours and opens a PR |
 | `.github/workflows/ci.yml` | On every PR: generated code up to date, check, clippy, tests, docs |
 
 ## Updating the protocol
@@ -42,21 +43,30 @@ Using the crate needs nothing from Mojang: `src/generated/` is committed. Only r
 the schemas, which are downloaded into the git-ignored `vendor/` and never committed.
 
 ```sh
-bash scripts/fetch-mojang-protocol.sh            # latest Mojang `main` + .mojang-protocol-sha
+bash scripts/fetch-mojang-protocol.sh            # latest release of the channel + .mojang-protocol-sha
 cargo run --bin proto-codegen                    # rewrites src/generated/
 cargo check && cargo test
 ```
 
 | Command | Fetches |
 | --- | --- |
-| `fetch-mojang-protocol.sh` or `--latest` | the latest commit of Mojang's `main`; updates `.mojang-protocol-sha` |
+| `fetch-mojang-protocol.sh` or `--latest` | the latest release of the channel; updates `.mojang-protocol-sha` |
 | `fetch-mojang-protocol.sh --locked` | the commit recorded in `.mojang-protocol-sha` |
+| `fetch-mojang-protocol.sh --resolve` | nothing: prints the commit `--latest` would fetch |
 | `fetch-mojang-protocol.sh <sha>` | that exact commit (full 40-character SHA) |
+
+### Release channel
+
+Mojang's `main` alternates between two release lines that speak different protocol versions: stable
+releases (tags such as `v1.26.66`) and previews (`v1.26.70-preview.26`). `--latest` therefore never
+follows the head of `main`: it takes the most recent tag of the channel named in
+`.mojang-protocol-channel`. The repository follows **`stable`**, the versions most players run; write
+`preview` in that file (or set `MOJANG_CHANNEL=preview` for one command) to target previews instead.
 
 `--locked` is the reproducible mode: it downloads exactly the schemas the committed code was built
 from. With them in place, `cargo run --bin proto-codegen -- --check` verifies that `src/generated/`
 matches without writing anything; CI does both on every pull request. The sync workflow fetches the
-latest version, regenerates, and opens a pull request containing only `.mojang-protocol-sha` and
+latest release of the channel, regenerates, and opens a pull request containing only `.mojang-protocol-sha` and
 `src/generated/`.
 
 ## Codec
@@ -144,7 +154,7 @@ The schemas are JSON Schema (draft-07) with `x-*` extensions; `scripts/audit_sch
 key, value and node shape, and the generator's parser rejects anything outside that inventory.
 
 They state structure and encoding hints, not a wire grammar. The rules below were checked against
-[gophertunnel](https://github.com/Sandertv/gophertunnel) (protocol 2225, one release behind the
+[gophertunnel](https://github.com/Sandertv/gophertunnel) (protocol 2225, the same version as the
 schemas) by comparing its hand-written marshalling of the packets named in the last column.
 
 | Schema | Rust | Wire | Checked against |
@@ -216,8 +226,7 @@ the schemas, so the list cannot go stale silently.
 ## What is and is not verified
 
 The byte vectors are written by hand from the documented layout and cross-checked against
-gophertunnel's code. They are **not** captures of a live session, and gophertunnel is one protocol
-release behind the schemas. Rules marked "not checked" above, and every packet not named in the
+gophertunnel's code at the same protocol version. They are **not** captures of a live session. Rules marked "not checked" above, and every packet not named in the
 table, rest on the schema alone. Confirm against real traffic before relying on a given packet.
 
 ## Licensing & Legal Disclaimer

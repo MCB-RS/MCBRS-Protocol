@@ -3312,18 +3312,15 @@ pub enum AudioContentPlaybackType {
     Music,
     /// Sound = 1
     Sound,
-    /// ConcurrentMusic = 2
-    ConcurrentMusic,
 }
 impl AudioContentPlaybackType {
     /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::Music, Self::Sound, Self::ConcurrentMusic];
+    pub const ALL: &'static [Self] = &[Self::Music, Self::Sound];
     /// Numeric value of the variant.
     pub const fn value(self) -> u8 {
         match self {
             Self::Music => 0,
             Self::Sound => 1,
-            Self::ConcurrentMusic => 2,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -3331,7 +3328,6 @@ impl AudioContentPlaybackType {
         match value {
             0 => Some(Self::Music),
             1 => Some(Self::Sound),
-            2 => Some(Self::ConcurrentMusic),
             _ => None,
         }
     }
@@ -3351,27 +3347,23 @@ impl ProtocolEnum for AudioContentPlaybackType {
         match self {
             Self::Music => "Music",
             Self::Sound => "Sound",
-            Self::ConcurrentMusic => "ConcurrentMusic",
         }
     }
     fn wire_name(self) -> &'static str {
         match self {
             Self::Music => "music",
             Self::Sound => "sound",
-            Self::ConcurrentMusic => "concurrentmusic",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
         match name {
             "Music" => return Some(Self::Music),
             "Sound" => return Some(Self::Sound),
-            "ConcurrentMusic" => return Some(Self::ConcurrentMusic),
             _ => {}
         }
         const NAMES: &[(&str, AudioContentPlaybackType)] = &[
             ("Music", AudioContentPlaybackType::Music),
             ("Sound", AudioContentPlaybackType::Sound),
-            ("ConcurrentMusic", AudioContentPlaybackType::ConcurrentMusic),
         ];
         NAMES
             .iter()
@@ -6315,16 +6307,14 @@ pub enum ContainerEnumName {
     CrafterLevelEntityContainer,
     /// DynamicContainer = 63
     DynamicContainer,
-    /// DiscPressBlockContainer = 67
-    DiscPressBlockContainer,
-    /// DiscPressDyeContainer = 68
-    DiscPressDyeContainer,
-    /// DiscPressDiscContainer = 69
-    DiscPressDiscContainer,
-    /// DiscPressResultPreviewContainer = 70
-    DiscPressResultPreviewContainer,
-    /// VirtualContainer = 71
-    VirtualContainer,
+    /// ReservedContainerA = 67
+    ReservedContainerA,
+    /// ReservedContainerB = 68
+    ReservedContainerB,
+    /// ReservedContainerC = 69
+    ReservedContainerC,
+    /// ReservedContainerD = 70
+    ReservedContainerD,
 }
 impl ContainerEnumName {
     /// Every variant, in declaration order.
@@ -6396,11 +6386,10 @@ impl ContainerEnumName {
         Self::SmithingTableTemplateContainer,
         Self::CrafterLevelEntityContainer,
         Self::DynamicContainer,
-        Self::DiscPressBlockContainer,
-        Self::DiscPressDyeContainer,
-        Self::DiscPressDiscContainer,
-        Self::DiscPressResultPreviewContainer,
-        Self::VirtualContainer,
+        Self::ReservedContainerA,
+        Self::ReservedContainerB,
+        Self::ReservedContainerC,
+        Self::ReservedContainerD,
     ];
     /// Numeric value of the variant.
     pub const fn value(self) -> u8 {
@@ -6472,11 +6461,10 @@ impl ContainerEnumName {
             Self::SmithingTableTemplateContainer => 61,
             Self::CrafterLevelEntityContainer => 62,
             Self::DynamicContainer => 63,
-            Self::DiscPressBlockContainer => 67,
-            Self::DiscPressDyeContainer => 68,
-            Self::DiscPressDiscContainer => 69,
-            Self::DiscPressResultPreviewContainer => 70,
-            Self::VirtualContainer => 71,
+            Self::ReservedContainerA => 67,
+            Self::ReservedContainerB => 68,
+            Self::ReservedContainerC => 69,
+            Self::ReservedContainerD => 70,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -6549,11 +6537,10 @@ impl ContainerEnumName {
             61 => Some(Self::SmithingTableTemplateContainer),
             62 => Some(Self::CrafterLevelEntityContainer),
             63 => Some(Self::DynamicContainer),
-            67 => Some(Self::DiscPressBlockContainer),
-            68 => Some(Self::DiscPressDyeContainer),
-            69 => Some(Self::DiscPressDiscContainer),
-            70 => Some(Self::DiscPressResultPreviewContainer),
-            71 => Some(Self::VirtualContainer),
+            67 => Some(Self::ReservedContainerA),
+            68 => Some(Self::ReservedContainerB),
+            69 => Some(Self::ReservedContainerC),
+            70 => Some(Self::ReservedContainerD),
             _ => None,
         }
     }
@@ -6646,11 +6633,10 @@ impl ProtocolEnum for ContainerEnumName {
             Self::SmithingTableTemplateContainer => "SmithingTableTemplateContainer",
             Self::CrafterLevelEntityContainer => "CrafterLevelEntityContainer",
             Self::DynamicContainer => "DynamicContainer",
-            Self::DiscPressBlockContainer => "DiscPressBlockContainer",
-            Self::DiscPressDyeContainer => "DiscPressDyeContainer",
-            Self::DiscPressDiscContainer => "DiscPressDiscContainer",
-            Self::DiscPressResultPreviewContainer => "DiscPressResultPreviewContainer",
-            Self::VirtualContainer => "VirtualContainer",
+            Self::ReservedContainerA => "ReservedContainerA",
+            Self::ReservedContainerB => "ReservedContainerB",
+            Self::ReservedContainerC => "ReservedContainerC",
+            Self::ReservedContainerD => "ReservedContainerD",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -6730,11 +6716,10 @@ impl ProtocolEnum for ContainerEnumName {
             Self::SmithingTableTemplateContainer => "smithingtabletemplatecontainer",
             Self::CrafterLevelEntityContainer => "crafterlevelentitycontainer",
             Self::DynamicContainer => "dynamiccontainer",
-            Self::DiscPressBlockContainer => "discpressblockcontainer",
-            Self::DiscPressDyeContainer => "discpressdyecontainer",
-            Self::DiscPressDiscContainer => "discpressdisccontainer",
-            Self::DiscPressResultPreviewContainer => "discpressresultpreviewcontainer",
-            Self::VirtualContainer => "virtualcontainer",
+            Self::ReservedContainerA => "reservedcontainera",
+            Self::ReservedContainerB => "reservedcontainerb",
+            Self::ReservedContainerC => "reservedcontainerc",
+            Self::ReservedContainerD => "reservedcontainerd",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -6850,13 +6835,10 @@ impl ProtocolEnum for ContainerEnumName {
                 return Some(Self::CrafterLevelEntityContainer);
             }
             "DynamicContainer" => return Some(Self::DynamicContainer),
-            "DiscPressBlockContainer" => return Some(Self::DiscPressBlockContainer),
-            "DiscPressDyeContainer" => return Some(Self::DiscPressDyeContainer),
-            "DiscPressDiscContainer" => return Some(Self::DiscPressDiscContainer),
-            "DiscPressResultPreviewContainer" => {
-                return Some(Self::DiscPressResultPreviewContainer);
-            }
-            "VirtualContainer" => return Some(Self::VirtualContainer),
+            "ReservedContainerA" => return Some(Self::ReservedContainerA),
+            "ReservedContainerB" => return Some(Self::ReservedContainerB),
+            "ReservedContainerC" => return Some(Self::ReservedContainerC),
+            "ReservedContainerD" => return Some(Self::ReservedContainerD),
             _ => {}
         }
         const NAMES: &[(&str, ContainerEnumName)] = &[
@@ -7008,14 +6990,10 @@ impl ProtocolEnum for ContainerEnumName {
                 ContainerEnumName::CrafterLevelEntityContainer,
             ),
             ("DynamicContainer", ContainerEnumName::DynamicContainer),
-            ("DiscPressBlockContainer", ContainerEnumName::DiscPressBlockContainer),
-            ("DiscPressDyeContainer", ContainerEnumName::DiscPressDyeContainer),
-            ("DiscPressDiscContainer", ContainerEnumName::DiscPressDiscContainer),
-            (
-                "DiscPressResultPreviewContainer",
-                ContainerEnumName::DiscPressResultPreviewContainer,
-            ),
-            ("VirtualContainer", ContainerEnumName::VirtualContainer),
+            ("ReservedContainerA", ContainerEnumName::ReservedContainerA),
+            ("ReservedContainerB", ContainerEnumName::ReservedContainerB),
+            ("ReservedContainerC", ContainerEnumName::ReservedContainerC),
+            ("ReservedContainerD", ContainerEnumName::ReservedContainerD),
         ];
         NAMES
             .iter()
@@ -7270,10 +7248,8 @@ pub enum ContainerType {
     DecoratedPot,
     /// CRAFTER = 36
     Crafter,
-    /// DISC_PRESS = 38
-    DiscPress,
-    /// VIRTUAL_CONTAINER = 39
-    VirtualContainer,
+    /// RESERVED_CONTAINER_TYPE = 38
+    ReservedContainerType,
 }
 impl ContainerType {
     /// Every variant, in declaration order.
@@ -7317,8 +7293,7 @@ impl ContainerType {
         Self::ChestBoat,
         Self::DecoratedPot,
         Self::Crafter,
-        Self::DiscPress,
-        Self::VirtualContainer,
+        Self::ReservedContainerType,
     ];
     /// Numeric value of the variant.
     pub const fn value(self) -> i8 {
@@ -7362,8 +7337,7 @@ impl ContainerType {
             Self::ChestBoat => 34,
             Self::DecoratedPot => 35,
             Self::Crafter => 36,
-            Self::DiscPress => 38,
-            Self::VirtualContainer => 39,
+            Self::ReservedContainerType => 38,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -7408,8 +7382,7 @@ impl ContainerType {
             34 => Some(Self::ChestBoat),
             35 => Some(Self::DecoratedPot),
             36 => Some(Self::Crafter),
-            38 => Some(Self::DiscPress),
-            39 => Some(Self::VirtualContainer),
+            38 => Some(Self::ReservedContainerType),
             _ => None,
         }
     }
@@ -7466,8 +7439,7 @@ impl ProtocolEnum for ContainerType {
             Self::ChestBoat => "CHEST_BOAT",
             Self::DecoratedPot => "DECORATED_POT",
             Self::Crafter => "CRAFTER",
-            Self::DiscPress => "DISC_PRESS",
-            Self::VirtualContainer => "VIRTUAL_CONTAINER",
+            Self::ReservedContainerType => "RESERVED_CONTAINER_TYPE",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -7511,8 +7483,7 @@ impl ProtocolEnum for ContainerType {
             Self::ChestBoat => "chest_boat",
             Self::DecoratedPot => "decorated_pot",
             Self::Crafter => "crafter",
-            Self::DiscPress => "disc_press",
-            Self::VirtualContainer => "virtual_container",
+            Self::ReservedContainerType => "reserved_container_type",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -7556,8 +7527,7 @@ impl ProtocolEnum for ContainerType {
             "CHEST_BOAT" => return Some(Self::ChestBoat),
             "DECORATED_POT" => return Some(Self::DecoratedPot),
             "CRAFTER" => return Some(Self::Crafter),
-            "DISC_PRESS" => return Some(Self::DiscPress),
-            "VIRTUAL_CONTAINER" => return Some(Self::VirtualContainer),
+            "RESERVED_CONTAINER_TYPE" => return Some(Self::ReservedContainerType),
             _ => {}
         }
         const NAMES: &[(&str, ContainerType)] = &[
@@ -7600,8 +7570,7 @@ impl ProtocolEnum for ContainerType {
             ("CHEST_BOAT", ContainerType::ChestBoat),
             ("DECORATED_POT", ContainerType::DecoratedPot),
             ("CRAFTER", ContainerType::Crafter),
-            ("DISC_PRESS", ContainerType::DiscPress),
-            ("VIRTUAL_CONTAINER", ContainerType::VirtualContainer),
+            ("RESERVED_CONTAINER_TYPE", ContainerType::ReservedContainerType),
         ];
         NAMES
             .iter()
@@ -8278,12 +8247,10 @@ pub enum CurrentCmdVersion {
     PostBlockFlattening,
     /// TestForBlockCommandDoesNotIgnoreBlockState = 44
     TestForBlockCommandDoesNotIgnoreBlockState,
-    /// GameTestRunSetMultiTag = 56
-    GameTestRunSetMultiTag,
-    /// SameActorBlockReplacementRetainsItemsFix = 57
-    SameActorBlockReplacementRetainsItemsFix,
-    /// Count = 58
+    /// Count = 56
     Count,
+    /// Latest = 55
+    Latest,
 }
 impl CurrentCmdVersion {
     /// Every variant, in declaration order.
@@ -8333,16 +8300,13 @@ impl CurrentCmdVersion {
         Self::LocateStructureOutput,
         Self::PostBlockFlattening,
         Self::TestForBlockCommandDoesNotIgnoreBlockState,
-        Self::GameTestRunSetMultiTag,
-        Self::SameActorBlockReplacementRetainsItemsFix,
         Self::Count,
+        Self::Latest,
     ];
     /// AgentSweepingBlockTest: same value as CommandSelectorHasItemFilterNoLongerCallsSameItemFunction.
     pub const AgentSweepingBlockTest: Self = Self::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction;
     /// CommandPositionFix: same value as BlockStateEquals.
     pub const CommandPositionFix: Self = Self::BlockStateEquals;
-    /// Latest: same value as SameActorBlockReplacementRetainsItemsFix.
-    pub const Latest: Self = Self::SameActorBlockReplacementRetainsItemsFix;
     /// Numeric value of the variant.
     pub const fn value(self) -> i32 {
         match self {
@@ -8401,9 +8365,8 @@ impl CurrentCmdVersion {
             Self::LocateStructureOutput => 42,
             Self::PostBlockFlattening => 43,
             Self::TestForBlockCommandDoesNotIgnoreBlockState => 44,
-            Self::GameTestRunSetMultiTag => 56,
-            Self::SameActorBlockReplacementRetainsItemsFix => 57,
-            Self::Count => 58,
+            Self::Count => 56,
+            Self::Latest => 55,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -8474,9 +8437,8 @@ impl CurrentCmdVersion {
             42 => Some(Self::LocateStructureOutput),
             43 => Some(Self::PostBlockFlattening),
             44 => Some(Self::TestForBlockCommandDoesNotIgnoreBlockState),
-            56 => Some(Self::GameTestRunSetMultiTag),
-            57 => Some(Self::SameActorBlockReplacementRetainsItemsFix),
-            58 => Some(Self::Count),
+            56 => Some(Self::Count),
+            55 => Some(Self::Latest),
             _ => None,
         }
     }
@@ -8575,11 +8537,8 @@ impl ProtocolEnum for CurrentCmdVersion {
             Self::TestForBlockCommandDoesNotIgnoreBlockState => {
                 "TestForBlockCommandDoesNotIgnoreBlockState"
             }
-            Self::GameTestRunSetMultiTag => "GameTestRunSetMultiTag",
-            Self::SameActorBlockReplacementRetainsItemsFix => {
-                "SameActorBlockReplacementRetainsItemsFix"
-            }
             Self::Count => "Count",
+            Self::Latest => "Latest",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -8665,11 +8624,8 @@ impl ProtocolEnum for CurrentCmdVersion {
             Self::TestForBlockCommandDoesNotIgnoreBlockState => {
                 "testforblockcommanddoesnotignoreblockstate"
             }
-            Self::GameTestRunSetMultiTag => "gametestrunsetmultitag",
-            Self::SameActorBlockReplacementRetainsItemsFix => {
-                "sameactorblockreplacementretainsitemsfix"
-            }
             Self::Count => "count",
+            Self::Latest => "latest",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -8781,18 +8737,14 @@ impl ProtocolEnum for CurrentCmdVersion {
             "TestForBlockCommandDoesNotIgnoreBlockState" => {
                 return Some(Self::TestForBlockCommandDoesNotIgnoreBlockState);
             }
-            "GameTestRunSetMultiTag" => return Some(Self::GameTestRunSetMultiTag),
-            "SameActorBlockReplacementRetainsItemsFix" => {
-                return Some(Self::SameActorBlockReplacementRetainsItemsFix);
-            }
             "Count" => return Some(Self::Count),
+            "Latest" => return Some(Self::Latest),
             "AgentSweepingBlockTest" => {
                 return Some(
                     Self::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction,
                 );
             }
             "CommandPositionFix" => return Some(Self::BlockStateEquals),
-            "Latest" => return Some(Self::SameActorBlockReplacementRetainsItemsFix),
             _ => {}
         }
         const NAMES: &[(&str, CurrentCmdVersion)] = &[
@@ -8913,18 +8865,13 @@ impl ProtocolEnum for CurrentCmdVersion {
                 "TestForBlockCommandDoesNotIgnoreBlockState",
                 CurrentCmdVersion::TestForBlockCommandDoesNotIgnoreBlockState,
             ),
-            ("GameTestRunSetMultiTag", CurrentCmdVersion::GameTestRunSetMultiTag),
-            (
-                "SameActorBlockReplacementRetainsItemsFix",
-                CurrentCmdVersion::SameActorBlockReplacementRetainsItemsFix,
-            ),
             ("Count", CurrentCmdVersion::Count),
+            ("Latest", CurrentCmdVersion::Latest),
             (
                 "AgentSweepingBlockTest",
                 CurrentCmdVersion::CommandSelectorHasItemFilterNoLongerCallsSameItemFunction,
             ),
             ("CommandPositionFix", CurrentCmdVersion::BlockStateEquals),
-            ("Latest", CurrentCmdVersion::SameActorBlockReplacementRetainsItemsFix),
         ];
         NAMES
             .iter()
@@ -9946,24 +9893,6 @@ pub enum DisconnectFailReason {
     UnsupportedTransport,
     /// SubClientLoginNotBound = 150
     SubClientLoginNotBound,
-    /// SessionRuntimeError = 151
-    SessionRuntimeError,
-    /// SessionInvalidResponse = 152
-    SessionInvalidResponse,
-    /// SessionNetworkError = 153
-    SessionNetworkError,
-    /// SessionServiceError = 154
-    SessionServiceError,
-    /// SessionServiceUnavailable = 155
-    SessionServiceUnavailable,
-    /// SessionThrottled = 156
-    SessionThrottled,
-    /// SessionRequestRejected = 157
-    SessionRequestRejected,
-    /// SessionUnknownError = 158
-    SessionUnknownError,
-    /// BrokenData = 159
-    BrokenData,
 }
 impl DisconnectFailReason {
     /// Every variant, in declaration order.
@@ -10119,15 +10048,6 @@ impl DisconnectFailReason {
         Self::MissingStructureData,
         Self::UnsupportedTransport,
         Self::SubClientLoginNotBound,
-        Self::SessionRuntimeError,
-        Self::SessionInvalidResponse,
-        Self::SessionNetworkError,
-        Self::SessionServiceError,
-        Self::SessionServiceUnavailable,
-        Self::SessionThrottled,
-        Self::SessionRequestRejected,
-        Self::SessionUnknownError,
-        Self::BrokenData,
     ];
     /// Numeric value of the variant.
     pub const fn value(self) -> i32 {
@@ -10283,15 +10203,6 @@ impl DisconnectFailReason {
             Self::MissingStructureData => 148,
             Self::UnsupportedTransport => 149,
             Self::SubClientLoginNotBound => 150,
-            Self::SessionRuntimeError => 151,
-            Self::SessionInvalidResponse => 152,
-            Self::SessionNetworkError => 153,
-            Self::SessionServiceError => 154,
-            Self::SessionServiceUnavailable => 155,
-            Self::SessionThrottled => 156,
-            Self::SessionRequestRejected => 157,
-            Self::SessionUnknownError => 158,
-            Self::BrokenData => 159,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -10448,15 +10359,6 @@ impl DisconnectFailReason {
             148 => Some(Self::MissingStructureData),
             149 => Some(Self::UnsupportedTransport),
             150 => Some(Self::SubClientLoginNotBound),
-            151 => Some(Self::SessionRuntimeError),
-            152 => Some(Self::SessionInvalidResponse),
-            153 => Some(Self::SessionNetworkError),
-            154 => Some(Self::SessionServiceError),
-            155 => Some(Self::SessionServiceUnavailable),
-            156 => Some(Self::SessionThrottled),
-            157 => Some(Self::SessionRequestRejected),
-            158 => Some(Self::SessionUnknownError),
-            159 => Some(Self::BrokenData),
             _ => None,
         }
     }
@@ -10651,15 +10553,6 @@ impl ProtocolEnum for DisconnectFailReason {
             Self::MissingStructureData => "MissingStructureData",
             Self::UnsupportedTransport => "UnsupportedTransport",
             Self::SubClientLoginNotBound => "SubClientLoginNotBound",
-            Self::SessionRuntimeError => "SessionRuntimeError",
-            Self::SessionInvalidResponse => "SessionInvalidResponse",
-            Self::SessionNetworkError => "SessionNetworkError",
-            Self::SessionServiceError => "SessionServiceError",
-            Self::SessionServiceUnavailable => "SessionServiceUnavailable",
-            Self::SessionThrottled => "SessionThrottled",
-            Self::SessionRequestRejected => "SessionRequestRejected",
-            Self::SessionUnknownError => "SessionUnknownError",
-            Self::BrokenData => "BrokenData",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -10841,15 +10734,6 @@ impl ProtocolEnum for DisconnectFailReason {
             Self::MissingStructureData => "missingstructuredata",
             Self::UnsupportedTransport => "unsupportedtransport",
             Self::SubClientLoginNotBound => "subclientloginnotbound",
-            Self::SessionRuntimeError => "sessionruntimeerror",
-            Self::SessionInvalidResponse => "sessioninvalidresponse",
-            Self::SessionNetworkError => "sessionnetworkerror",
-            Self::SessionServiceError => "sessionserviceerror",
-            Self::SessionServiceUnavailable => "sessionserviceunavailable",
-            Self::SessionThrottled => "sessionthrottled",
-            Self::SessionRequestRejected => "sessionrequestrejected",
-            Self::SessionUnknownError => "sessionunknownerror",
-            Self::BrokenData => "brokendata",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -11075,15 +10959,6 @@ impl ProtocolEnum for DisconnectFailReason {
             "MissingStructureData" => return Some(Self::MissingStructureData),
             "UnsupportedTransport" => return Some(Self::UnsupportedTransport),
             "SubClientLoginNotBound" => return Some(Self::SubClientLoginNotBound),
-            "SessionRuntimeError" => return Some(Self::SessionRuntimeError),
-            "SessionInvalidResponse" => return Some(Self::SessionInvalidResponse),
-            "SessionNetworkError" => return Some(Self::SessionNetworkError),
-            "SessionServiceError" => return Some(Self::SessionServiceError),
-            "SessionServiceUnavailable" => return Some(Self::SessionServiceUnavailable),
-            "SessionThrottled" => return Some(Self::SessionThrottled),
-            "SessionRequestRejected" => return Some(Self::SessionRequestRejected),
-            "SessionUnknownError" => return Some(Self::SessionUnknownError),
-            "BrokenData" => return Some(Self::BrokenData),
             _ => {}
         }
         const NAMES: &[(&str, DisconnectFailReason)] = &[
@@ -11364,18 +11239,6 @@ impl ProtocolEnum for DisconnectFailReason {
             ("MissingStructureData", DisconnectFailReason::MissingStructureData),
             ("UnsupportedTransport", DisconnectFailReason::UnsupportedTransport),
             ("SubClientLoginNotBound", DisconnectFailReason::SubClientLoginNotBound),
-            ("SessionRuntimeError", DisconnectFailReason::SessionRuntimeError),
-            ("SessionInvalidResponse", DisconnectFailReason::SessionInvalidResponse),
-            ("SessionNetworkError", DisconnectFailReason::SessionNetworkError),
-            ("SessionServiceError", DisconnectFailReason::SessionServiceError),
-            (
-                "SessionServiceUnavailable",
-                DisconnectFailReason::SessionServiceUnavailable,
-            ),
-            ("SessionThrottled", DisconnectFailReason::SessionThrottled),
-            ("SessionRequestRejected", DisconnectFailReason::SessionRequestRejected),
-            ("SessionUnknownError", DisconnectFailReason::SessionUnknownError),
-            ("BrokenData", DisconnectFailReason::BrokenData),
         ];
         NAMES
             .iter()
@@ -11831,96 +11694,6 @@ impl TryFrom<i8> for EditorLevelMigrationVersion {
         Self::from_value(value)
             .ok_or(ProtocolError::InvalidEnumValue {
                 enum_name: "EditorLevelMigrationVersion",
-                value: value as i64,
-            })
-    }
-}
-/// Protocol enum EditorPackType.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum EditorPackType {
-    /// None = 0
-    #[default]
-    None,
-    /// Core = 1
-    Core,
-    /// Annotation = 2
-    Annotation,
-}
-impl EditorPackType {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::None, Self::Core, Self::Annotation];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::None => 0,
-            Self::Core => 1,
-            Self::Annotation => 2,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::None),
-            1 => Some(Self::Core),
-            2 => Some(Self::Annotation),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for EditorPackType {
-    const NAME: &'static str = "EditorPackType";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::None => "None",
-            Self::Core => "Core",
-            Self::Annotation => "Annotation",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::None => "none",
-            Self::Core => "core",
-            Self::Annotation => "annotation",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "None" => return Some(Self::None),
-            "Core" => return Some(Self::Core),
-            "Annotation" => return Some(Self::Annotation),
-            _ => {}
-        }
-        const NAMES: &[(&str, EditorPackType)] = &[
-            ("None", EditorPackType::None),
-            ("Core", EditorPackType::Core),
-            ("Annotation", EditorPackType::Annotation),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<EditorPackType> for u8 {
-    fn from(value: EditorPackType) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for EditorPackType {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "EditorPackType",
                 value: value as i64,
             })
     }
@@ -15542,9 +15315,7 @@ pub enum InputMode {
     Touch,
     /// GamePad = 3
     GamePad,
-    /// GamePadAndMouse = 5
-    GamePadAndMouse,
-    /// Count = 6
+    /// Count = 5
     Count,
 }
 impl InputMode {
@@ -15554,7 +15325,6 @@ impl InputMode {
         Self::Mouse,
         Self::Touch,
         Self::GamePad,
-        Self::GamePadAndMouse,
         Self::Count,
     ];
     /// Numeric value of the variant.
@@ -15564,8 +15334,7 @@ impl InputMode {
             Self::Mouse => 1,
             Self::Touch => 2,
             Self::GamePad => 3,
-            Self::GamePadAndMouse => 5,
-            Self::Count => 6,
+            Self::Count => 5,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -15575,8 +15344,7 @@ impl InputMode {
             1 => Some(Self::Mouse),
             2 => Some(Self::Touch),
             3 => Some(Self::GamePad),
-            5 => Some(Self::GamePadAndMouse),
-            6 => Some(Self::Count),
+            5 => Some(Self::Count),
             _ => None,
         }
     }
@@ -15598,7 +15366,6 @@ impl ProtocolEnum for InputMode {
             Self::Mouse => "Mouse",
             Self::Touch => "Touch",
             Self::GamePad => "GamePad",
-            Self::GamePadAndMouse => "GamePadAndMouse",
             Self::Count => "Count",
         }
     }
@@ -15608,7 +15375,6 @@ impl ProtocolEnum for InputMode {
             Self::Mouse => "mouse",
             Self::Touch => "touch",
             Self::GamePad => "gamepad",
-            Self::GamePadAndMouse => "gamepadandmouse",
             Self::Count => "count",
         }
     }
@@ -15618,7 +15384,6 @@ impl ProtocolEnum for InputMode {
             "Mouse" => return Some(Self::Mouse),
             "Touch" => return Some(Self::Touch),
             "GamePad" => return Some(Self::GamePad),
-            "GamePadAndMouse" => return Some(Self::GamePadAndMouse),
             "Count" => return Some(Self::Count),
             _ => {}
         }
@@ -15627,7 +15392,6 @@ impl ProtocolEnum for InputMode {
             ("Mouse", InputMode::Mouse),
             ("Touch", InputMode::Touch),
             ("GamePad", InputMode::GamePad),
-            ("GamePadAndMouse", InputMode::GamePadAndMouse),
             ("Count", InputMode::Count),
         ];
         NAMES
@@ -17472,8 +17236,8 @@ pub enum ItemStackRequestActionType {
     CraftRepairAndDisenchant,
     /// CraftLoom = 17
     CraftLoom,
-    /// CraftDiscPress = 18
-    CraftDiscPress,
+    /// CraftReservedAction = 18
+    CraftReservedAction,
     /// CraftNonImplemented = 19
     CraftNonImplemented,
     /// CraftResults = 20
@@ -17498,7 +17262,7 @@ impl ItemStackRequestActionType {
         Self::CraftRecipeOptional,
         Self::CraftRepairAndDisenchant,
         Self::CraftLoom,
-        Self::CraftDiscPress,
+        Self::CraftReservedAction,
         Self::CraftNonImplemented,
         Self::CraftResults,
     ];
@@ -17521,7 +17285,7 @@ impl ItemStackRequestActionType {
             Self::CraftRecipeOptional => 15,
             Self::CraftRepairAndDisenchant => 16,
             Self::CraftLoom => 17,
-            Self::CraftDiscPress => 18,
+            Self::CraftReservedAction => 18,
             Self::CraftNonImplemented => 19,
             Self::CraftResults => 20,
         }
@@ -17545,7 +17309,7 @@ impl ItemStackRequestActionType {
             15 => Some(Self::CraftRecipeOptional),
             16 => Some(Self::CraftRepairAndDisenchant),
             17 => Some(Self::CraftLoom),
-            18 => Some(Self::CraftDiscPress),
+            18 => Some(Self::CraftReservedAction),
             19 => Some(Self::CraftNonImplemented),
             20 => Some(Self::CraftResults),
             _ => None,
@@ -17581,7 +17345,7 @@ impl ProtocolEnum for ItemStackRequestActionType {
             Self::CraftRecipeOptional => "CraftRecipeOptional",
             Self::CraftRepairAndDisenchant => "CraftRepairAndDisenchant",
             Self::CraftLoom => "CraftLoom",
-            Self::CraftDiscPress => "CraftDiscPress",
+            Self::CraftReservedAction => "CraftReservedAction",
             Self::CraftNonImplemented => "CraftNonImplemented",
             Self::CraftResults => "CraftResults",
         }
@@ -17604,7 +17368,7 @@ impl ProtocolEnum for ItemStackRequestActionType {
             Self::CraftRecipeOptional => "craftrecipeoptional",
             Self::CraftRepairAndDisenchant => "craftrepairanddisenchant",
             Self::CraftLoom => "craftloom",
-            Self::CraftDiscPress => "craftdiscpress",
+            Self::CraftReservedAction => "craftreservedaction",
             Self::CraftNonImplemented => "craftnonimplemented",
             Self::CraftResults => "craftresults",
         }
@@ -17627,7 +17391,7 @@ impl ProtocolEnum for ItemStackRequestActionType {
             "CraftRecipeOptional" => return Some(Self::CraftRecipeOptional),
             "CraftRepairAndDisenchant" => return Some(Self::CraftRepairAndDisenchant),
             "CraftLoom" => return Some(Self::CraftLoom),
-            "CraftDiscPress" => return Some(Self::CraftDiscPress),
+            "CraftReservedAction" => return Some(Self::CraftReservedAction),
             "CraftNonImplemented" => return Some(Self::CraftNonImplemented),
             "CraftResults" => return Some(Self::CraftResults),
             _ => {}
@@ -17652,7 +17416,7 @@ impl ProtocolEnum for ItemStackRequestActionType {
                 ItemStackRequestActionType::CraftRepairAndDisenchant,
             ),
             ("CraftLoom", ItemStackRequestActionType::CraftLoom),
-            ("CraftDiscPress", ItemStackRequestActionType::CraftDiscPress),
+            ("CraftReservedAction", ItemStackRequestActionType::CraftReservedAction),
             ("CraftNonImplemented", ItemStackRequestActionType::CraftNonImplemented),
             ("CraftResults", ItemStackRequestActionType::CraftResults),
         ];
@@ -21010,19 +20774,9 @@ pub enum LevelSoundEvent {
     Dismount,
     /// straw_bed.break_leave = 613
     StrawBedBreakLeave,
-    /// convert_to_frostbite = 614
-    ConvertToFrostbite,
-    /// convert_to_zombie = 615
-    ConvertToZombie,
-    /// crack = 616
-    Crack,
-    /// ice_ball.throw = 617
-    IceBallThrow,
-    /// record.flurry = 618
-    RecordFlurry,
-    /// imitate.frostbite = 619
-    ImitateFrostbite,
-    /// undefined = 620
+    /// ice_ball.break = 614
+    IceBallBreak,
+    /// undefined = 615
     Undefined,
 }
 impl LevelSoundEvent {
@@ -21597,12 +21351,7 @@ impl LevelSoundEvent {
         Self::Mount,
         Self::Dismount,
         Self::StrawBedBreakLeave,
-        Self::ConvertToFrostbite,
-        Self::ConvertToZombie,
-        Self::Crack,
-        Self::IceBallThrow,
-        Self::RecordFlurry,
-        Self::ImitateFrostbite,
+        Self::IceBallBreak,
         Self::Undefined,
     ];
     /// Numeric value of the variant.
@@ -22177,13 +21926,8 @@ impl LevelSoundEvent {
             Self::Mount => 611,
             Self::Dismount => 612,
             Self::StrawBedBreakLeave => 613,
-            Self::ConvertToFrostbite => 614,
-            Self::ConvertToZombie => 615,
-            Self::Crack => 616,
-            Self::IceBallThrow => 617,
-            Self::RecordFlurry => 618,
-            Self::ImitateFrostbite => 619,
-            Self::Undefined => 620,
+            Self::IceBallBreak => 614,
+            Self::Undefined => 615,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -22758,13 +22502,8 @@ impl LevelSoundEvent {
             611 => Some(Self::Mount),
             612 => Some(Self::Dismount),
             613 => Some(Self::StrawBedBreakLeave),
-            614 => Some(Self::ConvertToFrostbite),
-            615 => Some(Self::ConvertToZombie),
-            616 => Some(Self::Crack),
-            617 => Some(Self::IceBallThrow),
-            618 => Some(Self::RecordFlurry),
-            619 => Some(Self::ImitateFrostbite),
-            620 => Some(Self::Undefined),
+            614 => Some(Self::IceBallBreak),
+            615 => Some(Self::Undefined),
             _ => None,
         }
     }
@@ -23361,12 +23100,7 @@ impl ProtocolEnum for LevelSoundEvent {
             Self::Mount => "mount",
             Self::Dismount => "dismount",
             Self::StrawBedBreakLeave => "straw_bed.break_leave",
-            Self::ConvertToFrostbite => "convert_to_frostbite",
-            Self::ConvertToZombie => "convert_to_zombie",
-            Self::Crack => "crack",
-            Self::IceBallThrow => "ice_ball.throw",
-            Self::RecordFlurry => "record.flurry",
-            Self::ImitateFrostbite => "imitate.frostbite",
+            Self::IceBallBreak => "ice_ball.break",
             Self::Undefined => "undefined",
         }
     }
@@ -23951,12 +23685,7 @@ impl ProtocolEnum for LevelSoundEvent {
             Self::Mount => "mount",
             Self::Dismount => "dismount",
             Self::StrawBedBreakLeave => "straw_bed.break_leave",
-            Self::ConvertToFrostbite => "convert_to_frostbite",
-            Self::ConvertToZombie => "convert_to_zombie",
-            Self::Crack => "crack",
-            Self::IceBallThrow => "ice_ball.throw",
-            Self::RecordFlurry => "record.flurry",
-            Self::ImitateFrostbite => "imitate.frostbite",
+            Self::IceBallBreak => "ice_ball.break",
             Self::Undefined => "undefined",
         }
     }
@@ -24599,12 +24328,7 @@ impl ProtocolEnum for LevelSoundEvent {
             "mount" => return Some(Self::Mount),
             "dismount" => return Some(Self::Dismount),
             "straw_bed.break_leave" => return Some(Self::StrawBedBreakLeave),
-            "convert_to_frostbite" => return Some(Self::ConvertToFrostbite),
-            "convert_to_zombie" => return Some(Self::ConvertToZombie),
-            "crack" => return Some(Self::Crack),
-            "ice_ball.throw" => return Some(Self::IceBallThrow),
-            "record.flurry" => return Some(Self::RecordFlurry),
-            "imitate.frostbite" => return Some(Self::ImitateFrostbite),
+            "ice_ball.break" => return Some(Self::IceBallBreak),
             "undefined" => return Some(Self::Undefined),
             _ => {}
         }
@@ -25262,12 +24986,7 @@ impl ProtocolEnum for LevelSoundEvent {
             ("mount", LevelSoundEvent::Mount),
             ("dismount", LevelSoundEvent::Dismount),
             ("straw_bed.break_leave", LevelSoundEvent::StrawBedBreakLeave),
-            ("convert_to_frostbite", LevelSoundEvent::ConvertToFrostbite),
-            ("convert_to_zombie", LevelSoundEvent::ConvertToZombie),
-            ("crack", LevelSoundEvent::Crack),
-            ("ice_ball.throw", LevelSoundEvent::IceBallThrow),
-            ("record.flurry", LevelSoundEvent::RecordFlurry),
-            ("imitate.frostbite", LevelSoundEvent::ImitateFrostbite),
+            ("ice_ball.break", LevelSoundEvent::IceBallBreak),
             ("undefined", LevelSoundEvent::Undefined),
         ];
         NAMES
@@ -28954,6 +28673,10 @@ pub enum MinecraftPacketIds {
     ClientBoundDebugRendererPacket,
     /// SyncActorProperty = 165
     SyncActorProperty,
+    /// AddVolumeEntityPacket = 166
+    AddVolumeEntityPacket,
+    /// RemoveVolumeEntityPacket = 167
+    RemoveVolumeEntityPacket,
     /// SimulationTypePacket = 168
     SimulationTypePacket,
     /// NpcDialoguePacket = 169
@@ -29086,20 +28809,6 @@ pub enum MinecraftPacketIds {
     ClientboundPlayAudioContent,
     /// ServerboundRegisterAudioContent = 360
     ServerboundRegisterAudioContent,
-    /// Chat = 361
-    Chat,
-    /// ClientboundOnlineMusicPlaybackResponse = 363
-    ClientboundOnlineMusicPlaybackResponse,
-    /// ServerboundRequestOnlineMusicPlayback = 362
-    ServerboundRequestOnlineMusicPlayback,
-    /// PlayerToggleArmorVisibilityRequestPacket = 364
-    PlayerToggleArmorVisibilityRequestPacket,
-    /// ClientboundMusicPlaybackFailure = 365
-    ClientboundMusicPlaybackFailure,
-    /// VirtualContainerOpen = 366
-    VirtualContainerOpen,
-    /// VirtualContainerClose = 367
-    VirtualContainerClose,
 }
 impl MinecraftPacketIds {
     /// Every variant, in declaration order.
@@ -29256,6 +28965,8 @@ impl MinecraftPacketIds {
         Self::ItemRegistryPacket,
         Self::ClientBoundDebugRendererPacket,
         Self::SyncActorProperty,
+        Self::AddVolumeEntityPacket,
+        Self::RemoveVolumeEntityPacket,
         Self::SimulationTypePacket,
         Self::NpcDialoguePacket,
         Self::EduUriResourcePacket,
@@ -29322,13 +29033,6 @@ impl MinecraftPacketIds {
         Self::ServerboundMatchmakingCancel,
         Self::ClientboundPlayAudioContent,
         Self::ServerboundRegisterAudioContent,
-        Self::Chat,
-        Self::ClientboundOnlineMusicPlaybackResponse,
-        Self::ServerboundRequestOnlineMusicPlayback,
-        Self::PlayerToggleArmorVisibilityRequestPacket,
-        Self::ClientboundMusicPlaybackFailure,
-        Self::VirtualContainerOpen,
-        Self::VirtualContainerClose,
     ];
     /// Numeric value of the variant.
     pub const fn value(self) -> i32 {
@@ -29485,6 +29189,8 @@ impl MinecraftPacketIds {
             Self::ItemRegistryPacket => 162,
             Self::ClientBoundDebugRendererPacket => 164,
             Self::SyncActorProperty => 165,
+            Self::AddVolumeEntityPacket => 166,
+            Self::RemoveVolumeEntityPacket => 167,
             Self::SimulationTypePacket => 168,
             Self::NpcDialoguePacket => 169,
             Self::EduUriResourcePacket => 170,
@@ -29551,13 +29257,6 @@ impl MinecraftPacketIds {
             Self::ServerboundMatchmakingCancel => 356,
             Self::ClientboundPlayAudioContent => 359,
             Self::ServerboundRegisterAudioContent => 360,
-            Self::Chat => 361,
-            Self::ClientboundOnlineMusicPlaybackResponse => 363,
-            Self::ServerboundRequestOnlineMusicPlayback => 362,
-            Self::PlayerToggleArmorVisibilityRequestPacket => 364,
-            Self::ClientboundMusicPlaybackFailure => 365,
-            Self::VirtualContainerOpen => 366,
-            Self::VirtualContainerClose => 367,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -29715,6 +29414,8 @@ impl MinecraftPacketIds {
             162 => Some(Self::ItemRegistryPacket),
             164 => Some(Self::ClientBoundDebugRendererPacket),
             165 => Some(Self::SyncActorProperty),
+            166 => Some(Self::AddVolumeEntityPacket),
+            167 => Some(Self::RemoveVolumeEntityPacket),
             168 => Some(Self::SimulationTypePacket),
             169 => Some(Self::NpcDialoguePacket),
             170 => Some(Self::EduUriResourcePacket),
@@ -29781,13 +29482,6 @@ impl MinecraftPacketIds {
             356 => Some(Self::ServerboundMatchmakingCancel),
             359 => Some(Self::ClientboundPlayAudioContent),
             360 => Some(Self::ServerboundRegisterAudioContent),
-            361 => Some(Self::Chat),
-            363 => Some(Self::ClientboundOnlineMusicPlaybackResponse),
-            362 => Some(Self::ServerboundRequestOnlineMusicPlayback),
-            364 => Some(Self::PlayerToggleArmorVisibilityRequestPacket),
-            365 => Some(Self::ClientboundMusicPlaybackFailure),
-            366 => Some(Self::VirtualContainerOpen),
-            367 => Some(Self::VirtualContainerClose),
             _ => None,
         }
     }
@@ -29965,6 +29659,8 @@ impl ProtocolEnum for MinecraftPacketIds {
             Self::ItemRegistryPacket => "ItemRegistryPacket",
             Self::ClientBoundDebugRendererPacket => "ClientBoundDebugRendererPacket",
             Self::SyncActorProperty => "SyncActorProperty",
+            Self::AddVolumeEntityPacket => "AddVolumeEntityPacket",
+            Self::RemoveVolumeEntityPacket => "RemoveVolumeEntityPacket",
             Self::SimulationTypePacket => "SimulationTypePacket",
             Self::NpcDialoguePacket => "NpcDialoguePacket",
             Self::EduUriResourcePacket => "EduUriResourcePacket",
@@ -30037,19 +29733,6 @@ impl ProtocolEnum for MinecraftPacketIds {
             Self::ServerboundMatchmakingCancel => "ServerboundMatchmakingCancel",
             Self::ClientboundPlayAudioContent => "ClientboundPlayAudioContent",
             Self::ServerboundRegisterAudioContent => "ServerboundRegisterAudioContent",
-            Self::Chat => "Chat",
-            Self::ClientboundOnlineMusicPlaybackResponse => {
-                "ClientboundOnlineMusicPlaybackResponse"
-            }
-            Self::ServerboundRequestOnlineMusicPlayback => {
-                "ServerboundRequestOnlineMusicPlayback"
-            }
-            Self::PlayerToggleArmorVisibilityRequestPacket => {
-                "PlayerToggleArmorVisibilityRequestPacket"
-            }
-            Self::ClientboundMusicPlaybackFailure => "ClientboundMusicPlaybackFailure",
-            Self::VirtualContainerOpen => "VirtualContainerOpen",
-            Self::VirtualContainerClose => "VirtualContainerClose",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -30214,6 +29897,8 @@ impl ProtocolEnum for MinecraftPacketIds {
             Self::ItemRegistryPacket => "itemregistrypacket",
             Self::ClientBoundDebugRendererPacket => "clientbounddebugrendererpacket",
             Self::SyncActorProperty => "syncactorproperty",
+            Self::AddVolumeEntityPacket => "addvolumeentitypacket",
+            Self::RemoveVolumeEntityPacket => "removevolumeentitypacket",
             Self::SimulationTypePacket => "simulationtypepacket",
             Self::NpcDialoguePacket => "npcdialoguepacket",
             Self::EduUriResourcePacket => "eduuriresourcepacket",
@@ -30286,19 +29971,6 @@ impl ProtocolEnum for MinecraftPacketIds {
             Self::ServerboundMatchmakingCancel => "serverboundmatchmakingcancel",
             Self::ClientboundPlayAudioContent => "clientboundplayaudiocontent",
             Self::ServerboundRegisterAudioContent => "serverboundregisteraudiocontent",
-            Self::Chat => "chat",
-            Self::ClientboundOnlineMusicPlaybackResponse => {
-                "clientboundonlinemusicplaybackresponse"
-            }
-            Self::ServerboundRequestOnlineMusicPlayback => {
-                "serverboundrequestonlinemusicplayback"
-            }
-            Self::PlayerToggleArmorVisibilityRequestPacket => {
-                "playertogglearmorvisibilityrequestpacket"
-            }
-            Self::ClientboundMusicPlaybackFailure => "clientboundmusicplaybackfailure",
-            Self::VirtualContainerOpen => "virtualcontaineropen",
-            Self::VirtualContainerClose => "virtualcontainerclose",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -30475,6 +30147,8 @@ impl ProtocolEnum for MinecraftPacketIds {
                 return Some(Self::ClientBoundDebugRendererPacket);
             }
             "SyncActorProperty" => return Some(Self::SyncActorProperty),
+            "AddVolumeEntityPacket" => return Some(Self::AddVolumeEntityPacket),
+            "RemoveVolumeEntityPacket" => return Some(Self::RemoveVolumeEntityPacket),
             "SimulationTypePacket" => return Some(Self::SimulationTypePacket),
             "NpcDialoguePacket" => return Some(Self::NpcDialoguePacket),
             "EduUriResourcePacket" => return Some(Self::EduUriResourcePacket),
@@ -30569,21 +30243,6 @@ impl ProtocolEnum for MinecraftPacketIds {
             "ServerboundRegisterAudioContent" => {
                 return Some(Self::ServerboundRegisterAudioContent);
             }
-            "Chat" => return Some(Self::Chat),
-            "ClientboundOnlineMusicPlaybackResponse" => {
-                return Some(Self::ClientboundOnlineMusicPlaybackResponse);
-            }
-            "ServerboundRequestOnlineMusicPlayback" => {
-                return Some(Self::ServerboundRequestOnlineMusicPlayback);
-            }
-            "PlayerToggleArmorVisibilityRequestPacket" => {
-                return Some(Self::PlayerToggleArmorVisibilityRequestPacket);
-            }
-            "ClientboundMusicPlaybackFailure" => {
-                return Some(Self::ClientboundMusicPlaybackFailure);
-            }
-            "VirtualContainerOpen" => return Some(Self::VirtualContainerOpen),
-            "VirtualContainerClose" => return Some(Self::VirtualContainerClose),
             _ => {}
         }
         const NAMES: &[(&str, MinecraftPacketIds)] = &[
@@ -30772,6 +30431,8 @@ impl ProtocolEnum for MinecraftPacketIds {
                 MinecraftPacketIds::ClientBoundDebugRendererPacket,
             ),
             ("SyncActorProperty", MinecraftPacketIds::SyncActorProperty),
+            ("AddVolumeEntityPacket", MinecraftPacketIds::AddVolumeEntityPacket),
+            ("RemoveVolumeEntityPacket", MinecraftPacketIds::RemoveVolumeEntityPacket),
             ("SimulationTypePacket", MinecraftPacketIds::SimulationTypePacket),
             ("NpcDialoguePacket", MinecraftPacketIds::NpcDialoguePacket),
             ("EduUriResourcePacket", MinecraftPacketIds::EduUriResourcePacket),
@@ -30883,25 +30544,6 @@ impl ProtocolEnum for MinecraftPacketIds {
                 "ServerboundRegisterAudioContent",
                 MinecraftPacketIds::ServerboundRegisterAudioContent,
             ),
-            ("Chat", MinecraftPacketIds::Chat),
-            (
-                "ClientboundOnlineMusicPlaybackResponse",
-                MinecraftPacketIds::ClientboundOnlineMusicPlaybackResponse,
-            ),
-            (
-                "ServerboundRequestOnlineMusicPlayback",
-                MinecraftPacketIds::ServerboundRequestOnlineMusicPlayback,
-            ),
-            (
-                "PlayerToggleArmorVisibilityRequestPacket",
-                MinecraftPacketIds::PlayerToggleArmorVisibilityRequestPacket,
-            ),
-            (
-                "ClientboundMusicPlaybackFailure",
-                MinecraftPacketIds::ClientboundMusicPlaybackFailure,
-            ),
-            ("VirtualContainerOpen", MinecraftPacketIds::VirtualContainerOpen),
-            ("VirtualContainerClose", MinecraftPacketIds::VirtualContainerClose),
         ];
         NAMES
             .iter()
@@ -31755,109 +31397,6 @@ impl TryFrom<i32> for MultiplayerSettingsPacketType {
         Self::from_value(value)
             .ok_or(ProtocolError::InvalidEnumValue {
                 enum_name: "MultiplayerSettingsPacketType",
-                value: value as i64,
-            })
-    }
-}
-/// Protocol enum MusicPlaybackState.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum MusicPlaybackState {
-    /// Local = 0
-    #[default]
-    Local,
-    /// Online = 1
-    Online,
-    /// NotFound = 2
-    NotFound,
-    /// Pending = 3
-    Pending,
-}
-impl MusicPlaybackState {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[
-        Self::Local,
-        Self::Online,
-        Self::NotFound,
-        Self::Pending,
-    ];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Local => 0,
-            Self::Online => 1,
-            Self::NotFound => 2,
-            Self::Pending => 3,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Local),
-            1 => Some(Self::Online),
-            2 => Some(Self::NotFound),
-            3 => Some(Self::Pending),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for MusicPlaybackState {
-    const NAME: &'static str = "MusicPlaybackState";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Local => "Local",
-            Self::Online => "Online",
-            Self::NotFound => "NotFound",
-            Self::Pending => "Pending",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Local => "local",
-            Self::Online => "online",
-            Self::NotFound => "notfound",
-            Self::Pending => "pending",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Local" => return Some(Self::Local),
-            "Online" => return Some(Self::Online),
-            "NotFound" => return Some(Self::NotFound),
-            "Pending" => return Some(Self::Pending),
-            _ => {}
-        }
-        const NAMES: &[(&str, MusicPlaybackState)] = &[
-            ("Local", MusicPlaybackState::Local),
-            ("Online", MusicPlaybackState::Online),
-            ("NotFound", MusicPlaybackState::NotFound),
-            ("Pending", MusicPlaybackState::Pending),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<MusicPlaybackState> for u8 {
-    fn from(value: MusicPlaybackState) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for MusicPlaybackState {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "MusicPlaybackState",
                 value: value as i64,
             })
     }
@@ -34111,10 +33650,10 @@ pub enum PlayerActionType {
     ///
     /// StartUsingItem = 37
     StartUsingItem,
-    /// Trigger an inventory swap of main hand item and off-hand item.
+    /// Internal update.
     ///
-    /// SwapOffhand = 38
-    SwapOffhand,
+    /// InternalUpdate = 38
+    InternalUpdate,
     /// Unused
     ///
     /// Count = 39
@@ -34156,7 +33695,7 @@ impl PlayerActionType {
         Self::StartFlying,
         Self::StopFlying,
         Self::StartUsingItem,
-        Self::SwapOffhand,
+        Self::InternalUpdate,
         Self::Count,
     ];
     /// Numeric value of the variant.
@@ -34195,7 +33734,7 @@ impl PlayerActionType {
             Self::StartFlying => 34,
             Self::StopFlying => 35,
             Self::StartUsingItem => 37,
-            Self::SwapOffhand => 38,
+            Self::InternalUpdate => 38,
             Self::Count => 39,
         }
     }
@@ -34235,7 +33774,7 @@ impl PlayerActionType {
             34 => Some(Self::StartFlying),
             35 => Some(Self::StopFlying),
             37 => Some(Self::StartUsingItem),
-            38 => Some(Self::SwapOffhand),
+            38 => Some(Self::InternalUpdate),
             39 => Some(Self::Count),
             _ => None,
         }
@@ -34287,7 +33826,7 @@ impl ProtocolEnum for PlayerActionType {
             Self::StartFlying => "StartFlying",
             Self::StopFlying => "StopFlying",
             Self::StartUsingItem => "StartUsingItem",
-            Self::SwapOffhand => "SwapOffhand",
+            Self::InternalUpdate => "InternalUpdate",
             Self::Count => "Count",
         }
     }
@@ -34326,7 +33865,7 @@ impl ProtocolEnum for PlayerActionType {
             Self::StartFlying => "startflying",
             Self::StopFlying => "stopflying",
             Self::StartUsingItem => "startusingitem",
-            Self::SwapOffhand => "swapoffhand",
+            Self::InternalUpdate => "internalupdate",
             Self::Count => "count",
         }
     }
@@ -34365,7 +33904,7 @@ impl ProtocolEnum for PlayerActionType {
             "StartFlying" => return Some(Self::StartFlying),
             "StopFlying" => return Some(Self::StopFlying),
             "StartUsingItem" => return Some(Self::StartUsingItem),
-            "SwapOffhand" => return Some(Self::SwapOffhand),
+            "InternalUpdate" => return Some(Self::InternalUpdate),
             "Count" => return Some(Self::Count),
             _ => {}
         }
@@ -34403,7 +33942,7 @@ impl ProtocolEnum for PlayerActionType {
             ("StartFlying", PlayerActionType::StartFlying),
             ("StopFlying", PlayerActionType::StopFlying),
             ("StartUsingItem", PlayerActionType::StartUsingItem),
-            ("SwapOffhand", PlayerActionType::SwapOffhand),
+            ("InternalUpdate", PlayerActionType::InternalUpdate),
             ("Count", PlayerActionType::Count),
         ];
         NAMES
@@ -34555,8 +34094,8 @@ pub enum PlayerAuthInputData {
     SneakPressedRaw,
     /// SneakCurrentRaw = 64
     SneakCurrentRaw,
-    /// SwapOffhand = 65
-    SwapOffhand,
+    /// InternalUpdate = 65
+    InternalUpdate,
 }
 impl PlayerAuthInputData {
     /// Every variant, in declaration order.
@@ -34623,7 +34162,7 @@ impl PlayerAuthInputData {
         Self::SneakReleasedRaw,
         Self::SneakPressedRaw,
         Self::SneakCurrentRaw,
-        Self::SwapOffhand,
+        Self::InternalUpdate,
     ];
     /// Numeric value of the variant.
     pub const fn value(self) -> i32 {
@@ -34690,7 +34229,7 @@ impl PlayerAuthInputData {
             Self::SneakReleasedRaw => 62,
             Self::SneakPressedRaw => 63,
             Self::SneakCurrentRaw => 64,
-            Self::SwapOffhand => 65,
+            Self::InternalUpdate => 65,
         }
     }
     /// Variant holding this numeric value, if any.
@@ -34758,7 +34297,7 @@ impl PlayerAuthInputData {
             62 => Some(Self::SneakReleasedRaw),
             63 => Some(Self::SneakPressedRaw),
             64 => Some(Self::SneakCurrentRaw),
-            65 => Some(Self::SwapOffhand),
+            65 => Some(Self::InternalUpdate),
             _ => None,
         }
     }
@@ -34838,7 +34377,7 @@ impl ProtocolEnum for PlayerAuthInputData {
             Self::SneakReleasedRaw => "SneakReleasedRaw",
             Self::SneakPressedRaw => "SneakPressedRaw",
             Self::SneakCurrentRaw => "SneakCurrentRaw",
-            Self::SwapOffhand => "SwapOffhand",
+            Self::InternalUpdate => "InternalUpdate",
         }
     }
     fn wire_name(self) -> &'static str {
@@ -34905,7 +34444,7 @@ impl ProtocolEnum for PlayerAuthInputData {
             Self::SneakReleasedRaw => "sneakreleasedraw",
             Self::SneakPressedRaw => "sneakpressedraw",
             Self::SneakCurrentRaw => "sneakcurrentraw",
-            Self::SwapOffhand => "swapoffhand",
+            Self::InternalUpdate => "internalupdate",
         }
     }
     fn from_name(name: &str) -> Option<Self> {
@@ -34972,7 +34511,7 @@ impl ProtocolEnum for PlayerAuthInputData {
             "SneakReleasedRaw" => return Some(Self::SneakReleasedRaw),
             "SneakPressedRaw" => return Some(Self::SneakPressedRaw),
             "SneakCurrentRaw" => return Some(Self::SneakCurrentRaw),
-            "SwapOffhand" => return Some(Self::SwapOffhand),
+            "InternalUpdate" => return Some(Self::InternalUpdate),
             _ => {}
         }
         const NAMES: &[(&str, PlayerAuthInputData)] = &[
@@ -35044,7 +34583,7 @@ impl ProtocolEnum for PlayerAuthInputData {
             ("SneakReleasedRaw", PlayerAuthInputData::SneakReleasedRaw),
             ("SneakPressedRaw", PlayerAuthInputData::SneakPressedRaw),
             ("SneakCurrentRaw", PlayerAuthInputData::SneakCurrentRaw),
-            ("SwapOffhand", PlayerAuthInputData::SwapOffhand),
+            ("InternalUpdate", PlayerAuthInputData::InternalUpdate),
         ];
         NAMES
             .iter()
@@ -36822,96 +36361,6 @@ impl TryFrom<u8> for ScriptModuleMinecraftScriptPrimitiveShapeType {
         Self::from_value(value)
             .ok_or(ProtocolError::InvalidEnumValue {
                 enum_name: "ScriptModuleMinecraft::ScriptPrimitiveShapeType",
-                value: value as i64,
-            })
-    }
-}
-/// Protocol enum SctpRecoveryProfile.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum SctpRecoveryProfile {
-    /// Default = 0
-    #[default]
-    Default,
-    /// Balanced = 2
-    Balanced,
-    /// Fast = 1
-    Fast,
-}
-impl SctpRecoveryProfile {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::Default, Self::Balanced, Self::Fast];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Default => 0,
-            Self::Balanced => 2,
-            Self::Fast => 1,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Default),
-            2 => Some(Self::Balanced),
-            1 => Some(Self::Fast),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for SctpRecoveryProfile {
-    const NAME: &'static str = "SctpRecoveryProfile";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Default => "Default",
-            Self::Balanced => "Balanced",
-            Self::Fast => "Fast",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Default => "default",
-            Self::Balanced => "balanced",
-            Self::Fast => "fast",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Default" => return Some(Self::Default),
-            "Balanced" => return Some(Self::Balanced),
-            "Fast" => return Some(Self::Fast),
-            _ => {}
-        }
-        const NAMES: &[(&str, SctpRecoveryProfile)] = &[
-            ("Default", SctpRecoveryProfile::Default),
-            ("Balanced", SctpRecoveryProfile::Balanced),
-            ("Fast", SctpRecoveryProfile::Fast),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<SctpRecoveryProfile> for u8 {
-    fn from(value: SctpRecoveryProfile) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for SctpRecoveryProfile {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "SctpRecoveryProfile",
                 value: value as i64,
             })
     }
@@ -39100,79 +38549,6 @@ impl TryFrom<i32> for SpawnPositionType {
             })
     }
 }
-/// Protocol enum StringAttributeOperation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum StringAttributeOperation {
-    /// OVERRIDE = 0
-    #[default]
-    Override,
-}
-impl StringAttributeOperation {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::Override];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> i32 {
-        match self {
-            Self::Override => 0,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: i32) -> Option<Self> {
-        match value {
-            0 => Some(Self::Override),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for StringAttributeOperation {
-    const NAME: &'static str = "StringAttributeOperation";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <i32>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Override => "OVERRIDE",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Override => "override",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        if name == "OVERRIDE" {
-            return Some(Self::Override);
-        }
-        const NAMES: &[(&str, StringAttributeOperation)] = &[
-            ("OVERRIDE", StringAttributeOperation::Override),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<StringAttributeOperation> for i32 {
-    fn from(value: StringAttributeOperation) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<i32> for StringAttributeOperation {
-    type Error = ProtocolError;
-    fn try_from(value: i32) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "StringAttributeOperation",
-                value: value as i64,
-            })
-    }
-}
 /// Protocol enum StructureBlockType.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum StructureBlockType {
@@ -41132,477 +40508,6 @@ impl TryFrom<u8> for VillageType {
         Self::from_value(value)
             .ok_or(ProtocolError::InvalidEnumValue {
                 enum_name: "VillageType",
-                value: value as i64,
-            })
-    }
-}
-/// Protocol enum VirtualContainerCloseCause.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum VirtualContainerCloseCause {
-    /// Unknown = 0
-    #[default]
-    Unknown,
-    /// UserClosed = 1
-    UserClosed,
-    /// ServerRequested = 2
-    ServerRequested,
-    /// UserBusy = 3
-    UserBusy,
-    /// ClientNotReady = 4
-    ClientNotReady,
-    /// InvalidContents = 5
-    InvalidContents,
-    /// UiCreationFailed = 6
-    UiCreationFailed,
-    /// UiCancelled = 7
-    UiCancelled,
-}
-impl VirtualContainerCloseCause {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[
-        Self::Unknown,
-        Self::UserClosed,
-        Self::ServerRequested,
-        Self::UserBusy,
-        Self::ClientNotReady,
-        Self::InvalidContents,
-        Self::UiCreationFailed,
-        Self::UiCancelled,
-    ];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Unknown => 0,
-            Self::UserClosed => 1,
-            Self::ServerRequested => 2,
-            Self::UserBusy => 3,
-            Self::ClientNotReady => 4,
-            Self::InvalidContents => 5,
-            Self::UiCreationFailed => 6,
-            Self::UiCancelled => 7,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Unknown),
-            1 => Some(Self::UserClosed),
-            2 => Some(Self::ServerRequested),
-            3 => Some(Self::UserBusy),
-            4 => Some(Self::ClientNotReady),
-            5 => Some(Self::InvalidContents),
-            6 => Some(Self::UiCreationFailed),
-            7 => Some(Self::UiCancelled),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for VirtualContainerCloseCause {
-    const NAME: &'static str = "VirtualContainerCloseCause";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Unknown => "Unknown",
-            Self::UserClosed => "UserClosed",
-            Self::ServerRequested => "ServerRequested",
-            Self::UserBusy => "UserBusy",
-            Self::ClientNotReady => "ClientNotReady",
-            Self::InvalidContents => "InvalidContents",
-            Self::UiCreationFailed => "UiCreationFailed",
-            Self::UiCancelled => "UiCancelled",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Unknown => "unknown",
-            Self::UserClosed => "userclosed",
-            Self::ServerRequested => "serverrequested",
-            Self::UserBusy => "userbusy",
-            Self::ClientNotReady => "clientnotready",
-            Self::InvalidContents => "invalidcontents",
-            Self::UiCreationFailed => "uicreationfailed",
-            Self::UiCancelled => "uicancelled",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Unknown" => return Some(Self::Unknown),
-            "UserClosed" => return Some(Self::UserClosed),
-            "ServerRequested" => return Some(Self::ServerRequested),
-            "UserBusy" => return Some(Self::UserBusy),
-            "ClientNotReady" => return Some(Self::ClientNotReady),
-            "InvalidContents" => return Some(Self::InvalidContents),
-            "UiCreationFailed" => return Some(Self::UiCreationFailed),
-            "UiCancelled" => return Some(Self::UiCancelled),
-            _ => {}
-        }
-        const NAMES: &[(&str, VirtualContainerCloseCause)] = &[
-            ("Unknown", VirtualContainerCloseCause::Unknown),
-            ("UserClosed", VirtualContainerCloseCause::UserClosed),
-            ("ServerRequested", VirtualContainerCloseCause::ServerRequested),
-            ("UserBusy", VirtualContainerCloseCause::UserBusy),
-            ("ClientNotReady", VirtualContainerCloseCause::ClientNotReady),
-            ("InvalidContents", VirtualContainerCloseCause::InvalidContents),
-            ("UiCreationFailed", VirtualContainerCloseCause::UiCreationFailed),
-            ("UiCancelled", VirtualContainerCloseCause::UiCancelled),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<VirtualContainerCloseCause> for u8 {
-    fn from(value: VirtualContainerCloseCause) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for VirtualContainerCloseCause {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "VirtualContainerCloseCause",
-                value: value as i64,
-            })
-    }
-}
-/// Protocol enum VirtualContainerCloseKind.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum VirtualContainerCloseKind {
-    /// Request = 0
-    #[default]
-    Request,
-    /// Closed = 1
-    Closed,
-    /// Confirmed = 2
-    Confirmed,
-}
-impl VirtualContainerCloseKind {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::Request, Self::Closed, Self::Confirmed];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Request => 0,
-            Self::Closed => 1,
-            Self::Confirmed => 2,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Request),
-            1 => Some(Self::Closed),
-            2 => Some(Self::Confirmed),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for VirtualContainerCloseKind {
-    const NAME: &'static str = "VirtualContainerCloseKind";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Request => "Request",
-            Self::Closed => "Closed",
-            Self::Confirmed => "Confirmed",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Request => "request",
-            Self::Closed => "closed",
-            Self::Confirmed => "confirmed",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Request" => return Some(Self::Request),
-            "Closed" => return Some(Self::Closed),
-            "Confirmed" => return Some(Self::Confirmed),
-            _ => {}
-        }
-        const NAMES: &[(&str, VirtualContainerCloseKind)] = &[
-            ("Request", VirtualContainerCloseKind::Request),
-            ("Closed", VirtualContainerCloseKind::Closed),
-            ("Confirmed", VirtualContainerCloseKind::Confirmed),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<VirtualContainerCloseKind> for u8 {
-    fn from(value: VirtualContainerCloseKind) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for VirtualContainerCloseKind {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "VirtualContainerCloseKind",
-                value: value as i64,
-            })
-    }
-}
-/// Why the session is closing or could not be opened. The server reports UserBusy and ClientNotReady to scripts as the player being busy. Request carries ServerRequested and Confirmed carries Unknown.
-///
-/// Protocol enum VirtualContainerClosePacketPayload Cause.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum VirtualContainerClosePacketPayloadCause {
-    /// Unknown = 0
-    #[default]
-    Unknown,
-    /// UserClosed = 1
-    UserClosed,
-    /// ServerRequested = 2
-    ServerRequested,
-    /// UserBusy = 3
-    UserBusy,
-    /// ClientNotReady = 4
-    ClientNotReady,
-    /// InvalidContents = 5
-    InvalidContents,
-    /// UiCreationFailed = 6
-    UiCreationFailed,
-    /// UiCancelled = 7
-    UiCancelled,
-}
-impl VirtualContainerClosePacketPayloadCause {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[
-        Self::Unknown,
-        Self::UserClosed,
-        Self::ServerRequested,
-        Self::UserBusy,
-        Self::ClientNotReady,
-        Self::InvalidContents,
-        Self::UiCreationFailed,
-        Self::UiCancelled,
-    ];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Unknown => 0,
-            Self::UserClosed => 1,
-            Self::ServerRequested => 2,
-            Self::UserBusy => 3,
-            Self::ClientNotReady => 4,
-            Self::InvalidContents => 5,
-            Self::UiCreationFailed => 6,
-            Self::UiCancelled => 7,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Unknown),
-            1 => Some(Self::UserClosed),
-            2 => Some(Self::ServerRequested),
-            3 => Some(Self::UserBusy),
-            4 => Some(Self::ClientNotReady),
-            5 => Some(Self::InvalidContents),
-            6 => Some(Self::UiCreationFailed),
-            7 => Some(Self::UiCancelled),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for VirtualContainerClosePacketPayloadCause {
-    const NAME: &'static str = "VirtualContainerClosePacketPayload Cause";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Unknown => "Unknown",
-            Self::UserClosed => "UserClosed",
-            Self::ServerRequested => "ServerRequested",
-            Self::UserBusy => "UserBusy",
-            Self::ClientNotReady => "ClientNotReady",
-            Self::InvalidContents => "InvalidContents",
-            Self::UiCreationFailed => "UiCreationFailed",
-            Self::UiCancelled => "UiCancelled",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Unknown => "unknown",
-            Self::UserClosed => "userclosed",
-            Self::ServerRequested => "serverrequested",
-            Self::UserBusy => "userbusy",
-            Self::ClientNotReady => "clientnotready",
-            Self::InvalidContents => "invalidcontents",
-            Self::UiCreationFailed => "uicreationfailed",
-            Self::UiCancelled => "uicancelled",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Unknown" => return Some(Self::Unknown),
-            "UserClosed" => return Some(Self::UserClosed),
-            "ServerRequested" => return Some(Self::ServerRequested),
-            "UserBusy" => return Some(Self::UserBusy),
-            "ClientNotReady" => return Some(Self::ClientNotReady),
-            "InvalidContents" => return Some(Self::InvalidContents),
-            "UiCreationFailed" => return Some(Self::UiCreationFailed),
-            "UiCancelled" => return Some(Self::UiCancelled),
-            _ => {}
-        }
-        const NAMES: &[(&str, VirtualContainerClosePacketPayloadCause)] = &[
-            ("Unknown", VirtualContainerClosePacketPayloadCause::Unknown),
-            ("UserClosed", VirtualContainerClosePacketPayloadCause::UserClosed),
-            (
-                "ServerRequested",
-                VirtualContainerClosePacketPayloadCause::ServerRequested,
-            ),
-            ("UserBusy", VirtualContainerClosePacketPayloadCause::UserBusy),
-            ("ClientNotReady", VirtualContainerClosePacketPayloadCause::ClientNotReady),
-            (
-                "InvalidContents",
-                VirtualContainerClosePacketPayloadCause::InvalidContents,
-            ),
-            (
-                "UiCreationFailed",
-                VirtualContainerClosePacketPayloadCause::UiCreationFailed,
-            ),
-            ("UiCancelled", VirtualContainerClosePacketPayloadCause::UiCancelled),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<VirtualContainerClosePacketPayloadCause> for u8 {
-    fn from(value: VirtualContainerClosePacketPayloadCause) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for VirtualContainerClosePacketPayloadCause {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "VirtualContainerClosePacketPayload Cause",
-                value: value as i64,
-            })
-    }
-}
-/// Server close request, client closure outcome, or server confirmation after inventory work drains.
-///
-/// Protocol enum VirtualContainerClosePacketPayload Kind.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum VirtualContainerClosePacketPayloadKind {
-    /// Request = 0
-    #[default]
-    Request,
-    /// Closed = 1
-    Closed,
-    /// Confirmed = 2
-    Confirmed,
-}
-impl VirtualContainerClosePacketPayloadKind {
-    /// Every variant, in declaration order.
-    pub const ALL: &'static [Self] = &[Self::Request, Self::Closed, Self::Confirmed];
-    /// Numeric value of the variant.
-    pub const fn value(self) -> u8 {
-        match self {
-            Self::Request => 0,
-            Self::Closed => 1,
-            Self::Confirmed => 2,
-        }
-    }
-    /// Variant holding this numeric value, if any.
-    pub const fn from_value(value: u8) -> Option<Self> {
-        match value {
-            0 => Some(Self::Request),
-            1 => Some(Self::Closed),
-            2 => Some(Self::Confirmed),
-            _ => None,
-        }
-    }
-}
-impl ProtocolEnum for VirtualContainerClosePacketPayloadKind {
-    const NAME: &'static str = "VirtualContainerClosePacketPayload Kind";
-    fn all() -> &'static [Self] {
-        Self::ALL
-    }
-    fn to_raw(self) -> i64 {
-        self.value() as i64
-    }
-    fn from_raw(raw: i64) -> Option<Self> {
-        <u8>::try_from(raw).ok().and_then(Self::from_value)
-    }
-    fn name(self) -> &'static str {
-        match self {
-            Self::Request => "Request",
-            Self::Closed => "Closed",
-            Self::Confirmed => "Confirmed",
-        }
-    }
-    fn wire_name(self) -> &'static str {
-        match self {
-            Self::Request => "request",
-            Self::Closed => "closed",
-            Self::Confirmed => "confirmed",
-        }
-    }
-    fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "Request" => return Some(Self::Request),
-            "Closed" => return Some(Self::Closed),
-            "Confirmed" => return Some(Self::Confirmed),
-            _ => {}
-        }
-        const NAMES: &[(&str, VirtualContainerClosePacketPayloadKind)] = &[
-            ("Request", VirtualContainerClosePacketPayloadKind::Request),
-            ("Closed", VirtualContainerClosePacketPayloadKind::Closed),
-            ("Confirmed", VirtualContainerClosePacketPayloadKind::Confirmed),
-        ];
-        NAMES
-            .iter()
-            .find(|(candidate, _)| candidate.eq_ignore_ascii_case(name))
-            .map(|(_, value)| *value)
-    }
-}
-impl From<VirtualContainerClosePacketPayloadKind> for u8 {
-    fn from(value: VirtualContainerClosePacketPayloadKind) -> Self {
-        value.value()
-    }
-}
-impl TryFrom<u8> for VirtualContainerClosePacketPayloadKind {
-    type Error = ProtocolError;
-    fn try_from(value: u8) -> Result<Self, ProtocolError> {
-        Self::from_value(value)
-            .ok_or(ProtocolError::InvalidEnumValue {
-                enum_name: "VirtualContainerClosePacketPayload Kind",
                 value: value as i64,
             })
     }
